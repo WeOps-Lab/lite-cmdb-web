@@ -1,0 +1,31 @@
+{
+  "extends": [
+    "next",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "rules": {
+    "@typescript-eslint/consistent-type-definitions": [
+      "error",
+      "interface"
+    ],
+    "@typescript-eslint/no-var-requires": "off",
+    "no-console": "off",
+    "indent": [
+      "error",
+      2,
+      {
+        "SwitchCase": 1,
+        "flatTernaryExpressions": false,
+        "ignoredNodes": [
+          "PropertyDefinition[decorators]",
+          "TSUnionType",
+          "FunctionExpression[params]:has(Identifier[decorators])"
+        ]
+      }
+    ],
+    "react-hooks/exhaustive-deps": "warn",
+    "react/display-name": "warn",
+    "@typescript-eslint/no-non-null-assertion": "off"
+  },
+  "plugins": ["@typescript-eslint", "react-hooks"]
+}

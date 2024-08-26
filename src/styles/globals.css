@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 定义通用颜色变量 */
+:root {
+  --color-primary: #155AEF;
+  --color-secondary: #F2F4F7;
+  --color-text: #495464;
+  --color-text-active: #155AEF;
+  --color-text-hover: #1018280A;
+  --color-bg: #FFFFFF;
+  --color-bg-hover: #f2f4f7;
+  --color-bg-active: #155aef14;
+  --color-border: #eaecf0;
+
+  --color-background-body: var(--color-secondary);
+  --color-menu-text-rgb: 102, 112, 133;
+
+  --color-components-nav-button-text: var(--color-text);
+  --color-components-nav-button-text-active: var(--color-primary);
+  --color-components-nav-button-bg: var(--color-bg);
+  --color-components-nav-button-bg-active: #FCFCFD;
+  --color-components-nav-button-bg-hover: var(--color-text-hover);
+  --color-components-nav-border: var(--color-border);
+
+  --color-components-side-nav-text: var(--color-text);
+  --color-components-side-nav-text-active: var(--color-primary);
+  --color-components-side-nav-text-active-bg: var(--color-bg-active);
+  --color-components-side-nav-hover-bg: var(--color-bg-hover);
+  --color-components-side-nav-bg: var(--color-bg);
+
+  --color-primary-bg: var(--color-bg);
+}
+
+.dark {
+  --color-primary: #155AEF;
+  --color-secondary: #1d1d20;
+  --color-text: #c8ceda99;
+  --color-text-active: #f4f4f5;
+  --color-text-hover: #c8ceda0a;
+  --color-bg: #141414;
+  --color-bg-hover: #c8ceda24;
+  --color-bg-active: #155aef14;
+  --color-border: #333333;
+
+  --color-background-body: var(--color-secondary);
+  --color-menu-text-rgb: 102, 112, 133;
+
+  --color-components-nav-button-text: var(--color-text);
+  --color-components-nav-button-text-active: var(--color-text-active);
+  --color-components-nav-button-bg: var(--color-bg);
+  --color-components-nav-button-bg-active: var(--color-bg-hover);
+  --color-components-nav-button-border: var(--color-border);
+  --color-components-nav-button-bg-hover: var(--color-text-hover);
+  --color-components-nav-border: var(--color-border);
+
+  --color-components-side-nav-text: var(--color-text);
+  --color-components-side-nav-text-active: var(--color-primary);
+  --color-components-side-nav-text-active-bg: var(--color-bg-active);
+  --color-components-side-nav-hover-bg: var(--color-bg-hover);
+  --color-components-side-nav-bg: var(--color-bg);
+
+  --color-primary-bg: var(--color-secondary);
+}
+
+body {
+  color: var(--color-components-nav-button-text);
+  background: var(--color-background-body);
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+.left-section {
+  @apply flex items-center space-x-4;
+}
+
+.right-section {
+  @apply flex items-center space-x-4;
+}
+
+.header-bg {
+  background: var(--color-background-body);
+  border-color: var(--color-components-nav-border);
+}
