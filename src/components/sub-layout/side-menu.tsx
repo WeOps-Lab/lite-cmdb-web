@@ -44,13 +44,13 @@ const SideMenu: React.FC<SideMenuProps> = ({
           ))}
         </ul>
         {showBackButton && (
-        <button
-          className="absolute bottom-4 left-4 flex items-center py-2 rounded-md text-sm"
-          onClick={onBackButtonClick}
-        >
-          <ArrowLeftOutlined className="mr-2" />
-        </button>
-      )}
+          <button
+            className="absolute bottom-4 left-4 flex items-center py-2 rounded-md text-sm"
+            onClick={onBackButtonClick}
+          >
+            <ArrowLeftOutlined className="mr-2" />
+          </button>
+        )}
       </nav>
     </aside>
   );

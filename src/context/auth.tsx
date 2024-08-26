@@ -30,7 +30,12 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [session, status, router]);
 
   if (status === 'loading') {
-    return <div>Loading...</div>;
+    return (
+      <div className='first-loader-wrapper'>
+        <div className='loading-arc'></div>
+        <h1><span>LOADING</span></h1>
+      </div>
+    );
   }
 
   return (

@@ -22,8 +22,9 @@ const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({
       <SideMenu 
         menuItems={menuItems}
         showBackButton={showBackButton}
-        onBackButtonClick={onBackButtonClick}>
-          {intro}
+        onBackButtonClick={onBackButtonClick}
+      >
+        {intro}
       </SideMenu>
       <section className="p-4 flex-1">
         {children}
