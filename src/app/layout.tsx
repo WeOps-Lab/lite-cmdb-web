@@ -1,5 +1,6 @@
 'use client';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import '@/styles/globals.css';
 import { AntdRegistry } from '@ant-design/nextjs-registry';
 import { SessionProvider } from 'next-auth/react';
@@ -17,6 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <Script src="/iconfont.js" strategy="beforeInteractive" />
+      </head>
       <body className={inter.className}>
         <SessionProvider>
           <LocaleProvider>
