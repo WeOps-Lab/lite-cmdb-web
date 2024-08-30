@@ -2,13 +2,15 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import sideMenuStyle from './index.module.less';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import Icon from '@/components/icon';
 
 export interface MenuItem {
   label: string;
   path: string;
+  icon?: string;
 }
 
 interface SideMenuProps {
@@ -25,6 +27,12 @@ const SideMenu: React.FC<SideMenuProps> = ({
   onBackButtonClick 
 }) => {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const buildUrlWithParams = (path: string) => {
+    const params = new URLSearchParams(searchParams);
+    return `${path}?${params.toString()}`;
+  };
 
   return (
     <aside className={`w-[216px] pr-4 flex flex-col h-full ${sideMenuStyle.sideMenu}`}>
@@ -37,8 +45,11 @@ const SideMenu: React.FC<SideMenuProps> = ({
         <ul className="p-3">
           {menuItems.map((item) => (
             <li key={item.path} className={`rounded-md mb-1 ${pathname === item.path ? sideMenuStyle.active : ''}`}>
-              <Link legacyBehavior href={item.path}>
-                <a className={`group flex items-center h-9 rounded-md py-2 text-sm font-normal px-3`}>{item.label}</a>
+              <Link legacyBehavior href={buildUrlWithParams(item.path)}>
+                <a className={`group flex items-center h-9 rounded-md py-2 text-sm font-normal px-3`}>
+                  {item.icon && <Icon type={item.icon} className="text-xl pr-1.5" />}
+                  {item.label}
+                </a>
               </Link>
             </li>
           ))}

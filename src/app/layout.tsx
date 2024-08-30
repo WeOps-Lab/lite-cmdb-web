@@ -27,10 +27,10 @@ export default function RootLayout({
             <ThemeProvider>
               <AuthProvider>
                 <div className="flex flex-col min-h-screen">
-                  <header className="sticky top-0 left-0 right-0 flex justify-between items-center border-b header-bg">
+                  <header className="sticky top-0 left-0 right-0 flex justify-between items-center header-bg">
                     <TopMenu />
                   </header>
-                  <main className="flex-1 p-4 h-full">
+                  <main className="flex-1 p-4 h-full flex">
                     <AntdRegistry>{children}</AntdRegistry>
                   </main>
                 </div>

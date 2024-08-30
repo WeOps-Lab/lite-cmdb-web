@@ -4,8 +4,8 @@ import React from 'react';
 import WithSideMenuLayout from '@/components/sub-layout';
 
 const menuItems = [
-  { label: 'Document', path: '/about/document' },
-  { label: 'System', path: '/about/system' },
+  { label: 'Document', path: '/about/document', icon: 'shiyongwendang' },
+  { label: 'System', path: '/about/system', icon: 'shezhi' },
 ];
 
 const intro = (

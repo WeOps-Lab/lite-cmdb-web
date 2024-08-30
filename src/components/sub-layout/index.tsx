@@ -26,7 +26,7 @@ const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({
       >
         {intro}
       </SideMenu>
-      <section className="p-4 flex-1">
+      <section className="p-4 flex-1 rounded-md">
         {children}
       </section>
     </div>
