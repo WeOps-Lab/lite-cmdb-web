@@ -2,6 +2,7 @@ import React from 'react';
 import { Modal, Tabs } from 'antd';
 import ThemeSwitcher from '../theme-switcher';
 import LanguageSwitcher from '../language-switcher';
+import OperateModal from '../operate-modal'
 
 interface SettingsDrawerProps {
   visible: boolean;
@@ -34,7 +35,7 @@ const SettingsModal: React.FC<SettingsDrawerProps> = ({
   ];
 
   return (
-    <Modal
+    <OperateModal
       title="Settings"
       visible={visible}
       onCancel={onClose}
@@ -42,7 +43,7 @@ const SettingsModal: React.FC<SettingsDrawerProps> = ({
       width={400}
     >
       <Tabs defaultActiveKey="1" items={items} />
-    </Modal>
+    </OperateModal>
   );
 };
 
