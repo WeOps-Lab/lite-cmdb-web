@@ -13,24 +13,14 @@ import OperateModal from "@/components/operate-modal";
 import SelectIcon from "./selectIcon";
 import { getIconUrl } from "@/utils/common";
 import type { FormInstance } from "antd";
+import useApiClient from "@/utils/request";
+import { ModelItem, ModelConfig } from "@/types/assetManage";
+import { deepClone } from "@/utils/common";
 const { Option } = Select;
 
-interface ModelFieldType {
-  model_id?: string;
-  model_name?: string;
-  classification_id?: string;
-}
-
 interface ModelModalProps {
-  onSuccess: (type: string) => void;
+  onSuccess: (info?:unknown) => void;
   groupList: Array<any>;
-}
-
-interface ModelConfig {
-  type: string;
-  groupInfo: any;
-  subTitle: string;
-  title: string;
 }
 
 export interface ModelModalRef {
@@ -43,48 +33,75 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("");
-    const [groupInfo, setGroupInfo] = useState<any>({});
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
+    const [modelInfo, setModelInfo] = useState<any>({});
     const [modelIcon, setModelIcon] = useState<any>("");
     const [iconId, setIconId] = useState<any>("");
     const formRef = useRef<FormInstance>(null);
     const selectIconRef = useRef<any>(null);
+    const { post, put } = useApiClient();
 
     useEffect(() => {
       if (modelVisible) {
         formRef.current?.resetFields();
-        formRef.current?.setFieldsValue(groupInfo);
+        formRef.current?.setFieldsValue(modelInfo);
       }
-    }, [modelVisible, groupInfo]);
+    }, [modelVisible, modelInfo]);
 
     useImperativeHandle(ref, () => ({
-      showModal: ({ type, groupInfo, subTitle, title }) => {
+      showModal: ({ type, modelForm, subTitle, title }) => {
         // 开启弹窗的交互
         setModelVisible(true);
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
-        let icon = getIconUrl({ bk_obj_icon: "", bk_obj_id: "" });
+        let icon = getIconUrl({ model_id: "", icn: "" });
         if (type === "edit") {
-          icon = getIconUrl({
-            bk_obj_icon: groupInfo.objIcon,
-            bk_obj_id: groupInfo.model_id,
-          });
+          icon = getIconUrl(modelForm);
         }
         setModelIcon(icon);
-        setIconId("cc-host");
-        setGroupInfo(groupInfo);
+        setIconId(modelForm.icn || "icon-cc-host");
+        setModelInfo(modelForm);
       },
     }));
 
-    const handleSubmit = () => {
-      formRef.current?.validateFields().then((values) => {
+    const OperateMoel = async (params: ModelItem) => {
+      try {
+        setConfirmLoading(true);
         const msg: string =
           type === "add"
             ? "New successfully added !"
             : "Modified successfully !";
-        message.success(msg);
-        onSuccess(values);
-        handleCancel();
+        const url: string =
+          type === "add" ? "/api/model/" : `/api/model/${modelInfo.model_id}/`;
+        let requestParams = deepClone(params);
+        if (type !== "add") {
+          requestParams = {
+            classification_id: params.classification_id,
+            model_name: params.model_name,
+            icn: params.icn,
+          };
+        }
+        const requestType = type === "add" ? post : put;
+        const { result } = await requestType(url, requestParams);
+        if (result) {
+          message.success(msg);
+          handleCancel();
+          onSuccess(params);
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setConfirmLoading(false);
+      }
+    };
+
+    const handleSubmit = () => {
+      formRef.current?.validateFields().then((values: ModelItem) => {
+        OperateMoel({
+          ...values,
+          icn: iconId,
+        });
       });
     };
 
@@ -94,13 +111,14 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
 
     const onConfirmSelectIcon = (icon: string) => {
       const objId = icon.replace("cc-", "");
+      const _iconId = "icon-" + icon;
       setModelIcon(
         getIconUrl({
-          bk_obj_icon: "icon-" + icon,
-          bk_obj_id: objId,
+          icn: _iconId,
+          model_id: objId,
         })
       );
-      setIconId(icon);
+      setIconId(_iconId);
     };
 
     const onSelectIcon = () => {
@@ -109,12 +127,6 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
         defaultIcon: iconId,
       });
     };
-
-    useEffect(() => {
-      return () => {
-        console.log("Component unmounted");
-      };
-    }, []);
 
     return (
       <div>
@@ -128,7 +140,11 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
               <Button className="mr-[10px]" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button type="primary" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                loading={confirmLoading}
+                onClick={handleSubmit}
+              >
                 Confirm
               </Button>
             </div>
@@ -157,12 +173,12 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
             labelCol={{ span: 4 }}
             wrapperCol={{ span: 20 }}
           >
-            <Form.Item<ModelFieldType>
+            <Form.Item<ModelItem>
               label="Group"
               name="classification_id"
               rules={[{ required: true, message: "Please input your group!" }]}
             >
-              <Select placeholder="Please select a country">
+              <Select disabled={type === 'edit'} placeholder="Please select a country">
                 {groupList.map((item) => {
                   return (
                     <Option
@@ -175,14 +191,14 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
                 })}
               </Select>
             </Form.Item>
-            <Form.Item<ModelFieldType>
+            <Form.Item<ModelItem>
               label="ID"
               name="model_id"
               rules={[{ required: true, message: "Please input your id!" }]}
             >
-              <Input />
+              <Input disabled={type === 'edit'}/>
             </Form.Item>
-            <Form.Item<ModelFieldType>
+            <Form.Item<ModelItem>
               label="Name"
               name="model_name"
               rules={[{ required: true, message: "Please input your name!" }]}

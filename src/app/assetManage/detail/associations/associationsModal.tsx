@@ -224,8 +224,8 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                         <div className="mb-[4px]">
                           <Image
                             src={getIconUrl({
-                              bk_obj_icon: "",
-                              bk_obj_id: "",
+                              icn: "",
+                              model_id: "",
                             })}
                             className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
                             alt="源"
@@ -250,8 +250,8 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                         <div className="mb-[4px]">
                           <Image
                             src={getIconUrl({
-                              bk_obj_icon: "",
-                              bk_obj_id: "",
+                              icn: "",
+                              model_id: "",
                             })}
                             className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
                             alt="目标"

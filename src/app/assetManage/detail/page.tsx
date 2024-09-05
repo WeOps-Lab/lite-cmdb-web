@@ -4,12 +4,12 @@ import { useSearchParams } from "next/navigation";
 
 export default function AssetDetail() {
   const searchParams = useSearchParams();
-  const objIcon = searchParams.get("bk_obj_icon");
-  const modelName = searchParams.get("bk_obj_name");
-  const modelId = searchParams.get("bk_obj_id");
+  const objIcon = searchParams.get("icn");
+  const modelName = searchParams.get("model_name");
+  const modelId = searchParams.get("model_id");
   const classificationId = searchParams.get("classification_id");
   redirect(
-    `/assetManage/detail/attributes?bk_obj_icon=${objIcon}&bk_obj_name=${modelName}&bk_obj_id=${modelId}&classification_id=${classificationId}`
+    `/assetManage/detail/attributes?icn=${objIcon}&model_name=${modelName}&model_id=${modelId}&classification_id=${classificationId}`
   );
   return null;
 }

@@ -1,10 +1,15 @@
 import { BUILD_IN_MODEL } from "../constants/asset";
 import { getSvgIcon } from "./utils";
+interface ModelItem {
+  icn: string | undefined;
+  model_id: string | undefined;
+  [key: string]: unknown;
+}
 
 export const iconList = getSvgIcon();
-export function getIconUrl(tex = { bk_obj_icon: "", bk_obj_id: "" }) {
+export function getIconUrl(tex: ModelItem) {
   try {
-    const icon = tex.bk_obj_icon?.split("icon-")[1];
+    const icon = tex.icn?.split("icon-")[1];
 
     // 查找显示的图标
     const showIcon = iconList.find((item) => item.key === icon);
@@ -15,7 +20,7 @@ export function getIconUrl(tex = { bk_obj_icon: "", bk_obj_id: "" }) {
     }
 
     // 查找内置模型和对应图标
-    const isBuilt = BUILD_IN_MODEL.find((item) => item.key === tex.bk_obj_id);
+    const isBuilt = BUILD_IN_MODEL.find((item) => item.key === tex.model_id);
     const builtIcon = isBuilt
       ? iconList.find((item) => item.key === isBuilt.icon)
       : null;
@@ -39,13 +44,7 @@ export const deepClone = (obj: any, hash = new WeakMap()) => {
   if (hash.has(obj)) return hash.get(obj);
 
   const result =
-    obj instanceof Date
-      ? new Date(obj)
-      : obj instanceof RegExp
-        ? new RegExp(obj.source, obj.flags)
-        : obj.constructor
-          ? new obj.constructor()
-          : Object.create(null);
+    obj instanceof Date ? new Date(obj) : obj instanceof RegExp ? new RegExp(obj.source, obj.flags) : obj.constructor ? new obj.constructor() : Object.create(null);
 
   hash.set(obj, result);
 

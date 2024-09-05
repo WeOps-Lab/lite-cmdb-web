@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Introduction from "@/components/introduction";
-import { Input, Button, Modal, message } from "antd";
+import { Input, Button, Modal, message, Spin } from "antd";
+import { deepClone } from "@/utils/common";
+import { GroupItem, ModelItem } from "@/types/assetManage";
 import {
   EditTwoTone,
   DeleteTwoTone,
@@ -17,51 +19,35 @@ import ModelModal from "./list/modelModal";
 import { useRouter } from "next/navigation";
 import useApiClient from "@/utils/request";
 
-interface ListItem {
-  bk_obj_icon: string;
-  bk_obj_id: string;
-  bk_obj_name: string;
-  count: number;
-}
-
-interface Classification {
-  classification_name: string;
-  classification_id: string;
-  count: number;
-  list: ListItem[];
-}
-
-interface GroupList {
-  classification_name: string;
-  classification_id: string;
-}
-
 const AssetManage = () => {
-  const [modelGroup, setModelGroup] = useState<Classification[]>([]);
-  const [groupList, setGroupList] = useState<GroupList[]>([]);
+  const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
+  const [groupList, setGroupList] = useState<GroupItem[]>([]);
+  const [modelList, setModelList] = useState<ModelItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [searchText, setSearchText] = useState<string>("");
   const [dragItem, setDragItem] = useState<any>({});
   const [dragOverItem, setDragOverItem] = useState<any>({});
   const groupRef = useRef<any>(null);
   const modelRef = useRef<any>(null);
   const router = useRouter();
-  const { get, isLoading } = useApiClient();
+  const { get, del, isLoading } = useApiClient();
   const { confirm } = Modal;
-  const showDeleteConfirm = () => {
+  const showDeleteConfirm = (row: GroupItem) => {
     confirm({
       title: "Do you want to delete this item?",
       content: "After deletion, the data cannot be recovered.",
       centered: true,
       onOk() {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
+        return new Promise(async (resolve, reject) => {
+          const res = await del(
+            `/api/classification/${row.classification_id}/`
+          );
+          if (res.result) {
             message.success("Item deleted successfully");
-            resolve(true);
-          }, 500);
-        }).catch(() => console.log("Oops errors!"));
-      },
-      onCancel() {
-        message.info("Action cancelled");
+            getModelGroup();
+          }
+          resolve(true);
+        });
       },
     });
   };
@@ -81,17 +67,17 @@ const AssetManage = () => {
     modelRef.current?.showModal({
       title,
       type,
-      groupInfo: row,
+      modelForm: row,
       subTitle: "",
     });
   };
 
-  const updateGroupList = (msg: string) => {
-    console.log("创建分组成功", msg);
+  const updateGroupList = () => {
+    getModelGroup();
   };
 
-  const updateModelList = (msg: string) => {
-    console.log("创建模型成功", msg);
+  const updateModelList = () => {
+    getModelGroup();
   };
 
   const onSearchTxtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -106,16 +92,9 @@ const AssetManage = () => {
     console.log("clear", 456);
   };
 
-  const linkToDetial = (
-    model = {
-      bk_obj_id: "",
-      bk_obj_name: "",
-      bk_obj_icon: "",
-      classification_id: "",
-    }
-  ) => {
+  const linkToDetial = (model: ModelItem) => {
     router.push(
-      `/assetManage/detail?bk_obj_icon=${model.bk_obj_icon}&bk_obj_name=${model.bk_obj_name}&bk_obj_id=${model.bk_obj_id}&classification_id=${model.classification_id}`
+      `/assetManage/detail?icn=${model.icn}&model_name=${model.model_name}&model_id=${model.model_id}&classification_id=${model.classification_id}`
     );
   };
 
@@ -141,101 +120,46 @@ const AssetManage = () => {
   };
 
   useEffect(() => {
-    const modelList = [
-      {
-        classification_name: "主机管理",
-        classification_id: "host",
-        count: 6,
-        list: [
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host",
-            bk_obj_name: "主机",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host1",
-            bk_obj_name: "主机1",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host2",
-            bk_obj_name: "主机2",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host3",
-            bk_obj_name: "主机3",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host4",
-            bk_obj_name: "主机4",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-host",
-            bk_obj_id: "host5",
-            bk_obj_name: "主机5",
-            count: 10,
-          },
-        ],
-      },
-      {
-        classification_name: "数据库",
-        classification_id: "data_base",
-        count: 2,
-        list: [
-          {
-            bk_obj_icon: "icon-cc-default",
-            bk_obj_id: "db2",
-            bk_obj_name: "DB2",
-            count: 10,
-          },
-          {
-            bk_obj_icon: "icon-cc-default",
-            bk_obj_id: "db_cluster",
-            bk_obj_name: "数据库集群",
-            count: 10,
-          },
-        ],
-      },
-    ];
-    const groupList = [
-      {
-        classification_name: "主机管理",
-        classification_id: "host",
-      },
-      {
-        classification_name: "数据库",
-        classification_id: "data_base",
-      },
-    ];
-    setModelGroup(modelList);
-    setGroupList(groupList);
     if (isLoading) return;
-    const fetchData = async () => {
-      try {
-        const response = await get("/api/classification/");
-        console.log("Fetched data:", response);
-        //   setData(response);
-      } catch (error) {
-        console.error("Failed to fetch data:", error);
-      }
-    };
-
-    fetchData();
-    return () => {
-      console.log("Component unmounted");
-    };
+    getModelGroup();
   }, [get, isLoading]);
 
+  const getModelGroup = () => {
+    const getCroupList = get("/api/classification/");
+    const getModelList = get("/api/model/");
+    setLoading(true);
+    Promise.all([getModelList, getCroupList])
+      .then((res) => {
+        if (res[0].result && res[1].result) {
+          const modeldata: ModelItem[] = res[0].data;
+          const groupData: GroupItem[] = res[1].data;
+          const groups = deepClone(groupData).map((item: GroupItem) => ({
+            ...item,
+            list: [],
+            count: 0,
+          }));
+          modeldata.forEach((modelItem: ModelItem) => {
+            const target = groups.find(
+              (item: GroupItem) =>
+                item.classification_id === modelItem.classification_id
+            );
+            if (target) {
+              target.list.push(modelItem);
+              target.count++;
+            }
+          });
+          setGroupList(groupData);
+          setModelList(modeldata);
+          setModelGroup(groups);
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  };
+
   return (
-    <div style={{ width: "100%" }}>
+    <div style={{ width: "100%", height: "100%" }}>
       <Introduction
         title="Model Setting"
         message="Asset model management provides the creation and management of all asset models and model groups. You can create and manage them according to your needs."
@@ -263,102 +187,102 @@ const AssetManage = () => {
             <Button onClick={() => showGroupModal("add")}>Add Group</Button>
           </div>
         </div>
-        {modelGroup.map((item, groupIndex) => {
-          return (
-            <div className="model-group" key={item.classification_id}>
-              <div
-                className={`${assetManageStyle.groupTitle} flex items-center mt-[20px] text-[14px]`}
-              >
-                <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
-                  {item.classification_name}（{item.count}）
-                </span>
-                <div className={assetManageStyle.groupOperate}>
-                  <EditTwoTone
-                    className="edit mr-[6px] cursor-pointer"
-                    onClick={() => showGroupModal("edit", item)}
-                  />
-                  <DeleteTwoTone
-                    className="delete cursor-pointer"
-                    onClick={showDeleteConfirm}
-                  />
+        <Spin spinning={loading}>
+          {modelGroup.map((item, groupIndex) => {
+            return (
+              <div className="model-group" key={item.classification_id}>
+                <div
+                  className={`${assetManageStyle.groupTitle} flex items-center mt-[20px] text-[14px]`}
+                >
+                  <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
+                    {item.classification_name}（{item.count}）
+                  </span>
+                  <div className={assetManageStyle.groupOperate}>
+                    <EditTwoTone
+                      className="edit mr-[6px] cursor-pointer"
+                      onClick={() => showGroupModal("edit", item)}
+                    />
+                    <DeleteTwoTone
+                      className="delete cursor-pointer"
+                      onClick={() => showDeleteConfirm(item)}
+                    />
+                  </div>
                 </div>
-              </div>
-              <ul className={assetManageStyle.modelList}>
-                {item.list.map((model, index) => (
-                  <li
-                    className={`bg-[var(--color-bg)] flex justify-between items-center ${
-                      assetManageStyle.modelListItem
-                    } ${
-                      dragOverItem?.bk_obj_id === model.bk_obj_id &&
-                      dragOverItem?.bk_obj_id !== dragItem?.bk_obj_id &&
-                      modelGroup[groupIndex].list.find(
-                        (group) => group.bk_obj_id === dragItem.bk_obj_id
-                      )
-                        ? assetManageStyle.dragActive
-                        : ""
-                    }`}
-                    key={index}
-                    draggable
-                    onDragStart={() =>
-                      handleDragStart({
-                        ...model,
-                        index,
-                      })
-                    }
-                    onDragEnter={() =>
-                      handleDragEnter({
-                        ...model,
-                        index,
-                      })
-                    }
-                    onDragEnd={() => handleDragEnd(groupIndex)}
-                  >
-                    <div className={`${assetManageStyle.leftSide} pl-[4px]`}>
-                      <HolderOutlined
-                        className={`${assetManageStyle.dragHander} cursor-move`}
-                      />
-                      <Image
-                        src={getIconUrl(model)}
-                        className="block w-auto h-10"
-                        alt="图标"
-                        width={100}
-                        height={40}
-                      />
-                      <div className="flex flex-col pl-[10px]">
-                        <span className="text-[14px] pb-[4px] font-[600]">
-                          {model.bk_obj_name}
-                        </span>
-                        <span className="text-[12px] text-[var(--color-text-3)]">
-                          {model.bk_obj_id}
-                        </span>
-                      </div>
-                    </div>
-                    <div
-                      className={assetManageStyle.rightSide}
-                      onClick={() =>
-                        linkToDetial({
+                <ul className={assetManageStyle.modelList}>
+                  {item.list.map((model, index) => (
+                    <li
+                      className={`bg-[var(--color-bg)] flex justify-between items-center ${
+                        assetManageStyle.modelListItem
+                      } ${
+                        dragOverItem?.model_id === model.model_id &&
+                        dragOverItem?.model_id !== dragItem?.model_id &&
+                        modelGroup[groupIndex].list.find(
+                          (group) => group.model_id === dragItem.model_id
+                        )
+                          ? assetManageStyle.dragActive
+                          : ""
+                      }`}
+                      key={index}
+                      draggable
+                      onDragStart={() =>
+                        handleDragStart({
                           ...model,
-                          classification_id: item.classification_id,
+                          index,
                         })
                       }
+                      onDragEnter={() =>
+                        handleDragEnter({
+                          ...model,
+                          index,
+                        })
+                      }
+                      onDragEnd={() => handleDragEnd(groupIndex)}
                     >
-                      <SwitcherOutlined />
-                      <span className="text-[12px] pt-[4px]">
-                        {model.count}
-                      </span>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          );
-        })}
+                      <div className={`${assetManageStyle.leftSide} pl-[4px]`}>
+                        <HolderOutlined
+                          className={`${assetManageStyle.dragHander} cursor-move`}
+                        />
+                        <Image
+                          src={getIconUrl(model)}
+                          className="block w-auto h-10"
+                          alt="图标"
+                          width={100}
+                          height={40}
+                        />
+                        <div className="flex flex-col pl-[10px]">
+                          <span className="text-[14px] pb-[4px] font-[600]">
+                            {model.model_name}
+                          </span>
+                          <span className="text-[12px] text-[var(--color-text-3)]">
+                            {model.model_id}
+                          </span>
+                        </div>
+                      </div>
+                      <div
+                        className={assetManageStyle.rightSide}
+                        onClick={() =>
+                          linkToDetial({
+                            ...model,
+                            classification_id: item.classification_id,
+                          })
+                        }
+                      >
+                        <SwitcherOutlined />
+                        <span className="text-[12px] pt-[4px]">0</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            );
+          })}
+        </Spin>
       </div>
-      <GroupModal ref={groupRef} onSuccess={(msg) => updateGroupList(msg)} />
+      <GroupModal ref={groupRef} onSuccess={updateGroupList} />
       <ModelModal
         ref={modelRef}
         groupList={groupList}
-        onSuccess={(msg) => updateModelList(msg)}
+        onSuccess={updateModelList}
       />
     </div>
   );
