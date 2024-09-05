@@ -3,6 +3,8 @@
   "about": "关于",
   "contact": "联系",
   "menu": {
-    "log": "日志"
+    "log": "日志",
+    "assetManage":"模型管理",
+    "asset":"资产"
   }
 }

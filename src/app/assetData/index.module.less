@@ -1,0 +1,52 @@
+.assetData {
+    width: 100%;
+
+    .groupSelector {
+        :global {
+            .ant-radio-button-wrapper {
+                margin-right: 10px;
+                border: none;
+                background: transparent;
+                border-radius: 4px !important;
+
+                &::before {
+                    width: 0;
+                }
+
+                &:hover {
+                    color: var(--color-primary);
+                    background: var(--color-bg-1);
+                }
+            }
+
+            .ant-radio-button-wrapper-checked {
+                background: var(--color-bg-1);
+                color: var(--color-primary);
+            }
+
+            .ant-radio-group-solid {
+                display: flex;
+                overflow-x: auto;
+            }
+        }
+    }
+
+    .owner {
+        display: flex;
+        align-items: center;
+        .userAvatar {
+            display: flex;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            margin-right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--color-fill-3);
+            color: var(--color-bg-1);
+            font-size: 12px;
+        }
+    }
+
+}

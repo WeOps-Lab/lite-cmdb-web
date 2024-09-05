@@ -1,0 +1,58 @@
+.modelSetting {
+    .groupTitle {
+        .groupOperate {
+            display: none;
+        }
+
+        &:hover {
+            .groupOperate {
+                display: flex;
+            }
+        }
+    }
+
+    .modelList {
+        display: flex;
+        flex-wrap: wrap;
+
+        .modelListItem {
+            width: calc(20% - 12px);
+            min-width: 200px;
+            border: 1px solid var(--color-border);
+            height: 70px;
+            margin: 10px 10px 0 0;
+            border-radius: 4px;
+            cursor: pointer;
+            user-select: none;
+
+            .leftSide {
+                display: flex;
+
+                .dragHander {
+                    visibility: hidden;
+                }
+
+                &:hover {
+                    .dragHander {
+                        visibility: visible;
+                    }
+                }
+            }
+
+            .rightSide {
+                width: 70px;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-direction: column;
+                color: var(--color-primary);
+                border-left: 1px solid var(--color-border);
+            }
+        }
+
+        .dragActive {
+            border: 1px solid var(--color-primary) !important;
+        }
+    }
+}

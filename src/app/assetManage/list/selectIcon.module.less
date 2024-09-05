@@ -1,0 +1,15 @@
+.selectIcon {
+    .activeBoder() {
+        border: 1px dashed var(--color-primary);
+    }
+
+    .modelIcon {
+        &:hover {
+            .activeBoder();
+        }
+    }
+
+    .active {
+        .activeBoder();
+    }
+}

@@ -3,6 +3,8 @@
   "about": "About",
   "contact": "Contact",
   "menu": {
-    "log": "Log"
+    "log": "Log",
+     "assetManage":"Model Management",
+     "asset":"Asset"
   }
 }
