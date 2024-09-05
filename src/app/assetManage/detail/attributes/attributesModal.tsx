@@ -13,20 +13,24 @@ import OperateModal from "@/components/operate-modal";
 import type { FormInstance } from "antd";
 import { PlusOutlined, DeleteTwoTone, HolderOutlined } from "@ant-design/icons";
 import { deepClone } from "@/utils/common";
+import useApiClient from "@/utils/request";
+import { useSearchParams } from "next/navigation";
 const { Option } = Select;
 
 interface AttrFieldType {
-  id: string;
-  name: string;
-  type: string;
+  model_id: string;
+  attr_id: string;
+  attr_name: string;
+  attr_type: string;
+  is_only: boolean;
   is_required: boolean;
-  is_editable: boolean;
-  is_unique: boolean;
-  enum_list: Array<string>;
+  editable: boolean;
+  option: Array<string>;
+  attr_group: string;
 }
 
 interface AttrModalProps {
-  onSuccess: (type: string) => void;
+  onSuccess: (type?: unknown) => void;
   attrTypeList: Array<{ id: string; name: string }>;
 }
 
@@ -49,7 +53,14 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const [type, setType] = useState<string>("");
     const [attrInfo, setAttrInfo] = useState<any>({});
     const [enumList, setEnumList] = useState<string[]>([""]);
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const formRef = useRef<FormInstance>(null);
+    const { post, put } = useApiClient();
+    const searchParams = useSearchParams();
+    const classificationId: string =
+      searchParams.get("classification_id") || "";
+    const modelId: string =
+      searchParams.get("model_id") || "";
 
     useEffect(() => {
       if (modelVisible) {
@@ -68,8 +79,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
         if (type === "add") {
           Object.assign(attrInfo, {
             is_required: false,
-            is_editable: false,
-            is_unique: false,
+            editable: false,
+            is_only: false,
           });
           setEnumList([""]);
         }
@@ -79,13 +90,12 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
 
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values) => {
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
-        message.success(msg);
-        onSuccess({ ...values, enum_list: enumList });
-        handleCancel();
+        operateAttr({
+          ...values,
+          option: '',
+          attr_group: classificationId,
+          model_id: modelId
+        });
       });
     };
 
@@ -130,6 +140,32 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
       setEnumList(items);
     };
 
+    const operateAttr = async (params: AttrFieldType) => {
+      try {
+        setConfirmLoading(true);
+        const msg: string =
+          type === "add"
+            ? "New successfully added !"
+            : "Modified successfully !";
+        const url: string =
+          type === "add"
+            ? `/api/model/${params.model_id}/attr/`
+            : `/api/model/${params.model_id}/attr_update/`;
+        const requestParams = deepClone(params);
+        const requestType = type === "add" ? post : put;
+        const { result } = await requestType(url, requestParams);
+        if (result) {
+          message.success(msg);
+          onSuccess();
+          handleCancel();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setConfirmLoading(false);
+      }
+    };
+
     return (
       <div>
         <OperateModal
@@ -156,21 +192,21 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
           >
             <Form.Item<AttrFieldType>
               label="Name"
-              name="name"
+              name="attr_name"
               rules={[{ required: true, message: "Please input your name!" }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
               label="ID"
-              name="id"
+              name="attr_id"
               rules={[{ required: true, message: "Please input your id!" }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
               label="Type"
-              name="type"
+              name="attr_type"
               rules={[{ required: true, message: "Please select a type!" }]}
             >
               <Select placeholder="Please select a type">
@@ -193,7 +229,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                 getFieldValue("type") === "enum" ? (
                   <Form.Item<AttrFieldType>
                     label="Value"
-                    name="enum_list"
+                    name="option"
                     rules={[{ validator: validateEnumList }]}
                   >
                     <DragDropContext onDragEnd={onDragEnd}>
@@ -219,7 +255,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                     {...provided.draggableProps}
                                     {...provided.dragHandleProps}
                                   >
-                                    <HolderOutlined className="mr-[4px]"/>
+                                    <HolderOutlined className="mr-[4px]" />
                                     <Input
                                       className="mr-[10px] w-4/5"
                                       value={enumItem}
@@ -252,7 +288,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             </Form.Item>
             <Form.Item<AttrFieldType>
               label="Editable"
-              name="is_editable"
+              name="editable"
               rules={[
                 { required: true, message: "Please select the Editable!" },
               ]}
@@ -264,7 +300,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             </Form.Item>
             <Form.Item<AttrFieldType>
               label="Unique"
-              name="is_unique"
+              name="is_only"
               rules={[{ required: true, message: "Please select the Unique!" }]}
             >
               <Radio.Group>

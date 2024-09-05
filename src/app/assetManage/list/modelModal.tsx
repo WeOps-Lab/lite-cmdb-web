@@ -65,7 +65,7 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
       },
     }));
 
-    const OperateMoel = async (params: ModelItem) => {
+    const OperateModel = async (params: ModelItem) => {
       try {
         setConfirmLoading(true);
         const msg: string =
@@ -98,7 +98,7 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
 
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values: ModelItem) => {
-        OperateMoel({
+        OperateModel({
           ...values,
           icn: iconId,
         });

@@ -438,6 +438,10 @@ export const ATTR_TYPE_LIST = [
     id: "bool",
     name: "boolean",
   },
+  {
+    id: "organization",
+    name: "organization",
+  },
 ];
 
 export const CONSTRAINT_List = [

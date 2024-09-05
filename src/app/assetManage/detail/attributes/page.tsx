@@ -9,6 +9,7 @@ import AttributesModal from "./attributesModal";
 import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { ATTR_TYPE_LIST } from "@/constants/asset";
+import useApiClient from "@/utils/request";
 const { confirm } = Modal;
 
 const Attributes = () => {
@@ -21,9 +22,10 @@ const Attributes = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [tableData, setTableData] = useState<any[]>([]);
   const attrRef = useRef<any>(null);
+  const { get, del } = useApiClient();
+  const { confirm } = Modal;
   const searchParams = useSearchParams();
-  const param1 = searchParams.get("param1");
-  const param2 = searchParams.get("param2");
+  const modelId = searchParams.get("model_id");
   const showAttrModal = (type: string, row = {}) => {
     const title = type === "add" ? "Add Attribute" : "Edit Attribute";
     attrRef.current?.showModal({
@@ -36,18 +38,18 @@ const Attributes = () => {
   const columns: TableColumnsType = [
     {
       title: "Name",
-      dataIndex: "name",
-      key: "name",
+      dataIndex: "attr_name",
+      key: "attr_name",
     },
-    // {
-    //   title: "Id",
-    //   dataIndex: "id",
-    //   key: "id",
-    // },
     {
       title: "Type",
-      dataIndex: "type",
-      key: "type",
+      dataIndex: "attr_type",
+      key: "attr_type",
+      render: (_, { attr_type }) => (
+        <>
+          {ATTR_TYPE_LIST.find((item) => item.id === attr_type)?.name || "--"}
+        </>
+      ),
     },
     {
       title: "REQUIRED",
@@ -65,13 +67,13 @@ const Attributes = () => {
     },
     {
       title: "EDITABLE",
-      key: "is_editable",
-      dataIndex: "is_editable",
-      render: (_, { is_editable }) => (
+      key: "editable",
+      dataIndex: "editable",
+      render: (_, { editable }) => (
         <>
           {
-            <Tag color={is_editable ? "green" : "geekblue"}>
-              {is_editable ? "Yes" : "No"}
+            <Tag color={editable ? "green" : "geekblue"}>
+              {editable ? "Yes" : "No"}
             </Tag>
           }
         </>
@@ -81,11 +83,11 @@ const Attributes = () => {
       title: "UNIQUE",
       key: "is_unique",
       dataIndex: "is_unique",
-      render: (_, { is_unique }) => (
+      render: (_, { is_only }) => (
         <>
           {
-            <Tag color={is_unique ? "green" : "geekblue"}>
-              {is_unique ? "Yes" : "No"}
+            <Tag color={is_only ? "green" : "geekblue"}>
+              {is_only ? "Yes" : "No"}
             </Tag>
           }
         </>
@@ -96,10 +98,22 @@ const Attributes = () => {
       key: "action",
       render: (_, record) => (
         <>
-          <Button type="link" className="mr-[10px]" onClick={()=> showAttrModal('edit',record)}>
+          <Button
+            type="link"
+            className="mr-[10px]"
+            onClick={() => showAttrModal("edit", record)}
+          >
             Edit
           </Button>
-          <Button type="link" onClick={() => showDeleteConfirm(record)}>
+          <Button
+            type="link"
+            onClick={() =>
+              showDeleteConfirm({
+                model_id: record.model_id,
+                attr_id: record.attr_id,
+              })
+            }
+          >
             Delete
           </Button>
         </>
@@ -107,18 +121,25 @@ const Attributes = () => {
     },
   ];
 
-  const showDeleteConfirm = (record = {}) => {
-    console.log(record);
+  const showDeleteConfirm = (row = { model_id: "", attr_id: "" }) => {
     confirm({
       title: "Do you want to delete this item?",
       content: "After deletion, the data cannot be recovered.",
       centered: true,
       onOk() {
-        if (pagination.current > 1 && tableData.length === 1) {
-          pagination.current--;
-        }
-        message.success("Delete successfully !");
-        fetchData();
+        return new Promise(async (resolve, reject) => {
+          const res = await del(
+            `/api/model/${row.model_id}/attr/${row.attr_id}/`
+          );
+          if (res.result) {
+            message.success("Item deleted successfully");
+            if (pagination.current > 1 && tableData.length === 1) {
+              pagination.current--;
+            }
+            fetchData();
+            resolve(true);
+          }
+        });
       },
     });
   };
@@ -148,158 +169,32 @@ const Attributes = () => {
     };
   };
 
-  const fetchData = () => {
+  const fetchData = async () => {
     setLoading(true);
-    const params = getTableParams();
-    console.log(params);
-    setTimeout(() => {
-      const data: any[] = [
-        {
-          key: "1",
-          name: "John Brown",
-          id: 32,
-          type: "int",
-          is_required: true,
-          is_editable: true,
-          is_unique: false,
-        },
-        {
-          key: "2",
-          name: "Jim Green",
-          id: 42,
-          type: "int",
-          is_required: true,
-          is_editable: false,
-          is_unique: false,
-        },
-        {
-          key: "4",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "5",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "6",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "7",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "8",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "9",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "10",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "11",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "12",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "13",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "14",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-        {
-          key: "15",
-          name: "Joe Black",
-          id: 36,
-          type: "int",
-          is_required: false,
-          is_editable: true,
-          is_unique: true,
-        },
-      ];
-      setTableData(data);
-      pagination.total = data.length;
-      pagination.pageSize = 10;
-      setPagination(pagination);
+    // const params = getTableParams();
+    try {
+      const { result, data } = await get(`/api/model/${modelId}/attr_list/`);
+      if (result) {
+        setTableData(data);
+        pagination.total = data.length;
+        pagination.pageSize = 10;
+        setPagination(pagination);
+        setLoading(false);
+      }
+    } catch (error) {
+      console.log(error);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
-  const updateAttrList = (msg: string) => {
-    console.log("创建属性成功", msg);
+  const updateAttrList = () => {
+    fetchData();
   };
 
   useEffect(() => {
-    console.log(param1, param2);
     fetchData();
-    return () => {
-      console.log("Component unmounted");
-    };
-  }, [pagination?.current, pagination?.pageSize]);
+  }, [pagination]);
 
   return (
     <div>
@@ -338,7 +233,7 @@ const Attributes = () => {
       <AttributesModal
         ref={attrRef}
         attrTypeList={ATTR_TYPE_LIST}
-        onSuccess={(msg) => updateAttrList(msg)}
+        onSuccess={updateAttrList}
       />
     </div>
   );
