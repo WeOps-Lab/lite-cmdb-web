@@ -41,22 +41,20 @@ const useApiClient = () => {
 
     // 响应拦截器
     const responseInterceptor = apiClient.interceptors.response.use(
-      (response: AxiosResponse) => {
-        return response.data;
-      },
+      (response: AxiosResponse) => response,
       (error) => {
         if (error.response) {
           const { status } = error.response;
-          const messgae = error.response?.data?.message
+          const messageText = error.response?.data?.message;
           if (status === 401) {
             // 处理 401 错误，重定向到 Keycloak 登录页面
             signIn('keycloak');
           } else if (status === 403) {
             // 处理 403 错误，显示无权限消息
-            message.error(messgae);
+            message.error(messageText);
           } else if (status === 500) {
             // 处理 500 错误，例如显示错误消息
-            console.error('Server error:', messgae);
+            console.error('Server error:', messageText);
             message.error('服务器错误，请稍后再试');
           }
         }
@@ -72,20 +70,24 @@ const useApiClient = () => {
   }, [token]);
 
   // 封装请求方法，并使用 useCallback 确保函数是稳定的
-  const get = useCallback((url: string, config?: AxiosRequestConfig) => {
-    return apiClient.get(url, config);
+  const get = useCallback(async <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+    const response = await apiClient.get<T>(url, config);
+    return response.data;
   }, []);
 
-  const post = useCallback((url: string, data?: unknown, config?: AxiosRequestConfig) => {
-    return apiClient.post(url, data, config);
+  const post = useCallback(async <T = any>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+    const response = await apiClient.post<T>(url, data, config);
+    return response.data;
   }, []);
 
-  const put = useCallback((url: string, data?: unknown, config?: AxiosRequestConfig) => {
-    return apiClient.put(url, data, config);
+  const put = useCallback(async <T = any>(url: string, data?: unknown, config?: AxiosRequestConfig): Promise<T> => {
+    const response = await apiClient.put<T>(url, data, config);
+    return response.data;
   }, []);
 
-  const del = useCallback((url: string, config?: AxiosRequestConfig) => {
-    return apiClient.delete(url, config);
+  const del = useCallback(async <T = any>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+    const response = await apiClient.delete<T>(url, config);
+    return response.data;
   }, []);
 
   return { get, post, put, del, isLoading };
