@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <Script src="/iconfont.js" strategy="beforeInteractive" />
+        <Script src="/iconfont.js" strategy="afterInteractive" />
       </head>
       <body className={inter.className}>
         <SessionProvider>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Tabs } from 'antd';
+import { Tabs } from 'antd';
 import ThemeSwitcher from '../theme-switcher';
 import LanguageSwitcher from '../language-switcher';
 import OperateModal from '../operate-modal'

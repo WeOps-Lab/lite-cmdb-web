@@ -1,6 +1,6 @@
 'use client';
 
-import { useSession } from 'next-auth/react';
+import { useSession, signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { createContext, useContext, useEffect, useState } from 'react';
 
@@ -19,7 +19,7 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (status === 'loading') return;
     console.log('session:', session);
     if (!session) {
-      // signIn('keycloak');
+      signIn('keycloak');
       return;
     }
     if (session?.accessToken) {
