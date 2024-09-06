@@ -200,7 +200,7 @@ const AssetData = () => {
           <Radio.Button value="d">Chengdu</Radio.Button>
         </Radio.Group>
       </div>
-      <div className="ml-[10px] p-[20px] pt-0px bg-[var(--color-bg-1)]">
+      <div className={assetDataStyle.assetList}>
         <Tabs defaultActiveKey="1" items={items} onChange={onChangeModel} />
         <div className="flex justify-between mb-4">
           <Input placeholder="Search Table" style={{ width: 200 }} />
