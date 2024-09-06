@@ -8,21 +8,10 @@ import AssociationsModal from "./associationsModal";
 import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { CONSTRAINT_List } from "@/constants/asset";
+import useApiClient from "@/utils/request";
+import { ModelItem, AssoTypeItem } from "@/types/assetManage";
+import { useSearchParams } from "next/navigation";
 const { confirm } = Modal;
-
-interface ModelListType {
-  model_id: string;
-  model_name: string;
-}
-
-interface AssoTypeList {
-  model_id: string;
-  model_name: string;
-  obj_asst_id: string;
-  asst_id: string;
-  asst_name: string;
-  [key: string]: any;
-}
 
 const Associations = () => {
   const [searchText, setSearchText] = useState<string>("");
@@ -33,9 +22,13 @@ const Associations = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [tableData, setTableData] = useState<any[]>([]);
-  const [modelList, setModelList] = useState<ModelListType[]>([]);
-  const [assoTypeList, setAssoTypeList] = useState<AssoTypeList[]>([]);
+  const [modelList, setModelList] = useState<ModelItem[]>([]);
+  const [assoTypeList, setAssoTypeList] = useState<AssoTypeItem[]>([]);
   const assoRef = useRef<any>(null);
+  const { get, del } = useApiClient();
+  const searchParams = useSearchParams();
+  const modelId = searchParams.get("model_id");
+
   const showAssoModal = (type: string, row = {}) => {
     const title = type === "add" ? "Add Associations" : "Edit Associations";
     assoRef.current?.showModal({
@@ -46,38 +39,31 @@ const Associations = () => {
     });
   };
   const columns: TableColumnsType<any> = [
-    // {
-    //   title: "Name",
-    //   dataIndex: "name",
-    //   key: "name",
-    // },
     {
       title: "Source Model",
-      dataIndex: "source_model_id",
-      key: "source_model_id",
+      dataIndex: "src_model_id",
+      key: "src_model_id",
     },
     {
       title: "Target Model",
-      dataIndex: "target_model_id",
-      key: "target_model_id",
+      dataIndex: "dst_model_id",
+      key: "dst_model_id",
     },
     {
       title: "Constraint",
-      dataIndex: "constraint",
-      key: "constraint",
-      render: (_, { constraint }) => (
-        <>
-          {CONSTRAINT_List.find((item) => item.id === constraint)?.name || "--"}
-        </>
+      dataIndex: "mapping",
+      key: "mapping",
+      render: (_, { mapping }) => (
+        <>{CONSTRAINT_List.find((item) => item.id === mapping)?.name || "--"}</>
       ),
     },
     {
       title: "Type",
-      key: "type",
-      dataIndex: "type",
-      render: (_, { type }) => {
+      key: "asst_id",
+      dataIndex: "asst_id",
+      render: (_, { asst_id }) => {
         const assoType =
-          assoTypeList.find((item) => item.obj_asst_id === type)?.asst_name ||
+          assoTypeList.find((item) => item.asst_id === asst_id)?.asst_name ||
           "--";
         return (
           <>
@@ -95,13 +81,6 @@ const Associations = () => {
       key: "action",
       render: (_, record) => (
         <>
-          <Button
-            type="link"
-            className="mr-[10px]"
-            onClick={() => showAssoModal("edit", record)}
-          >
-            Edit
-          </Button>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
             Delete
           </Button>
@@ -110,18 +89,23 @@ const Associations = () => {
     },
   ];
 
-  const showDeleteConfirm = (record = {}) => {
-    console.log(record);
+  const showDeleteConfirm = (row = { asset_id: "" }) => {
     confirm({
       title: "Do you want to delete this item?",
       content: "After deletion, the data cannot be recovered.",
       centered: true,
       onOk() {
-        if (pagination.current > 1 && tableData.length === 1) {
-          pagination.current--;
-        }
-        message.success("Delete successfully !");
-        fetchData();
+        return new Promise(async (resolve, reject) => {
+          const res = await del(`/api/model/association/${row.asset_id}/`);
+          if (res.result) {
+            message.success("Item deleted successfully");
+            if (pagination.current > 1 && tableData.length === 1) {
+              pagination.current--;
+            }
+            fetchData();
+            resolve(true);
+          }
+        });
       },
     });
   };
@@ -151,87 +135,49 @@ const Associations = () => {
     };
   };
 
-  const getModelList = () => {
-    const allModelList = [
-      {
-        model_id: "host",
-        model_name: "主机",
-      },
-      {
-        model_id: "mysql",
-        model_name: "Mysql",
-      },
-    ];
-    setModelList(allModelList);
-  };
-  const getAssoTypeList = () => {
-    const allAssoTypeList = [
-      {
-        model_id: "mysql",
-        model_name: "Mysql",
-        obj_asst_id: "mysql_install_on_host",
-        asst_name: "安装于",
-        asst_id: "install_on",
-      },
-    ];
-    setAssoTypeList(allAssoTypeList);
-  };
-  const fetchData = (type?: string) => {
+  const fetchData = async (type?: string) => {
     setLoading(true);
     const params = getTableParams();
-    console.log(params);
-    setTimeout(() => {
-      const data: any[] = [
-        {
-          key: "1",
-          name: "John Brown",
-          id: 32,
-          source_model_id: "host",
-          target_model_id: "mysql",
-          constraint: "1:n",
-          type: "mysql_install_on_host",
-        },
-        {
-          key: "2",
-          name: "Jim Green",
-          id: 42,
-          source_model_id: "host",
-          target_model_id: "mysql",
-          constraint: "1:n",
-          type: "mysql_install_on_host",
-        },
-        {
-          key: "4",
-          name: "Joe Black",
-          id: 36,
-          source_model_id: "host",
-          target_model_id: "mysql",
-          constraint: "1:n",
-          type: "mysql_install_on_host",
-        },
-      ];
-      setTableData(data);
-      pagination.total = data.length;
-      pagination.pageSize = 10;
-      setPagination(pagination);
+    console.log(params)
+    try {
+      const res = await get(`/api/model/${modelId}/association/`);
+      if (res.result) {
+        setTableData(res.data);
+      }
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
-  const updateAssoList = (msg: string) => {
-    console.log("创建属性成功", msg);
+  const updateAssoList = () => {
+    fetchData();
+  };
+
+  const getInitData = () => {
+    const getAssoTypeList = get("/api/model/model_association_type/");
+    const getModelList = get("/api/model/");
+    const fetchAssoData = get(`/api/model/${modelId}/association/`);
+    setLoading(true);
+    Promise.all([getModelList, getAssoTypeList, fetchAssoData])
+      .then((res) => {
+        if (res[0].result && res[1].result) {
+          const modeldata: ModelItem[] = res[0].data;
+          const assoTypeData: AssoTypeItem[] = res[1].data;
+          const assoTableData: AssoTypeItem[] = res[2].data;
+          setAssoTypeList(assoTypeData);
+          setModelList(modeldata);
+          setTableData(assoTableData);
+          pagination.total = res[2].count || 0
+          setPagination(pagination)
+        }
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   useEffect(() => {
-    // setLoading(true)
-    Promise.all([getModelList(), fetchData("init"), getAssoTypeList()]).finally(
-      () => {
-        // setLoading(false)
-      }
-    );
-    return () => {
-      console.log("Component unmounted");
-    };
+    getInitData();
   }, [pagination?.current, pagination?.pageSize]);
 
   return (
@@ -273,7 +219,7 @@ const Associations = () => {
         constraintList={CONSTRAINT_List}
         allModelList={modelList}
         assoTypeList={assoTypeList}
-        onSuccess={(msg) => updateAssoList(msg)}
+        onSuccess={updateAssoList}
       />
     </div>
   );

@@ -13,35 +13,16 @@ import Image from "next/image";
 import { getIconUrl } from "@/utils/common";
 import type { FormInstance } from "antd";
 import associationsModalStyle from "./associationsModal.module.less";
+import { deepClone } from "@/utils/common";
+import useApiClient from "@/utils/request";
 const { Option } = Select;
-
-interface AssoFieldType {
-  id: string;
-  source_model_id: string;
-  target_model_id: string;
-  type: string;
-  constraint: string;
-}
-
-interface ModelListType {
-  model_id: string;
-  model_name: string;
-}
-
-interface AssoTypeList {
-  model_id: string;
-  model_name: string;
-  obj_asst_id: string;
-  asst_id: string;
-  asst_name: string;
-  [key: string]: any;
-}
+import { AssoTypeItem, ModelItem, AssoFieldType } from "@/types/assetManage";
 
 interface AssoModalProps {
-  onSuccess: (type: string) => void;
+  onSuccess: () => void;
   constraintList: Array<{ id: string; name: string }>;
-  allModelList: ModelListType[];
-  assoTypeList: AssoTypeList[];
+  allModelList: ModelItem[];
+  assoTypeList: AssoTypeItem[];
 }
 
 interface AssoConfig {
@@ -60,9 +41,10 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
     const [modelVisible, setModelVisible] = useState<boolean>(false);
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [assoInfo, setAssoInfo] = useState<any>({});
     const formRef = useRef<FormInstance>(null);
+    const { post } = useApiClient();
 
     useEffect(() => {
       if (modelVisible) {
@@ -72,30 +54,47 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
     }, [modelVisible, assoInfo]);
 
     useImperativeHandle(ref, () => ({
-      showModal: ({ type, assoInfo, subTitle, title }) => {
+      showModal: ({ assoInfo, subTitle, title }) => {
         // 开启弹窗的交互
         setModelVisible(true);
         setSubTitle(subTitle);
-        setType(type);
         setTitle(title);
-        if (type === "add") {
-          Object.assign(assoInfo, {
-            is_required: false,
-          });
-        }
         setAssoInfo(assoInfo);
       },
     }));
 
+    const showModelKeyName = (id: string, key: string) => {
+      return allModelList.find((item) => item.model_id === id)?.[key] || "--";
+    };
+
+    const showAssoType = (id: string) => {
+      const target = assoTypeList.find((item) => item.asst_id === id);
+      if (target) {
+        return `${target.asst_name}(${target.asst_id})`;
+      }
+      return "--";
+    };
+
+    const operateRelationships = async (params: AssoFieldType) => {
+      try {
+        setConfirmLoading(true);
+        const requestParams = deepClone(params);
+        const { result } = await post("/api/model/association/", requestParams);
+        if (result) {
+          message.success("New successfully added !");
+          onSuccess();
+          handleCancel();
+        }
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setConfirmLoading(false);
+      }
+    };
+
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values) => {
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
-        message.success(msg);
-        onSuccess(values);
-        handleCancel();
+        operateRelationships(values);
       });
     };
 
@@ -116,7 +115,11 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               <Button className="mr-[10px]" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button type="primary" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                loading={confirmLoading}
+                onClick={handleSubmit}
+              >
                 Confirm
               </Button>
             </div>
@@ -131,7 +134,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
           >
             <Form.Item<AssoFieldType>
               label="Source Model"
-              name="source_model_id"
+              name="src_model_id"
               rules={[
                 { required: true, message: "Please select the Source Model !" },
               ]}
@@ -148,7 +151,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             </Form.Item>
             <Form.Item<AssoFieldType>
               label="Target Model"
-              name="target_model_id"
+              name="dst_model_id"
               rules={[
                 { required: true, message: "Please select the Target Model !" },
               ]}
@@ -165,7 +168,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             </Form.Item>
             <Form.Item<AssoFieldType>
               label="Association Type"
-              name="type"
+              name="asst_id"
               rules={[
                 {
                   required: true,
@@ -179,7 +182,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               >
                 {assoTypeList.map((item) => {
                   return (
-                    <Option value={item.obj_asst_id} key={item.obj_asst_id}>
+                    <Option value={item.asst_id} key={item.asst_id}>
                       {`${item.asst_name}(${item.asst_id})`}
                     </Option>
                   );
@@ -188,7 +191,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             </Form.Item>
             <Form.Item<AssoFieldType>
               label="Constraint"
-              name="constraint"
+              name="mapping"
               rules={[
                 {
                   required: true,
@@ -209,65 +212,79 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             <Form.Item
               noStyle
               shouldUpdate={(prevValues, currentValues) =>
-                prevValues.type !== currentValues.type ||
-                prevValues.target_model_id !== currentValues.target_model_id ||
-                prevValues.source_model_id !== currentValues.source_model_id
+                prevValues.asst_id !== currentValues.asst_id ||
+                prevValues.dst_model_id !== currentValues.dst_model_id ||
+                prevValues.src_model_id !== currentValues.src_model_id
               }
             >
               {({ getFieldValue }) =>
-                getFieldValue("type") && getFieldValue("target_model_id") && getFieldValue("source_model_id") ? (
-                  <Form.Item<AssoFieldType> label="Effect">
-                    <div
-                      className={associationsModalStyle.effectRepresentation}
-                    >
-                      <div className={associationsModalStyle.modelObject}>
-                        <div className="mb-[4px]">
-                          <Image
-                            src={getIconUrl({
-                              icn: "",
-                              model_id: "",
-                            })}
-                            className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
-                            alt="源"
-                            width={40}
-                            height={40}
-                          />
+                getFieldValue("asst_id") &&
+                getFieldValue("dst_model_id") &&
+                getFieldValue("src_model_id") ? (
+                    <Form.Item<AssoFieldType> label="Effect">
+                      <div
+                        className={associationsModalStyle.effectRepresentation}
+                      >
+                        <div className={associationsModalStyle.modelObject}>
+                          <div className="mb-[4px]">
+                            <Image
+                              src={getIconUrl({
+                                icn: showModelKeyName(
+                                  getFieldValue("src_model_id"),
+                                  "icn"
+                                ),
+                                model_id: getFieldValue("src_model_id"),
+                              })}
+                              className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
+                              alt="源"
+                              width={40}
+                              height={40}
+                            />
+                          </div>
+                          <span
+                            className={associationsModalStyle.modelObjectName}
+                          >
+                            {showModelKeyName(
+                              getFieldValue("src_model_id"),
+                              "model_name"
+                            )}
+                          </span>
                         </div>
-                        <span
-                          className={associationsModalStyle.modelObjectName}
-                        >
-                          {getFieldValue("source_model_id")}
-                        </span>
-                      </div>
-                      <div className={associationsModalStyle.modelEdge}>
-                        <div className={associationsModalStyle.connection}>
-                          <span className={associationsModalStyle.name}>
-                            {getFieldValue("type")}
+                        <div className={associationsModalStyle.modelEdge}>
+                          <div className={associationsModalStyle.connection}>
+                            <span className={associationsModalStyle.name}>
+                              {showAssoType(getFieldValue("asst_id"))}
+                            </span>
+                          </div>
+                        </div>
+                        <div className={associationsModalStyle.modelObject}>
+                          <div className="mb-[4px]">
+                            <Image
+                              src={getIconUrl({
+                                icn: showModelKeyName(
+                                  getFieldValue("dst_model_id"),
+                                  "icn"
+                                ),
+                                model_id: getFieldValue("dst_model_id"),
+                              })}
+                              className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
+                              alt="目标"
+                              width={40}
+                              height={40}
+                            />
+                          </div>
+                          <span
+                            className={associationsModalStyle.modelObjectName}
+                          >
+                            {showModelKeyName(
+                              getFieldValue("dst_model_id"),
+                              "model_name"
+                            )}
                           </span>
                         </div>
                       </div>
-                      <div className={associationsModalStyle.modelObject}>
-                        <div className="mb-[4px]">
-                          <Image
-                            src={getIconUrl({
-                              icn: "",
-                              model_id: "",
-                            })}
-                            className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
-                            alt="目标"
-                            width={40}
-                            height={40}
-                          />
-                        </div>
-                        <span
-                          className={associationsModalStyle.modelObjectName}
-                        >
-                          {getFieldValue("target_model_id")}
-                        </span>
-                      </div>
-                    </div>
-                  </Form.Item>
-                ) : null
+                    </Form.Item>
+                  ) : null
               }
             </Form.Item>
           </Form>

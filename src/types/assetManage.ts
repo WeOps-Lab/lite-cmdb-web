@@ -39,3 +39,16 @@ export interface ClassificationItem {
   classification_id: string;
   [key: string]: any;
 }
+
+export interface AssoTypeItem {
+  asst_id: string;
+  asst_name: string;
+  [key: string]: any;
+}
+
+export interface AssoFieldType {
+  asst_id: string;
+  src_model_id: string;
+  dst_model_id: string;
+  mapping: string;
+}
