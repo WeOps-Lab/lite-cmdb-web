@@ -60,15 +60,15 @@ const dataSource = [
 const items: TabsProps["items"] = [
   {
     key: "1",
-    label: "Tab 1",
+    label: "主机1",
   },
   {
     key: "2",
-    label: "Tab 2",
+    label: "主机2",
   },
   {
     key: "3",
-    label: "Tab 3",
+    label: "主机3",
   },
 ];
 
@@ -194,10 +194,10 @@ const AssetData = () => {
           defaultValue="a"
           buttonStyle="solid"
         >
-          <Radio.Button value="a">Hangzhou</Radio.Button>
-          <Radio.Button value="b">Shanghai</Radio.Button>
-          <Radio.Button value="c">Beijing</Radio.Button>
-          <Radio.Button value="d">Chengdu</Radio.Button>
+          <Radio.Button value="a">主机管理</Radio.Button>
+          <Radio.Button value="b">数据库</Radio.Button>
+          <Radio.Button value="c">网络设备</Radio.Button>
+          <Radio.Button value="d">中间件</Radio.Button>
         </Radio.Group>
       </div>
       <div className={assetDataStyle.assetList}>
