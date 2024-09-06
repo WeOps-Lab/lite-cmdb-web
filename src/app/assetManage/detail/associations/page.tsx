@@ -38,16 +38,21 @@ const Associations = () => {
       subTitle: "",
     });
   };
+  const showModelName = (id: string) => {
+    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+  };
   const columns: TableColumnsType<any> = [
     {
       title: "Source Model",
       dataIndex: "src_model_id",
       key: "src_model_id",
+      render: (_, { src_model_id }) => <>{showModelName(src_model_id)}</>,
     },
     {
       title: "Target Model",
       dataIndex: "dst_model_id",
       key: "dst_model_id",
+      render: (_, { dst_model_id }) => <>{showModelName(dst_model_id)}</>,
     },
     {
       title: "Constraint",
@@ -138,7 +143,7 @@ const Associations = () => {
   const fetchData = async (type?: string) => {
     setLoading(true);
     const params = getTableParams();
-    console.log(params)
+    console.log(params);
     try {
       const res = await get(`/api/model/${modelId}/association/`);
       if (res.result) {
@@ -160,15 +165,15 @@ const Associations = () => {
     setLoading(true);
     Promise.all([getModelList, getAssoTypeList, fetchAssoData])
       .then((res) => {
-        if (res[0].result && res[1].result) {
+        if (res[0].result && res[1].result && res[2]) {
           const modeldata: ModelItem[] = res[0].data;
           const assoTypeData: AssoTypeItem[] = res[1].data;
           const assoTableData: AssoTypeItem[] = res[2].data;
           setAssoTypeList(assoTypeData);
           setModelList(modeldata);
           setTableData(assoTableData);
-          pagination.total = res[2].count || 0
-          setPagination(pagination)
+          //   pagination.total = res[2].count || 0
+          setPagination(pagination);
         }
       })
       .finally(() => {
