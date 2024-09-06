@@ -86,6 +86,13 @@ const Associations = () => {
       key: "action",
       render: (_, record) => (
         <>
+          <Button
+            className="mr-[10px]"
+            type="link"
+            onClick={() => showAssoModal("edit", record)}
+          >
+            Edit
+          </Button>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
             Delete
           </Button>

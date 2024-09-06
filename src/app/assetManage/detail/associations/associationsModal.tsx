@@ -41,6 +41,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
     const [modelVisible, setModelVisible] = useState<boolean>(false);
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
+    const [assoType, setAssoType] = useState<string>("");
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [assoInfo, setAssoInfo] = useState<any>({});
     const formRef = useRef<FormInstance>(null);
@@ -54,12 +55,13 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
     }, [modelVisible, assoInfo]);
 
     useImperativeHandle(ref, () => ({
-      showModal: ({ assoInfo, subTitle, title }) => {
+      showModal: ({ type, assoInfo, subTitle, title }) => {
         // 开启弹窗的交互
         setModelVisible(true);
         setSubTitle(subTitle);
         setTitle(title);
         setAssoInfo(assoInfo);
+        setAssoType(type)
       },
     }));
 
@@ -118,6 +120,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               <Button
                 type="primary"
                 loading={confirmLoading}
+                disabled={assoType === "edit"}
                 onClick={handleSubmit}
               >
                 Confirm
@@ -131,6 +134,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             name="basic"
             labelCol={{ span: 6 }}
             wrapperCol={{ span: 18 }}
+            disabled={assoType === "edit"}
           >
             <Form.Item<AssoFieldType>
               label="Source Model"
