@@ -93,7 +93,10 @@ const Associations = () => {
           >
             Edit
           </Button>
-          <Button type="link" onClick={() => showDeleteConfirm(record)}>
+          <Button
+            type="link"
+            onClick={() => showDeleteConfirm(record.model_asst_id)}
+          >
             Delete
           </Button>
         </>
@@ -101,14 +104,14 @@ const Associations = () => {
     },
   ];
 
-  const showDeleteConfirm = (row = { asset_id: "" }) => {
+  const showDeleteConfirm = (id: string) => {
     confirm({
       title: "Do you want to delete this item?",
       content: "After deletion, the data cannot be recovered.",
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
-          const res = await del(`/api/model/association/${row.asset_id}/`);
+          const res = await del(`/api/model/association/${id}/`);
           if (res.result) {
             message.success("Item deleted successfully");
             if (pagination.current > 1 && tableData.length === 1) {
