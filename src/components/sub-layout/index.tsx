@@ -8,6 +8,7 @@ interface WithSideMenuLayoutProps {
   showBackButton?: boolean;
   onBackButtonClick?: () => void;
   children: React.ReactNode;
+  topSection?: React.ReactNode;
 }
 
 const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({ 
@@ -15,10 +16,11 @@ const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({
   intro, 
   showBackButton, 
   onBackButtonClick, 
-  children
+  children,
+  topSection
 }) => {
   return (
-    <div className={`flex grow ${sideMenuStyle.sideMenuLayout}`}>
+    <div className={`flex grow w-full ${sideMenuStyle.sideMenuLayout}`}>
       <SideMenu 
         menuItems={menuItems}
         showBackButton={showBackButton}
@@ -26,8 +28,15 @@ const WithSideMenuLayout: React.FC<WithSideMenuLayoutProps> = ({
       >
         {intro}
       </SideMenu>
-      <section className="p-4 flex-1 rounded-md">
-        {children}
+      <section className="flex-1 flex flex-col overflow-hidden">
+        {topSection && (
+          <div className={`mb-4 w-full rounded-md ${sideMenuStyle.sectionContainer}`}>
+            {topSection}
+          </div>
+        )} 
+        <div className={`p-4 flex-1 rounded-md overflow-auto ${sideMenuStyle.sectionContainer}`}>
+          {children}
+        </div>
       </section>
     </div>
   );
