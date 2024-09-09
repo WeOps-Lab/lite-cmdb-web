@@ -1,12 +1,12 @@
 import axios, { AxiosRequestConfig, AxiosResponse, InternalAxiosRequestConfig } from 'axios';
-import { useEffect, useCallback, useState } from 'react';
+import { useEffect, useCallback, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth';
 import { message } from 'antd';
 import { signIn } from 'next-auth/react';
 
 const apiClient = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL || 'reqApi',
-  timeout: 10000, // 请求超时时间
+  baseURL: '/reqApi',
+  timeout: 100000, // 请求超时时间
   headers: {
     'Content-Type': 'application/json',
   },
@@ -27,9 +27,11 @@ const handleResponse = (response: AxiosResponse, onError?: () => void) => {
 const useApiClient = () => {
   const authContext = useAuth();
   const token = authContext?.token || null;
+  const tokenRef = useRef(token);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    tokenRef.current = token;
     if (token) {
       setIsLoading(false);
     }
@@ -39,11 +41,11 @@ const useApiClient = () => {
     // 请求拦截器
     const requestInterceptor = apiClient.interceptors.request.use(
       (config: InternalAxiosRequestConfig) => {
-        if (!token) {
+        if (!tokenRef.current) {
           signIn('keycloak');
           return Promise.reject(new Error('No token available'));
         }
-        config.headers.Authorization = `Bearer ${token}`;
+        config.headers.Authorization = `Bearer ${tokenRef.current}`;
         return config;
       },
       (error) => {
@@ -79,7 +81,7 @@ const useApiClient = () => {
       apiClient.interceptors.request.eject(requestInterceptor);
       apiClient.interceptors.response.eject(responseInterceptor);
     };
-  }, [token]);
+  }, []);
 
   // 封装请求方法，并使用 useCallback 确保函数是稳定的
   const get = useCallback(async <T = any>(url: string, config?: AxiosRequestConfig, onError?: () => void): Promise<T> => {
