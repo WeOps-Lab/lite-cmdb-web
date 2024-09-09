@@ -136,15 +136,14 @@ const Attributes = () => {
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
-          const res = await del(
-            `/api/model/${row.model_id}/attr/${row.attr_id}/`
-          );
-          if (res.result) {
+          try {
+            await del(`/api/model/${row.model_id}/attr/${row.attr_id}/`);
             message.success(t("successfullyDeleted"));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
             fetchData();
+          } finally {
             resolve(true);
           }
         });
@@ -184,14 +183,11 @@ const Attributes = () => {
     setLoading(true);
     // const params = getTableParams();
     try {
-      const { result, data } = await get(`/api/model/${modelId}/attr_list/`);
-      if (result) {
-        setTableData(data);
-        pagination.total = data.length;
-        pagination.pageSize = 10;
-        setPagination(pagination);
-        setLoading(false);
-      }
+      const data = await get(`/api/model/${modelId}/attr_list/`);
+      setTableData(data);
+      pagination.total = data.length;
+      pagination.pageSize = 10;
+      setPagination(pagination);
     } catch (error) {
       console.log(error);
     } finally {

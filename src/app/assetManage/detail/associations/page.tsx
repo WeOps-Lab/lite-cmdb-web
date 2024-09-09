@@ -138,13 +138,14 @@ const Associations = () => {
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
-          const res = await del(`/api/model/association/${id}/`);
-          if (res.result) {
+          try {
+            await del(`/api/model/association/${id}/`);
             message.success(t("successfullyDeleted"));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
             fetchData();
+          } finally {
             resolve(true);
           }
         });
@@ -185,10 +186,8 @@ const Associations = () => {
     const params = getTableParams();
     console.log(params);
     try {
-      const res = await get(`/api/model/${modelId}/association/`);
-      if (res.result) {
-        setTableData(res.data);
-      }
+      const data = await get(`/api/model/${modelId}/association/`);
+      setTableData(data);
     } finally {
       setLoading(false);
     }
@@ -205,16 +204,14 @@ const Associations = () => {
     setLoading(true);
     Promise.all([getModelList, getAssoTypeList, fetchAssoData])
       .then((res) => {
-        if (res[0].result && res[1].result && res[2]) {
-          const modeldata: ModelItem[] = res[0].data;
-          const assoTypeData: AssoTypeItem[] = res[1].data;
-          const assoTableData: AssoTypeItem[] = res[2].data;
-          setAssoTypeList(assoTypeData);
-          setModelList(modeldata);
-          setTableData(assoTableData);
-          //   pagination.total = res[2].count || 0
-          setPagination(pagination);
-        }
+        const modeldata: ModelItem[] = res[0];
+        const assoTypeData: AssoTypeItem[] = res[1];
+        const assoTableData: AssoTypeItem[] = res[2];
+        setAssoTypeList(assoTypeData);
+        setModelList(modeldata);
+        setTableData(assoTableData);
+        //   pagination.total = res[2].count || 0
+        setPagination(pagination);
       })
       .finally(() => {
         setLoading(false);

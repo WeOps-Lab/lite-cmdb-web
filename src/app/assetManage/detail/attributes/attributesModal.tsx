@@ -142,12 +142,10 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             : `/api/model/${params.model_id}/attr_update/`;
         const requestParams = deepClone(params);
         const requestType = type === "add" ? post : put;
-        const { result } = await requestType(url, requestParams);
-        if (result) {
-          message.success(msg);
-          onSuccess();
-          handleCancel();
-        }
+        await requestType(url, requestParams);
+        message.success(msg);
+        onSuccess();
+        handleCancel();
       } catch (error) {
         console.log(error);
       } finally {

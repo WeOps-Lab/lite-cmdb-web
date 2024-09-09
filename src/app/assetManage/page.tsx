@@ -47,14 +47,13 @@ const AssetManage = () => {
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
-          const res = await del(
-            `/api/classification/${row.classification_id}/`
-          );
-          if (res.result) {
+          try {
+            await del(`/api/classification/${row.classification_id}/`);
             message.success(t("successfullyDeleted"));
             getModelGroup();
+          } finally {
+            resolve(true);
           }
-          resolve(true);
         });
       },
     });
@@ -93,11 +92,11 @@ const AssetManage = () => {
   };
 
   const onTxtPressEnter = () => {
-    getModelGroup()
+    getModelGroup();
   };
 
   const onTxtClear = () => {
-    getModelGroup()
+    getModelGroup();
   };
 
   const linkToDetial = (model: ModelItem) => {
@@ -134,11 +133,11 @@ const AssetManage = () => {
     const getCroupList = get("/api/classification/");
     const getModelList = get("/api/model/");
     setLoading(true);
-    Promise.all([getModelList, getCroupList])
-      .then((res) => {
-        if (res[0].result && res[1].result) {
-          const modeldata: ModelItem[] = res[0].data;
-          const groupData: GroupItem[] = res[1].data;
+    try {
+      Promise.all([getModelList, getCroupList])
+        .then((res) => {
+          const modeldata: ModelItem[] = res[0];
+          const groupData: GroupItem[] = res[1];
           const groups = deepClone(groupData).map((item: GroupItem) => ({
             ...item,
             list: [],
@@ -157,11 +156,13 @@ const AssetManage = () => {
           setGroupList(groupData);
           setModelList(modeldata);
           setModelGroup(groups);
-        }
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    } catch (error) {
+      setLoading(false);
+    }
   };
 
   return (

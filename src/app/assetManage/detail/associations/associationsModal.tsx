@@ -75,12 +75,10 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
       try {
         setConfirmLoading(true);
         const requestParams = deepClone(params);
-        const { result } = await post("/api/model/association/", requestParams);
-        if (result) {
-          message.success(t("successfullyAdded"));
-          onSuccess();
-          handleCancel();
-        }
+        await post("/api/model/association/", requestParams);
+        message.success(t("successfullyAdded"));
+        onSuccess();
+        handleCancel();
       } catch (error) {
         console.log(error);
       } finally {

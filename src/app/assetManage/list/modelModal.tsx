@@ -84,12 +84,10 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
           };
         }
         const requestType = type === "add" ? post : put;
-        const { result } = await requestType(url, requestParams);
-        if (result) {
-          message.success(msg);
-          handleCancel();
-          onSuccess(params);
-        }
+        await requestType(url, requestParams);
+        message.success(msg);
+        handleCancel();
+        onSuccess(params);
       } catch (error) {
         console.log(error);
       } finally {

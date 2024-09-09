@@ -29,7 +29,10 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const { t } = useTranslation();
   const menuItems = [
     { label: t("Model.attributes"), path: "/assetManage/detail/attributes" },
-    { label: t("Model.relationships"), path: "/assetManage/detail/associations" },
+    {
+      label: t("Model.relationships"),
+      path: "/assetManage/detail/associations",
+    },
   ];
 
   useEffect(() => {
@@ -40,10 +43,8 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const getGroups = async () => {
     setPageLoading(true);
     try {
-      const { result, data } = await get("/api/classification/");
-      if (result) {
-        setGroupList(data);
-      }
+      const data = await get("/api/classification/");
+      setGroupList(data);
     } catch (error) {
       console.log(error);
     } finally {
@@ -69,9 +70,11 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
-          const res = await del(`/api/model/${row.model_id}/`);
-          if (res.result) {
+          try {
+            await del(`/api/model/${row.model_id}/`);
             message.success(t("successfullyDeleted"));
+            router.push(`/assetManage`);
+          } finally {
             resolve(true);
           }
         });

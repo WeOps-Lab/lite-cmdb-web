@@ -69,12 +69,10 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
           };
         }
         const requestType = type === "add" ? post : put;
-        const { result } = await requestType(url, params);
-        if (result) {
-          message.success(msg);
-          handleCancel();
-          onSuccess();
-        }
+        await requestType(url, params);
+        message.success(msg);
+        handleCancel();
+        onSuccess();
       } catch (error) {
         console.log(error);
       } finally {
