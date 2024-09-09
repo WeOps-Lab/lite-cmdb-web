@@ -12,6 +12,7 @@ import OperateModal from "@/components/operate-modal";
 import type { FormInstance } from "antd";
 import useApiClient from "@/utils/request";
 import { GroupConfig, GroupFieldType } from "@/types/assetManage";
+import { useTranslation } from "@/utils/i18n";
 
 interface GroupModalProps {
   onSuccess: () => void;
@@ -31,6 +32,7 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
     const [type, setType] = useState<string>("");
     const formRef = useRef<FormInstance>(null);
     const { post, put } = useApiClient();
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       showModal: ({ type, groupInfo, subTitle, title }) => {
@@ -53,10 +55,9 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
     const operateGroup = async (params: GroupFieldType) => {
       try {
         setConfirmLoading(true);
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
+        const msg: string = t(
+          type === "add" ? "successfullyAdded" : "successfullyModified"
+        );
         const url: string =
           type === "add"
             ? "/api/classification/"
@@ -100,16 +101,15 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
-              </Button>
               <Button
+                className="mr-[10px]"
                 type="primary"
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                Confirm
+                {t("confirm")}
               </Button>
+              <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
           }
         >
@@ -122,14 +122,14 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
             <Form.Item<GroupFieldType>
               label="ID"
               name="classification_id"
-              rules={[{ required: true, message: "Please input your id!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input disabled={type === "edit"} />
             </Form.Item>
             <Form.Item<GroupFieldType>
               label="Name"
               name="classification_name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input />
             </Form.Item>

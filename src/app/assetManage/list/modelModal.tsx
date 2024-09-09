@@ -17,9 +17,10 @@ import useApiClient from "@/utils/request";
 import { ModelItem, ModelConfig } from "@/types/assetManage";
 import { deepClone } from "@/utils/common";
 const { Option } = Select;
+import { useTranslation } from "@/utils/i18n";
 
 interface ModelModalProps {
-  onSuccess: (info?:unknown) => void;
+  onSuccess: (info?: unknown) => void;
   groupList: Array<any>;
 }
 
@@ -40,6 +41,7 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     const formRef = useRef<FormInstance>(null);
     const selectIconRef = useRef<any>(null);
     const { post, put } = useApiClient();
+    const { t } = useTranslation();
 
     useEffect(() => {
       if (modelVisible) {
@@ -68,10 +70,9 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     const OperateModel = async (params: ModelItem) => {
       try {
         setConfirmLoading(true);
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
+        const msg: string = t(
+          type === "add" ? "successfullyAdded" : "successfullyModified"
+        );
         const url: string =
           type === "add" ? "/api/model/" : `/api/model/${modelInfo.model_id}/`;
         let requestParams = deepClone(params);
@@ -123,7 +124,7 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
 
     const onSelectIcon = () => {
       selectIconRef.current?.showModal({
-        title: "Select the icon",
+        title: t("Model.selectIcon"),
         defaultIcon: iconId,
       });
     };
@@ -137,16 +138,15 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
-              </Button>
               <Button
                 type="primary"
+                className="mr-[10px]"
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                Confirm
+                {t("confirm")}
               </Button>
+              <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
           }
         >
@@ -158,13 +158,13 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
               <Image
                 src={modelIcon}
                 className="block w-auto h-10"
-                alt="图标"
+                alt={t("picture")}
                 width={60}
                 height={60}
               />
             </div>
             <span className="text-[var(--color-text-3)] mt-[10px] mb-[20px]">
-              Select the icon
+              {t("Model.selectIcon")}
             </span>
           </div>
           <Form
@@ -174,11 +174,14 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
             wrapperCol={{ span: 20 }}
           >
             <Form.Item<ModelItem>
-              label="Group"
+              label={t("group")}
               name="classification_id"
-              rules={[{ required: true, message: "Please input your group!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
-              <Select disabled={type === 'edit'} placeholder="Please select a country">
+              <Select
+                disabled={type === "edit"}
+                placeholder="Please select a country"
+              >
                 {groupList.map((item) => {
                   return (
                     <Option
@@ -192,16 +195,16 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
               </Select>
             </Form.Item>
             <Form.Item<ModelItem>
-              label="ID"
+              label={t("id")}
               name="model_id"
-              rules={[{ required: true, message: "Please input your id!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
-              <Input disabled={type === 'edit'}/>
+              <Input disabled={type === "edit"} />
             </Form.Item>
             <Form.Item<ModelItem>
-              label="Name"
+              label={t("name")}
               name="model_name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input />
             </Form.Item>

@@ -52,3 +52,15 @@ export interface AssoFieldType {
   dst_model_id: string;
   mapping: string;
 }
+
+export interface AttrFieldType {
+  model_id: string;
+  attr_id: string;
+  attr_name: string;
+  attr_type: string;
+  is_only: boolean;
+  is_required: boolean;
+  editable: boolean;
+  option: Array<string>;
+  attr_group: string;
+}

@@ -12,11 +12,7 @@ import ModelModal from "../list/modelModal";
 import attrLayoutStyle from "./layout.module.less";
 import useApiClient from "@/utils/request";
 import { ClassificationItem } from "@/types/assetManage";
-
-const menuItems = [
-  { label: "Attributes", path: "/assetManage/detail/attributes" },
-  { label: "Relationships", path: "/assetManage/detail/associations" },
-];
+import { useTranslation } from "@/utils/i18n";
 
 const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
@@ -30,6 +26,11 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const { confirm } = Modal;
   const modelRef = useRef<any>(null);
   const { get, del, isLoading } = useApiClient();
+  const { t } = useTranslation();
+  const menuItems = [
+    { label: t("Model.attributes"), path: "/assetManage/detail/attributes" },
+    { label: t("Model.relationships"), path: "/assetManage/detail/associations" },
+  ];
 
   useEffect(() => {
     if (isLoading) return;
@@ -49,6 +50,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       setPageLoading(false);
     }
   };
+
   const onSuccess = (info: any) => {
     router.replace(
       `/assetManage/detail/attributes?icn=${info.icn}&model_name=${info.model_name}&model_id=${info.model_id}&classification_id=${info.classification_id}`
@@ -62,14 +64,14 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
 
   const showDeleteConfirm = (row = { model_id: "" }) => {
     confirm({
-      title: "Do you want to delete this item?",
-      content: "After deletion, the data cannot be recovered.",
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
           const res = await del(`/api/model/${row.model_id}/`);
           if (res.result) {
-            message.success("Item deleted successfully");
+            message.success(t("successfullyDeleted"));
             resolve(true);
           }
         });
@@ -78,7 +80,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const shoModelModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add Model" : "Edit Model";
+    const title = t(type === "add" ? "Model.addModel" : "Model.editModel");
     modelRef.current?.showModal({
       title,
       type,
@@ -95,7 +97,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
             <Image
               src={getIconUrl({ icn: objIcon, model_id: modelId })}
               className="block mr-[20px]"
-              alt="图标"
+              alt={t("picture")}
               width={40}
               height={40}
             />

@@ -15,19 +15,9 @@ import { PlusOutlined, DeleteTwoTone, HolderOutlined } from "@ant-design/icons";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { useSearchParams } from "next/navigation";
+import { AttrFieldType } from "@/types/assetManage"
+import { useTranslation } from "@/utils/i18n";
 const { Option } = Select;
-
-interface AttrFieldType {
-  model_id: string;
-  attr_id: string;
-  attr_name: string;
-  attr_type: string;
-  is_only: boolean;
-  is_required: boolean;
-  editable: boolean;
-  option: Array<string>;
-  attr_group: string;
-}
 
 interface AttrModalProps {
   onSuccess: (type?: unknown) => void;
@@ -59,8 +49,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const searchParams = useSearchParams();
     const classificationId: string =
       searchParams.get("classification_id") || "";
-    const modelId: string =
-      searchParams.get("model_id") || "";
+    const modelId: string = searchParams.get("model_id") || "";
+    const { t } = useTranslation();
 
     useEffect(() => {
       if (modelVisible) {
@@ -92,9 +82,9 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
       formRef.current?.validateFields().then((values) => {
         operateAttr({
           ...values,
-          option: '',
+          option: "",
           attr_group: classificationId,
-          model_id: modelId
+          model_id: modelId,
         });
       });
     };
@@ -102,7 +92,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     // 自定义验证枚举列表
     const validateEnumList = async () => {
       if (enumList.some((item) => !item)) {
-        return Promise.reject(new Error("The value cannot be empty"));
+        return Promise.reject(new Error(t("valueValidate")));
       }
       return Promise.resolve();
     };
@@ -143,10 +133,9 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const operateAttr = async (params: AttrFieldType) => {
       try {
         setConfirmLoading(true);
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
+        const msg: string = t(
+          type === "add" ? "successfullyAdded" : "successfullyModified"
+        );
         const url: string =
           type === "add"
             ? `/api/model/${params.model_id}/attr/`
@@ -175,12 +164,15 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
+              <Button
+                type="primary"
+                className="mr-[10px]"
+                loading={confirmLoading}
+                onClick={handleSubmit}
+              >
+                {t("confirm")}
               </Button>
-              <Button type="primary" onClick={handleSubmit}>
-                Confirm
-              </Button>
+              <Button onClick={handleCancel}> {t("cancel")}</Button>
             </div>
           }
         >
@@ -191,25 +183,25 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             wrapperCol={{ span: 20 }}
           >
             <Form.Item<AttrFieldType>
-              label="Name"
+              label={t("name")}
               name="attr_name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label="ID"
+              label={t("id")}
               name="attr_id"
-              rules={[{ required: true, message: "Please input your id!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label="Type"
+              label={t("type")}
               name="attr_type"
-              rules={[{ required: true, message: "Please select a type!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
-              <Select placeholder="Please select a type">
+              <Select>
                 {attrTypeList.map((item) => {
                   return (
                     <Option value={item.id} key={item.id}>
@@ -228,7 +220,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
               {({ getFieldValue }) =>
                 getFieldValue("type") === "enum" ? (
                   <Form.Item<AttrFieldType>
-                    label="Value"
+                    label={t("value")}
                     name="option"
                     rules={[{ validator: validateEnumList }]}
                   >
@@ -287,37 +279,33 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
               }
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label="Editable"
+              label={t("editable")}
               name="editable"
-              rules={[
-                { required: true, message: "Please select the Editable!" },
-              ]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Radio.Group>
-                <Radio value={true}>Yes</Radio>
-                <Radio value={false}>No</Radio>
+                <Radio value={true}>{t("yes")}</Radio>
+                <Radio value={false}>{t("no")}</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label="Unique"
+              label={t("unique")}
               name="is_only"
-              rules={[{ required: true, message: "Please select the Unique!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Radio.Group>
-                <Radio value={true}>Yes</Radio>
-                <Radio value={false}>No</Radio>
+                <Radio value={true}>{t("yes")}</Radio>
+                <Radio value={false}>{t("no")}</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label="Require"
+              label={t("required")}
               name="is_required"
-              rules={[
-                { required: true, message: "Please select the Require!" },
-              ]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Radio.Group>
-                <Radio value={true}>Yes</Radio>
-                <Radio value={false}>No</Radio>
+                <Radio value={true}>{t("yes")}</Radio>
+                <Radio value={false}>{t("no")}</Radio>
               </Radio.Group>
             </Form.Item>
           </Form>

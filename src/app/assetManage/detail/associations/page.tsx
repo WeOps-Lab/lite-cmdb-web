@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Input, Button, Modal, message } from "antd";
+import { Input, Button, Modal, message, Tooltip } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CustomTable from "@/components/custom-table";
 import AssociationsModal from "./associationsModal";
@@ -11,6 +11,7 @@ import { CONSTRAINT_List } from "@/constants/asset";
 import useApiClient from "@/utils/request";
 import { ModelItem, AssoTypeItem } from "@/types/assetManage";
 import { useSearchParams } from "next/navigation";
+import { useTranslation } from "@/utils/i18n";
 const { confirm } = Modal;
 
 const Associations = () => {
@@ -28,34 +29,48 @@ const Associations = () => {
   const { get, del } = useApiClient();
   const searchParams = useSearchParams();
   const modelId = searchParams.get("model_id");
-
-  const showAssoModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add Associations" : "Edit Associations";
-    assoRef.current?.showModal({
-      title,
-      type,
-      assoInfo: row,
-      subTitle: "",
-    });
-  };
-  const showModelName = (id: string) => {
-    return modelList.find((item) => item.model_id === id)?.model_name || "--";
-  };
+  const { t } = useTranslation();
   const columns: TableColumnsType<any> = [
     {
-      title: "Source Model",
+      title: t("name"),
+      dataIndex: "model_asst_id",
+      key: "model_asst_id",
+      ellipsis: {
+        showTitle: false,
+      },
+      render: (_, record) => {
+        const assoName = `${showModelName(record.src_model_id)}_${
+          record.asst_id
+        }_${showModelName(record.dst_model_id)}`;
+        return (
+          <a
+            title={assoName}
+            onClick={() =>
+              showAssoModal("edit", {
+                ...record,
+                subTitle: assoName,
+              })
+            }
+          >
+            {assoName}
+          </a>
+        );
+      },
+    },
+    {
+      title: t("Model.sourceModel"),
       dataIndex: "src_model_id",
       key: "src_model_id",
       render: (_, { src_model_id }) => <>{showModelName(src_model_id)}</>,
     },
     {
-      title: "Target Model",
+      title: t("Model.targetModel"),
       dataIndex: "dst_model_id",
       key: "dst_model_id",
       render: (_, { dst_model_id }) => <>{showModelName(dst_model_id)}</>,
     },
     {
-      title: "Constraint",
+      title: t("Model.constraint"),
       dataIndex: "mapping",
       key: "mapping",
       render: (_, { mapping }) => (
@@ -63,18 +78,15 @@ const Associations = () => {
       ),
     },
     {
-      title: "Type",
+      title: t("type"),
       key: "asst_id",
       dataIndex: "asst_id",
       render: (_, { asst_id }) => {
-        const assoType =
-          assoTypeList.find((item) => item.asst_id === asst_id)?.asst_name ||
-          "--";
         return (
           <>
             {
-              <Tag color={assoType ? "green" : "geekblue"}>
-                {assoType || "--"}
+              <Tag color={asst_id ? "green" : "geekblue"}>
+                {asst_id || "--"}
               </Tag>
             }
           </>
@@ -82,38 +94,53 @@ const Associations = () => {
       },
     },
     {
-      title: "ACTIONS",
+      title: t("action"),
       key: "action",
       render: (_, record) => (
         <>
           <Button
-            className="mr-[10px]"
-            type="link"
-            onClick={() => showAssoModal("edit", record)}
-          >
-            Edit
-          </Button>
-          <Button
             type="link"
             onClick={() => showDeleteConfirm(record.model_asst_id)}
           >
-            Delete
+            {t("delete")}
           </Button>
         </>
       ),
     },
   ];
 
+  useEffect(() => {
+    getInitData();
+  }, [pagination?.current, pagination?.pageSize]);
+
+  const showAssoModal = (type: string, row = { subTitle: "" }) => {
+    const title = t(
+      type === "add" ? "Model.addAssociations" : "Model.checkAssociations"
+    );
+    const assorow = type === "add" ? { src_model_id: modelId } : row;
+    const subTitle = row.subTitle;
+    assoRef.current?.showModal({
+      title,
+      type,
+      assoInfo: assorow,
+      subTitle,
+    });
+  };
+
+  const showModelName = (id: string) => {
+    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+  };
+
   const showDeleteConfirm = (id: string) => {
     confirm({
-      title: "Do you want to delete this item?",
-      content: "After deletion, the data cannot be recovered.",
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
           const res = await del(`/api/model/association/${id}/`);
           if (res.result) {
-            message.success("Item deleted successfully");
+            message.success(t("successfullyDeleted"));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
@@ -134,14 +161,17 @@ const Associations = () => {
     setPagination(pagination);
     fetchData();
   };
+
   const onTxtClear = () => {
     pagination.current = 1;
     setPagination(pagination);
     fetchData();
   };
+
   const handleTableChange = (pagination = {}) => {
     setPagination(pagination);
   };
+
   const getTableParams = () => {
     return {
       search: searchText,
@@ -191,17 +221,13 @@ const Associations = () => {
       });
   };
 
-  useEffect(() => {
-    getInitData();
-  }, [pagination?.current, pagination?.pageSize]);
-
   return (
     <div>
       <div>
         <div className="nav-box flex justify-end mb-[10px]">
           <div className="left-side w-[240px] mr-[8px]">
             <Input
-              placeholder="search..."
+              placeholder={t("search")}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -216,7 +242,7 @@ const Associations = () => {
               icon={<PlusOutlined />}
               onClick={() => showAssoModal("add")}
             >
-              Add
+              {t("add")}
             </Button>
           </div>
         </div>

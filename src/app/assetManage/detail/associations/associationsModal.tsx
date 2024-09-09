@@ -17,6 +17,7 @@ import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 const { Option } = Select;
 import { AssoTypeItem, ModelItem, AssoFieldType } from "@/types/assetManage";
+import { useTranslation } from "@/utils/i18n";
 
 interface AssoModalProps {
   onSuccess: () => void;
@@ -46,6 +47,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
     const [assoInfo, setAssoInfo] = useState<any>({});
     const formRef = useRef<FormInstance>(null);
     const { post } = useApiClient();
+    const { t } = useTranslation();
 
     useEffect(() => {
       if (modelVisible) {
@@ -61,20 +63,12 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
         setSubTitle(subTitle);
         setTitle(title);
         setAssoInfo(assoInfo);
-        setAssoType(type)
+        setAssoType(type);
       },
     }));
 
     const showModelKeyName = (id: string, key: string) => {
       return allModelList.find((item) => item.model_id === id)?.[key] || "--";
-    };
-
-    const showAssoType = (id: string) => {
-      const target = assoTypeList.find((item) => item.asst_id === id);
-      if (target) {
-        return `${target.asst_name}(${target.asst_id})`;
-      }
-      return "--";
     };
 
     const operateRelationships = async (params: AssoFieldType) => {
@@ -83,7 +77,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
         const requestParams = deepClone(params);
         const { result } = await post("/api/model/association/", requestParams);
         if (result) {
-          message.success("New successfully added !");
+          message.success(t("successfullyAdded"));
           onSuccess();
           handleCancel();
         }
@@ -114,17 +108,16 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
-              </Button>
               <Button
+                className="mr-[10px]"
                 type="primary"
                 loading={confirmLoading}
                 disabled={assoType === "edit"}
                 onClick={handleSubmit}
               >
-                Confirm
+                {t("confirm")}
               </Button>
+              <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
           }
         >
@@ -137,13 +130,11 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
             disabled={assoType === "edit"}
           >
             <Form.Item<AssoFieldType>
-              label="Source Model"
+              label={t("Model.sourceModel")}
               name="src_model_id"
-              rules={[
-                { required: true, message: "Please select the Source Model !" },
-              ]}
+              rules={[{ required: true, message: t("required") }]}
             >
-              <Select placeholder="Please select the Source Model" allowClear>
+              <Select allowClear disabled>
                 {allModelList.map((item) => {
                   return (
                     <Option value={item.model_id} key={item.model_id}>
@@ -154,13 +145,11 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               </Select>
             </Form.Item>
             <Form.Item<AssoFieldType>
-              label="Target Model"
+              label={t("Model.targetModel")}
               name="dst_model_id"
-              rules={[
-                { required: true, message: "Please select the Target Model !" },
-              ]}
+              rules={[{ required: true, message: t("required") }]}
             >
-              <Select placeholder="Please select the Target Model" allowClear>
+              <Select allowClear>
                 {allModelList.map((item) => {
                   return (
                     <Option value={item.model_id} key={item.model_id}>
@@ -171,39 +160,36 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               </Select>
             </Form.Item>
             <Form.Item<AssoFieldType>
-              label="Association Type"
+              label={t("Model.associationType")}
               name="asst_id"
               rules={[
                 {
                   required: true,
-                  message: "Please select an Association Type !",
+                  message: t("required"),
                 },
               ]}
             >
-              <Select
-                placeholder="Please select an Association type"
-                allowClear
-              >
+              <Select allowClear>
                 {assoTypeList.map((item) => {
                   return (
                     <Option value={item.asst_id} key={item.asst_id}>
-                      {`${item.asst_name}(${item.asst_id})`}
+                      {item.asst_id}
                     </Option>
                   );
                 })}
               </Select>
             </Form.Item>
             <Form.Item<AssoFieldType>
-              label="Constraint"
+              label={t("Model.constraint")}
               name="mapping"
               rules={[
                 {
                   required: true,
-                  message: "Please select the constraint !",
+                  message: t("required"),
                 },
               ]}
             >
-              <Select placeholder="Please select the constraint">
+              <Select>
                 {constraintList.map((item) => {
                   return (
                     <Option value={item.id} key={item.id}>
@@ -225,7 +211,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                 getFieldValue("asst_id") &&
                 getFieldValue("dst_model_id") &&
                 getFieldValue("src_model_id") ? (
-                    <Form.Item<AssoFieldType> label="Effect">
+                    <Form.Item<AssoFieldType> label={t("Model.effect")}>
                       <div
                         className={associationsModalStyle.effectRepresentation}
                       >
@@ -240,7 +226,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                                 model_id: getFieldValue("src_model_id"),
                               })}
                               className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
-                              alt="源"
+                              alt={t("picture")}
                               width={40}
                               height={40}
                             />
@@ -257,7 +243,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                         <div className={associationsModalStyle.modelEdge}>
                           <div className={associationsModalStyle.connection}>
                             <span className={associationsModalStyle.name}>
-                              {showAssoType(getFieldValue("asst_id"))}
+                              {getFieldValue("asst_id")}
                             </span>
                           </div>
                         </div>
@@ -272,7 +258,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                                 model_id: getFieldValue("dst_model_id"),
                               })}
                               className="block bg-[var(--color-bg-1)] p-[6px] rounded-[50%]"
-                              alt="目标"
+                              alt={t("picture")}
                               width={40}
                               height={40}
                             />

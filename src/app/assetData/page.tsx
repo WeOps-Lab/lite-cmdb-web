@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef } from "react";
-import { Tree, Input, Button, Space, Modal, Radio, Tabs, message } from "antd";
+import { Input, Button, Space, Modal, Radio, Tabs, message } from "antd";
 import CustomTable from "@/components/custom-table";
 import type { TableColumnsType } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
@@ -9,29 +9,8 @@ import type { RadioChangeEvent, TabsProps } from "antd";
 import assetDataStyle from "./index.module.less";
 import { getRandomColor } from "@/utils/common";
 import FieldModal from "./list/fieldModal";
+import { useTranslation } from "@/utils/i18n";
 const { confirm } = Modal;
-
-const treeData = [
-  {
-    title: "Organization 1",
-    key: "0-0",
-    children: [
-      {
-        title: "Department 1",
-        key: "0-0-0",
-        children: [
-          { title: "Team 1", key: "0-0-0-0" },
-          { title: "Team 2", key: "0-0-0-1" },
-        ],
-      },
-      {
-        title: "Department 2",
-        key: "0-0-1",
-        children: [{ title: "Team 3", key: "0-0-1-0" }],
-      },
-    ],
-  },
-];
 
 const dataSource = [
   {
@@ -75,64 +54,7 @@ const items: TabsProps["items"] = [
 const AssetData = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState([]);
   const fieldRef = useRef<any>(null);
-
-  const onSelectChange = (selectedKeys: any) => {
-    setSelectedRowKeys(selectedKeys);
-  };
-
-  const onChangeModel = (key: string) => {
-    console.log(key);
-  };
-
-  const rowSelection = {
-    selectedRowKeys,
-    onChange: onSelectChange,
-  };
-
-  const handleDelete = () => {
-    confirm({
-      title: "Are you sure delete these items?",
-      onOk: () => {
-        message.success("Item deleted successfully");
-        setSelectedRowKeys([]);
-      },
-    });
-  };
-
-  const onGroupChange = (e: RadioChangeEvent) => {
-    console.log(`radio checked:${e.target.value}`);
-  };
-
-  const showDeleteConfirm = (row = {}) => {
-    confirm({
-      title: "Do you want to delete this item?",
-      content: "After deletion, the data cannot be recovered.",
-      centered: true,
-      onOk() {
-        return new Promise((resolve, reject) => {
-          setTimeout(() => {
-            setSelectedRowKeys([]);
-            message.success("Item deleted successfully");
-            resolve(true);
-          }, 500);
-        }).catch(() => console.log("Oops errors!"));
-      },
-    });
-  };
-
-  const updateFieldList = (msg: string) => {
-    console.log("创建分组成功", msg);
-  };
-
-  const showAttrModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add" : "Edit";
-    fieldRef.current?.showModal({
-      title,
-      type,
-      groupInfo: row,
-      subTitle: "",
-    });
-  };
+  const { t } = useTranslation();
 
   const columns: TableColumnsType = [
     {
@@ -167,7 +89,7 @@ const AssetData = () => {
       ),
     },
     {
-      title: "Action",
+      title: t("action"),
       key: "action",
       render: (_, record) => (
         <>
@@ -176,15 +98,73 @@ const AssetData = () => {
             className="mr-[10px]"
             onClick={() => showAttrModal("edit", record)}
           >
-            Edit
+            {t("edit")}
           </Button>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
-            Delete
+            {t("delete")}
           </Button>
         </>
       ),
     },
   ];
+
+  const onSelectChange = (selectedKeys: any) => {
+    setSelectedRowKeys(selectedKeys);
+  };
+
+  const onChangeModel = (key: string) => {
+    console.log(key);
+  };
+
+  const rowSelection = {
+    selectedRowKeys,
+    onChange: onSelectChange,
+  };
+
+  const handleDelete = () => {
+    confirm({
+      title: t("batchDeleteTitle"),
+      onOk: () => {
+        message.success(t("successfullyDeleted"));
+        setSelectedRowKeys([]);
+      },
+    });
+  };
+
+  const onGroupChange = (e: RadioChangeEvent) => {
+    console.log(`radio checked:${e.target.value}`);
+  };
+
+  const showDeleteConfirm = (row = {}) => {
+    confirm({
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
+      centered: true,
+      onOk() {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            setSelectedRowKeys([]);
+            message.success(t("successfullyDeleted"));
+            resolve(true);
+          }, 500);
+        }).catch(() => console.log("Oops errors!"));
+      },
+    });
+  };
+
+  const updateFieldList = (msg: string) => {
+    console.log("创建分组成功", msg);
+  };
+
+  const showAttrModal = (type: string, row = {}) => {
+    const title = type === "add" ? "Add" : "Edit";
+    fieldRef.current?.showModal({
+      title,
+      type,
+      groupInfo: row,
+      subTitle: "",
+    });
+  };
 
   return (
     <div className={assetDataStyle.assetData}>
@@ -211,17 +191,17 @@ const AssetData = () => {
               icon={<PlusOutlined />}
               onClick={() => showAttrModal("add")}
             >
-              Add
+              {t("add")}
             </Button>
             <Button>Export</Button>
             <Button
               onClick={() => showAttrModal("add")}
               disabled={!selectedRowKeys.length}
             >
-              Edit
+              {t("edit")}
             </Button>
             <Button onClick={handleDelete} disabled={!selectedRowKeys.length}>
-              Delete
+              {t("delete")}
             </Button>
           </Space>
         </div>

@@ -10,7 +10,7 @@ import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { ATTR_TYPE_LIST } from "@/constants/asset";
 import useApiClient from "@/utils/request";
-const { confirm } = Modal;
+import { useTranslation } from "@/utils/i18n";
 
 const Attributes = () => {
   const [searchText, setSearchText] = useState<string>("");
@@ -26,23 +26,15 @@ const Attributes = () => {
   const { confirm } = Modal;
   const searchParams = useSearchParams();
   const modelId = searchParams.get("model_id");
-  const showAttrModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add Attribute" : "Edit Attribute";
-    attrRef.current?.showModal({
-      title,
-      type,
-      attrInfo: row,
-      subTitle: "",
-    });
-  };
+  const { t } = useTranslation();
   const columns: TableColumnsType = [
     {
-      title: "Name",
+      title: t("name"),
       dataIndex: "attr_name",
       key: "attr_name",
     },
     {
-      title: "Type",
+      title: t("type"),
       dataIndex: "attr_type",
       key: "attr_type",
       render: (_, { attr_type }) => (
@@ -52,49 +44,49 @@ const Attributes = () => {
       ),
     },
     {
-      title: "REQUIRED",
+      title: t("required"),
       key: "is_required",
       dataIndex: "is_required",
       render: (_, { is_required }) => (
         <>
           {
             <Tag color={is_required ? "green" : "geekblue"}>
-              {is_required ? "Yes" : "No"}
+              {t(is_required ? "yes" : "no")}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: "EDITABLE",
+      title: t("editable"),
       key: "editable",
       dataIndex: "editable",
       render: (_, { editable }) => (
         <>
           {
             <Tag color={editable ? "green" : "geekblue"}>
-              {editable ? "Yes" : "No"}
+              {t(editable ? "yes" : "no")}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: "UNIQUE",
+      title: t("unique"),
       key: "is_unique",
       dataIndex: "is_unique",
       render: (_, { is_only }) => (
         <>
           {
             <Tag color={is_only ? "green" : "geekblue"}>
-              {is_only ? "Yes" : "No"}
+              {t(is_only ? "yes" : "no")}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: "ACTIONS",
+      title: t("action"),
       key: "action",
       render: (_, record) => (
         <>
@@ -103,7 +95,7 @@ const Attributes = () => {
             className="mr-[10px]"
             onClick={() => showAttrModal("edit", record)}
           >
-            Edit
+            {t("edit")}
           </Button>
           <Button
             type="link"
@@ -114,17 +106,33 @@ const Attributes = () => {
               })
             }
           >
-            Delete
+            {t("delete")}
           </Button>
         </>
       ),
     },
   ];
 
+  useEffect(() => {
+    fetchData();
+  }, [pagination]);
+
+  const showAttrModal = (type: string, row = {}) => {
+    const title = t(
+      type === "add" ? "Model.addAttribute" : "Model.editAttribute"
+    );
+    attrRef.current?.showModal({
+      title,
+      type,
+      attrInfo: row,
+      subTitle: "",
+    });
+  };
+
   const showDeleteConfirm = (row = { model_id: "", attr_id: "" }) => {
     confirm({
-      title: "Do you want to delete this item?",
-      content: "After deletion, the data cannot be recovered.",
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
@@ -132,7 +140,7 @@ const Attributes = () => {
             `/api/model/${row.model_id}/attr/${row.attr_id}/`
           );
           if (res.result) {
-            message.success("Item deleted successfully");
+            message.success(t("successfullyDeleted"));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
@@ -153,14 +161,17 @@ const Attributes = () => {
     setPagination(pagination);
     fetchData();
   };
+
   const onTxtClear = () => {
     pagination.current = 1;
     setPagination(pagination);
     fetchData();
   };
+
   const handleTableChange = (pagination = {}) => {
     setPagination(pagination);
   };
+
   const getTableParams = () => {
     return {
       search: searchText,
@@ -192,17 +203,13 @@ const Attributes = () => {
     fetchData();
   };
 
-  useEffect(() => {
-    fetchData();
-  }, [pagination]);
-
   return (
     <div>
       <div>
         <div className="nav-box flex justify-end mb-[10px]">
           <div className="left-side w-[240px] mr-[8px]">
             <Input
-              placeholder="search..."
+              placeholder={t("search")}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -217,7 +224,7 @@ const Attributes = () => {
               icon={<PlusOutlined />}
               onClick={() => showAttrModal("add")}
             >
-              Add
+              {t("add")}
             </Button>
           </div>
         </div>

@@ -18,6 +18,7 @@ import GroupModal from "./list/groupModal";
 import ModelModal from "./list/modelModal";
 import { useRouter } from "next/navigation";
 import useApiClient from "@/utils/request";
+import { useTranslation } from "@/utils/i18n";
 
 const AssetManage = () => {
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
@@ -32,10 +33,17 @@ const AssetManage = () => {
   const router = useRouter();
   const { get, del, isLoading } = useApiClient();
   const { confirm } = Modal;
+  const { t } = useTranslation();
+
+  useEffect(() => {
+    if (isLoading) return;
+    getModelGroup();
+  }, [get, isLoading]);
+
   const showDeleteConfirm = (row: GroupItem) => {
     confirm({
-      title: "Do you want to delete this item?",
-      content: "After deletion, the data cannot be recovered.",
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
@@ -43,7 +51,7 @@ const AssetManage = () => {
             `/api/classification/${row.classification_id}/`
           );
           if (res.result) {
-            message.success("Item deleted successfully");
+            message.success(t("successfullyDeleted"));
             getModelGroup();
           }
           resolve(true);
@@ -53,7 +61,7 @@ const AssetManage = () => {
   };
 
   const showGroupModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add Group" : "Edit Group";
+    const title = t(type === "add" ? "Model.addGroup" : "Model.editGroup");
     groupRef.current?.showModal({
       title,
       type,
@@ -63,7 +71,7 @@ const AssetManage = () => {
   };
 
   const shoModelModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add Model" : "Edit Model";
+    const title = t(type === "add" ? "Model.addModel" : "Model.editModel");
     modelRef.current?.showModal({
       title,
       type,
@@ -85,11 +93,11 @@ const AssetManage = () => {
   };
 
   const onTxtPressEnter = () => {
-    console.log("enter", 123);
+    getModelGroup()
   };
 
   const onTxtClear = () => {
-    console.log("clear", 456);
+    getModelGroup()
   };
 
   const linkToDetial = (model: ModelItem) => {
@@ -99,14 +107,17 @@ const AssetManage = () => {
   };
 
   const handleDragStart = (item: any) => {
+    if (item) return;
     setDragItem(item);
   };
 
   const handleDragEnter = (item: any) => {
+    if (item) return;
     setDragOverItem(item);
   };
 
   const handleDragEnd = (groupIndex: number) => {
+    if (groupIndex) return;
     if (dragItem === null || dragOverItem === null) {
       return;
     }
@@ -118,11 +129,6 @@ const AssetManage = () => {
     setDragOverItem(null);
     setModelGroup(newModelGroup);
   };
-
-  useEffect(() => {
-    if (isLoading) return;
-    getModelGroup();
-  }, [get, isLoading]);
 
   const getModelGroup = () => {
     const getCroupList = get("/api/classification/");
@@ -160,15 +166,12 @@ const AssetManage = () => {
 
   return (
     <div style={{ width: "100%", height: "100%" }}>
-      <Introduction
-        title="Model Setting"
-        message="Asset model management provides the creation and management of all asset models and model groups. You can create and manage them according to your needs."
-      />
+      <Introduction title={t("Model.title")} message={t("Model.message")} />
       <div className={assetManageStyle.modelSetting}>
         <div className="nav-box flex justify-between mb-[10px]">
           <div className="left-side w-[240px]">
             <Input
-              placeholder="search..."
+              placeholder={t("search")}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -182,9 +185,11 @@ const AssetManage = () => {
               className="mr-[8px]"
               onClick={() => shoModelModal("add")}
             >
-              Add Model
+              {t("Model.addModel")}
             </Button>
-            <Button onClick={() => showGroupModal("add")}>Add Group</Button>
+            <Button onClick={() => showGroupModal("add")}>
+              {t("Model.addGroup")}
+            </Button>
           </div>
         </div>
         <Spin spinning={loading}>
@@ -238,14 +243,22 @@ const AssetManage = () => {
                       }
                       onDragEnd={() => handleDragEnd(groupIndex)}
                     >
-                      <div className={`${assetManageStyle.leftSide} pl-[4px]`}>
+                      <div
+                        className={`${assetManageStyle.leftSide} pl-[4px]`}
+                        onClick={() =>
+                          linkToDetial({
+                            ...model,
+                            classification_id: item.classification_id,
+                          })
+                        }
+                      >
                         <HolderOutlined
                           className={`${assetManageStyle.dragHander} cursor-move`}
                         />
                         <Image
                           src={getIconUrl(model)}
                           className="block w-auto h-10"
-                          alt="图标"
+                          alt={t("picture")}
                           width={100}
                           height={40}
                         />
@@ -258,15 +271,7 @@ const AssetManage = () => {
                           </span>
                         </div>
                       </div>
-                      <div
-                        className={assetManageStyle.rightSide}
-                        onClick={() =>
-                          linkToDetial({
-                            ...model,
-                            classification_id: item.classification_id,
-                          })
-                        }
-                      >
+                      <div className={assetManageStyle.rightSide}>
                         <SwitcherOutlined />
                         <span className="text-[12px] pt-[4px]">0</span>
                       </div>

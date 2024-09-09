@@ -6,6 +6,7 @@ import Image from "next/image";
 import OperateModal from "@/components/operate-modal";
 import { iconList } from "@/utils/common";
 import selectIconStyle from "./selectIcon.module.less";
+import { useTranslation } from "@/utils/i18n";
 
 interface SelectIconProps {
   onSelect: (type: string) => void;
@@ -25,6 +26,7 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
     const [visible, setVisible] = useState<boolean>(false);
     const [title, setTitle] = useState<string>("");
     const [activeIcon, setActiveIcon] = useState<string>("");
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       showModal: ({ defaultIcon, title }) => {
@@ -52,12 +54,14 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="primary" onClick={handleSubmit}>
+              <Button
+                type="primary"
+                className="mr-[10px]"
+                onClick={handleSubmit}
+              >
                 Confirm
               </Button>
+              <Button onClick={handleCancel}>Cancel</Button>
             </div>
           }
         >
@@ -79,7 +83,7 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
                     <Image
                       src={require(`../../../../public/assets/assetModelIcon/${item.url}.svg`)}
                       className="block cursor-pointer"
-                      alt="图标"
+                      alt={t("picture")}
                       width={25}
                       height={25}
                     />
@@ -93,5 +97,5 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
     );
   }
 );
-SelectIcon.displayName = "SelectIcon";
+SelectIcon.displayName = "selectIcon";
 export default SelectIcon;

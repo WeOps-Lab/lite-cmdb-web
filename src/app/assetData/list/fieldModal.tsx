@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { Input, Button, Form, message } from "antd";
 import OperateModal from "@/components/operate-modal";
+import { useTranslation } from "@/utils/i18n";
 
 interface FieldType {
   name?: string;
@@ -36,6 +37,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("");
     const [form] = Form.useForm();
+    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       showModal: ({ type, groupInfo, subTitle, title }) => {
@@ -51,10 +53,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
 
     const handleSubmit = () => {
       form.validateFields().then((values) => {
-        const msg: string =
-          type === "add"
-            ? "New successfully added !"
-            : "Modified successfully !";
+        const msg: string = t(
+          type === "add" ? "successfullyAdded" : "successfullyModified"
+        );
         message.success(msg);
         onSuccess(values);
         handleCancel();
@@ -80,12 +81,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button className="mr-[10px]" onClick={handleCancel}>
-                Cancel
+              <Button
+                className="mr-[10px]"
+                type="primary"
+                onClick={handleSubmit}
+              >
+                {t("confirm")}
               </Button>
-              <Button type="primary" onClick={handleSubmit}>
-                Confirm
-              </Button>
+              <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
           }
         >
@@ -93,7 +96,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             <Form.Item<FieldType>
               name="name"
               label="Name"
-              rules={[{ required: true, message: "Please input your name!" }]}
+              rules={[{ required: true, message: t("required") }]}
             >
               <Input />
             </Form.Item>
