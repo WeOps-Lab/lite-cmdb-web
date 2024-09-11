@@ -42,13 +42,15 @@ interface FieldRef {
 interface FieldConfig {
   type: string;
   attrList: AttrFieldType[];
-  formInfo: unknown;
+  formInfo: any;
   subTitle: string;
   title: string;
+  model_id: string;
+  list: Array<any>;
 }
 
 const AssetData = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const fieldRef = useRef<FieldRef>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
@@ -226,16 +228,6 @@ const AssetData = () => {
     onChange: onSelectChange,
   };
 
-  const handleDelete = () => {
-    confirm({
-      title: t("batchDeleteTitle"),
-      onOk: () => {
-        message.success(t("successfullyDeleted"));
-        setSelectedRowKeys([]);
-      },
-    });
-  };
-
   const onGroupChange = (e: RadioChangeEvent) => {
     const currentGroupId = e.target.value;
     setGroupId(currentGroupId);
@@ -252,25 +244,59 @@ const AssetData = () => {
     getInitData(currentModelId);
   };
 
-  const showDeleteConfirm = (row = {}) => {
+  const showDeleteConfirm = (row = { id: "" }) => {
     confirm({
       title: t("deleteTitle"),
       content: t("deleteContent"),
       centered: true,
       onOk() {
-        return new Promise((resolve) => {
-          setTimeout(() => {
-            setSelectedRowKeys([]);
+        return new Promise(async (resolve, reject) => {
+          try {
+            await del(`/api/instance/${row.id}/`);
             message.success(t("successfullyDeleted"));
+            if (pagination?.current) {
+              pagination.current > 1 &&
+                tableData.length === 1 &&
+                pagination.current--;
+            }
+            setSelectedRowKeys([]);
+            fetchData();
+          } finally {
             resolve(true);
-          }, 500);
-        }).catch(() => console.log("Oops errors!"));
+          }
+        });
       },
     });
   };
 
-  const updateFieldList = (msg: string) => {
-    console.log("创建分组成功", msg);
+  const batchDeleteConfirm = () => {
+    confirm({
+      title: t("deleteTitle"),
+      content: t("deleteContent"),
+      centered: true,
+      onOk() {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const list = selectedRowKeys.map((item) => item.id);
+            await post("/api/instance/batch_delete/", list);
+            message.success(t("successfullyDeleted"));
+            if (pagination?.current) {
+              pagination.current > 1 &&
+                tableData.length === 1 &&
+                pagination.current--;
+            }
+            setSelectedRowKeys([]);
+            fetchData();
+          } finally {
+            resolve(true);
+          }
+        });
+      },
+    });
+  };
+
+  const updateFieldList = () => {
+    fetchData();
   };
 
   const showAttrModal = (type: string, row = {}) => {
@@ -281,6 +307,8 @@ const AssetData = () => {
       attrList: propertyList,
       formInfo: row,
       subTitle: "",
+      model_id: modelId,
+      list: selectedRowKeys,
     });
   };
 
@@ -335,12 +363,15 @@ const AssetData = () => {
               </Button>
               <Button>Export</Button>
               <Button
-                onClick={() => showAttrModal("add")}
+                onClick={() => showAttrModal("batchEdit")}
                 disabled={!selectedRowKeys.length}
               >
                 {t("edit")}
               </Button>
-              <Button onClick={handleDelete} disabled={!selectedRowKeys.length}>
+              <Button
+                onClick={batchDeleteConfirm}
+                disabled={!selectedRowKeys.length}
+              >
                 {t("delete")}
               </Button>
             </Space>
@@ -357,7 +388,7 @@ const AssetData = () => {
             ref={fieldRef}
             userList={userList}
             organizationList={organizationList}
-            onSuccess={(msg) => updateFieldList(msg)}
+            onSuccess={updateFieldList}
           />
         </div>
       </div>
