@@ -75,8 +75,8 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setType(type);
         setTitle(title);
         setModelId(model_id);
-        setFormItems(deepClone(attrList));
-        setInstanceData(attrList);
+        setFormItems(attrList);
+        setInstanceData(formInfo);
         setSelectedRows(list);
         form.resetFields();
         form.setFieldsValue(formInfo);
@@ -92,6 +92,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const operateAttr = async (params: AttrFieldType) => {
       try {
         setConfirmLoading(true);
+        const formData = deepClone(params);
         const msg: string = t(
           type === "add" ? "successfullyAdded" : "successfullyModified"
         );
@@ -99,15 +100,23 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           type === "add" ? `/api/instance/` : `/api/instance/batch_update/`;
         let requestParams: RequestParams = {
           model_id: modelId,
-          instance_info: deepClone(params),
+          instance_info: formData,
         };
         if (type !== "add") {
+          if (type === "batchEdit") {
+            for (const key in formData) {
+              if (
+                !formData[key] &&
+                formData[key] !== 0 &&
+                formData[key] !== false
+              ) {
+                delete formData[key];
+              }
+            }
+          }
           requestParams = {
-            inst_ids:
-              type === "edit"
-                ? [instanceData.id]
-                : selectedRows.map((item) => item.id),
-            update_data: instanceData,
+            inst_ids: type === "edit" ? [instanceData._id] : selectedRows,
+            update_data: formData,
           };
         }
         await post(url, requestParams);
@@ -152,13 +161,18 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 key={item.attr_id}
                 name={item.attr_id}
                 label={item.attr_name}
-                rules={[{ required: item.is_required, message: t("required") }]}
+                rules={[
+                  {
+                    required: item.is_required && type !== "batchEdit",
+                    message: t("required"),
+                  },
+                ]}
               >
                 {(() => {
                   switch (item.attr_type) {
                     case "user":
                       return (
-                        <Select>
+                        <Select disabled={!item.editable && type !== "add"}>
                           {userList.map((opt) => (
                             <Select.Option key={opt.id} value={opt.id}>
                               {opt.username}
@@ -168,7 +182,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                       );
                     case "enum":
                       return (
-                        <Select>
+                        <Select disabled={!item.editable && type !== "add"}>
                           {item.option?.map((opt) => (
                             <Select.Option key={opt} value={opt}>
                               {opt}
@@ -179,6 +193,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                     case "organization":
                       return (
                         <Cascader
+                          disabled={!item.editable && type !== "add"}
                           style={{ width: 200 }}
                           options={organizationList}
                         />
@@ -186,12 +201,15 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                     case "time":
                       return (
                         <RangePicker
+                          disabled={!item.editable && type !== "add"}
                           showTime={{ format: "HH:mm" }}
                           format="YYYY-MM-DD HH:mm"
                         />
                       );
                     default:
-                      return <Input />;
+                      return (
+                        <Input disabled={!item.editable && type !== "add"} />
+                      );
                   }
                 })()}
               </Form.Item>

@@ -9,10 +9,12 @@ import {
   Tabs,
   message,
   Spin,
+  Dropdown,
   TablePaginationConfig,
 } from "antd";
 import CustomTable from "@/components/custom-table";
-import SearchFilter from "./list/searchFilter"; // 导入新组件
+import SearchFilter from "./list/searchFilter";
+import ImportInst from "./list/importInst";
 import { PlusOutlined } from "@ant-design/icons";
 import type { RadioChangeEvent } from "antd";
 import assetDataStyle from "./index.module.less";
@@ -29,16 +31,24 @@ import {
   Organization,
   AttrFieldType,
 } from "@/types/assetManage";
+import axios from "axios";
+import { useAuth } from "@/context/auth";
+import type { MenuProps } from "antd";
 
 interface ModelTabs {
   key: string;
   label: string;
 }
-
 interface FieldRef {
-  showModal: (config: FieldConfig) => void; // 你可以根据实际情况定义更多方法或属性
+  showModal: (config: FieldConfig) => void;
 }
-
+interface ImportRef {
+  showModal: (config: {
+    subTitle: string;
+    title: string;
+    model_id: string;
+  }) => void;
+}
 interface FieldConfig {
   type: string;
   attrList: AttrFieldType[];
@@ -52,8 +62,10 @@ interface FieldConfig {
 const AssetData = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const fieldRef = useRef<FieldRef>(null);
+  const importRef = useRef<ImportRef>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
+  const [exportLoading, setExportLoading] = useState<boolean>(false);
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
   const [groupId, setGroupId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
@@ -71,6 +83,59 @@ const AssetData = () => {
   });
   const { t } = useTranslation();
   const { get, del, post, isLoading } = useApiClient();
+  const authContext = useAuth();
+  const token = authContext?.token || null;
+  const tokenRef = useRef(token);
+
+  const handleExport = async () => {
+    try {
+      setExportLoading(true);
+      const response = await axios({
+        url: `/reqApi/api/instance/${modelId}/inst_export/`, // 替换为你的导出数据的API端点
+        method: "POST",
+        responseType: "blob", // 确保响应类型为blob
+        data: selectedRowKeys,
+        headers: {
+          Authorization: `Bearer ${tokenRef.current}`,
+        },
+      });
+      // 创建一个Blob对象
+      const blob = new Blob([response.data], {
+        type: response.headers["content-type"],
+      });
+      // 创建一个下载链接
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = `${modelId}资产列表.xlsx`; // 设置下载文件的名称
+      document.body.appendChild(link);
+      link.click();
+      // 移除下载链接
+      document.body.removeChild(link);
+    } catch (error: any) {
+      message.error(error.message);
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
+  const showImportModal = () => {
+    importRef.current?.showModal({
+      title: t("import"),
+      subTitle: "",
+      model_id: modelId,
+    });
+  };
+
+  const addInstItems: MenuProps["items"] = [
+    {
+      key: "1",
+      label: <a onClick={() => showAttrModal("add")}>{t("add")}</a>,
+    },
+    {
+      key: "2",
+      label: <a onClick={showImportModal}>{t("import")}</a>,
+    },
+  ];
 
   useEffect(() => {
     if (isLoading) return;
@@ -82,6 +147,40 @@ const AssetData = () => {
       fetchData();
     }
   }, [pagination?.current, pagination?.pageSize, queryList]);
+
+  useEffect(() => {
+    if (propertyList.length && userList.length) {
+      const attrList = getAssetColumns({
+        attrList: propertyList,
+        userList,
+        groupList: organizationList,
+        t,
+      });
+      const tableColumns = [
+        ...attrList,
+        {
+          title: t("action"),
+          key: "action",
+          dataIndex: "action",
+          render: (_: unknown, record: any) => (
+            <>
+              <Button
+                type="link"
+                className="mr-[10px]"
+                onClick={() => showAttrModal("edit", record)}
+              >
+                {t("edit")}
+              </Button>
+              <Button type="link" onClick={() => showDeleteConfirm(record)}>
+                {t("delete")}
+              </Button>
+            </>
+          ),
+        },
+      ];
+      setColumns(tableColumns);
+    }
+  }, [propertyList, userList]);
 
   const fetchData = async () => {
     setTableLoading(true);
@@ -172,39 +271,11 @@ const AssetData = () => {
     try {
       Promise.all([getAttrList, getInstList])
         .then((res) => {
-          const attrList = getAssetColumns({
-            attrList: res[0],
-            userList,
-            groupList: organizationList,
-            t,
-          });
+          pagination.total = res[1].count;
+          setPropertyList(res[0]);
           const tableList = res[1].insts;
           setTableData(tableList);
-          setPropertyList(res[0]);
-          pagination.total = res[1].count;
           setPagination(pagination);
-          setColumns([
-            ...attrList,
-            {
-              title: t("action"),
-              key: "action",
-              dataIndex: "action",
-              render: (_: unknown, record: any) => (
-                <>
-                  <Button
-                    type="link"
-                    className="mr-[10px]"
-                    onClick={() => showAttrModal("edit", record)}
-                  >
-                    {t("edit")}
-                  </Button>
-                  <Button type="link" onClick={() => showDeleteConfirm(record)}>
-                    {t("delete")}
-                  </Button>
-                </>
-              ),
-            },
-          ]);
         })
         .finally(() => {
           setLoading(false);
@@ -244,15 +315,15 @@ const AssetData = () => {
     getInitData(currentModelId);
   };
 
-  const showDeleteConfirm = (row = { id: "" }) => {
+  const showDeleteConfirm = (row = { _id: "" }) => {
     confirm({
       title: t("deleteTitle"),
       content: t("deleteContent"),
       centered: true,
       onOk() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
           try {
-            await del(`/api/instance/${row.id}/`);
+            await del(`/api/instance/${row._id}/`);
             message.success(t("successfullyDeleted"));
             if (pagination?.current) {
               pagination.current > 1 &&
@@ -275,9 +346,9 @@ const AssetData = () => {
       content: t("deleteContent"),
       centered: true,
       onOk() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
           try {
-            const list = selectedRowKeys.map((item) => item.id);
+            const list = selectedRowKeys;
             await post("/api/instance/batch_delete/", list);
             message.success(t("successfullyDeleted"));
             if (pagination?.current) {
@@ -353,15 +424,18 @@ const AssetData = () => {
               onSearch={handleSearch}
             />
             <Space>
+              <Dropdown menu={{ items: addInstItems }} placement="bottom" arrow>
+                <Button icon={<PlusOutlined />} type="primary">
+                  {t("add")}
+                </Button>
+              </Dropdown>
               <Button
-                type="primary"
-                className="mr-[8px]"
-                icon={<PlusOutlined />}
-                onClick={() => showAttrModal("add")}
+                disabled={!selectedRowKeys.length}
+                loading={exportLoading}
+                onClick={handleExport}
               >
-                {t("add")}
+                {t("export")}
               </Button>
-              <Button>Export</Button>
               <Button
                 onClick={() => showAttrModal("batchEdit")}
                 disabled={!selectedRowKeys.length}
@@ -382,6 +456,7 @@ const AssetData = () => {
             columns={columns}
             pagination={pagination}
             loading={tableLoading}
+            rowKey="_id"
             onChange={handleTableChange}
           />
           <FieldModal
@@ -390,6 +465,7 @@ const AssetData = () => {
             organizationList={organizationList}
             onSuccess={updateFieldList}
           />
+          <ImportInst ref={importRef} onSuccess={updateFieldList} />
         </div>
       </div>
     </Spin>

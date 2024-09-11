@@ -25,6 +25,9 @@
   "edit": "Edit",
   "delete": "Delete",
   "add": "Add",
+  "export": "Export",
+  "import": "Import",
+  "uploadAction": "Click or drag file to this area to upload",
   "valueValidate": "The value cannot be empty",
   "value": "Value",
   "string": "String",
@@ -35,6 +38,7 @@
   "password": "Password",
   "boolean": "Boolean",
   "organization": "Organization",
+  "exportTemplate": "Export Template",
   "menu": {
     "log": "Log",
     "assetManage": "Model",
@@ -60,6 +64,7 @@
     "constraint": "Constraint",
     "associationType": "Association Type",
     "effect": "Effect",
-    "isExactSearch": "Accurate search"
+    "isExactSearch": "Accurate search",
+    "uploadDescription": "Only files of xls or xlsx type can be uploaded"
   }
 }

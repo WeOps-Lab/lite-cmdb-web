@@ -178,7 +178,7 @@ export const getAssetColumns = (config: {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
-              {findGroupNameById(config.groupList || [], record[attrId]) ||
+              {findGroupNameById(config.groupList || [], record[attrId][0]) ||
                 "--"}
             </>
           ),

@@ -61,7 +61,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
           condition.value = +condition.value;
           break;
         case "organization":
-          condition.type = "str=";
+          condition.type = "list[]";
           break;
         case "time":
           delete condition.value;
