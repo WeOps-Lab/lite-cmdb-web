@@ -59,6 +59,7 @@
     "targetModel": "Target Model",
     "constraint": "Constraint",
     "associationType": "Association Type",
-    "effect": "Effect"
+    "effect": "Effect",
+    "isExactSearch": "Accurate search"
   }
 }

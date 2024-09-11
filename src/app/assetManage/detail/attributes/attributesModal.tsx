@@ -15,7 +15,7 @@ import { PlusOutlined, DeleteTwoTone, HolderOutlined } from "@ant-design/icons";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { useSearchParams } from "next/navigation";
-import { AttrFieldType } from "@/types/assetManage"
+import { AttrFieldType } from "@/types/assetManage";
 import { useTranslation } from "@/utils/i18n";
 const { Option } = Select;
 
@@ -80,9 +80,10 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
 
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values) => {
+        const flag = enumList.every((item) => !!item);
         operateAttr({
           ...values,
-          option: "",
+          option: flag ? enumList : [],
           attr_group: classificationId,
           model_id: modelId,
         });
@@ -212,11 +213,11 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             <Form.Item
               noStyle
               shouldUpdate={(prevValues, currentValues) =>
-                prevValues.type !== currentValues.type
+                prevValues.attr_type !== currentValues.attr_type
               }
             >
               {({ getFieldValue }) =>
-                getFieldValue("type") === "enum" ? (
+                getFieldValue("attr_type") === "enum" ? (
                   <Form.Item<AttrFieldType>
                     label={t("value")}
                     name="option"

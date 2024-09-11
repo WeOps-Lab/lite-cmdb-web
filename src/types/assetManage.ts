@@ -64,3 +64,47 @@ export interface AttrFieldType {
   option: Array<string>;
   attr_group: string;
 }
+
+export interface ModelIconItem {
+  icn: string | undefined;
+  model_id: string | undefined;
+  [key: string]: unknown;
+}
+export interface ColumnItem {
+  title: string;
+  dataIndex: string;
+  key: string;
+  render?: (_: unknown, record: any) => JSX.Element;
+  [key: string]: any;
+}
+export interface UserItem {
+  id: string;
+  username: string;
+  [key: string]: unknown;
+}
+export interface SubGroupItem {
+  value?: string;
+  label?: string;
+  children?: Array<SubGroupItem>;
+}
+export interface Organization {
+  id: string;
+  name: string;
+  children: Array<SubGroupItem>;
+  [key: string]: unknown;
+}
+
+export interface OriginSubGroupItem {
+    id:string;
+    name:string;
+    parentId:string;
+    subGroupCount: number;
+    subGroups: Array<OriginSubGroupItem>
+}
+export interface OriginOrganization {
+    id:string;
+    name: string;
+    subGroupCount:number;
+    subGroups: Array<OriginSubGroupItem>;
+    [key: string]: unknown;
+}

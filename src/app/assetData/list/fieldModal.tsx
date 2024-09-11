@@ -1,27 +1,34 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  forwardRef,
-  useImperativeHandle,
-} from "react";
-import { Input, Button, Form, message } from "antd";
+import React, { useState, forwardRef, useImperativeHandle } from "react";
+import {
+  Input,
+  Button,
+  Form,
+  message,
+  Select,
+  Cascader,
+  DatePicker,
+} from "antd";
 import OperateModal from "@/components/operate-modal";
 import { useTranslation } from "@/utils/i18n";
+import { AttrFieldType, Organization, UserItem } from "@/types/assetManage";
+import { deepClone } from "@/utils/common";
 
 interface FieldType {
-  name?: string;
-  age?: string;
+  [key: string]: unknown;
 }
 
 interface FieldModalProps {
   onSuccess: (type: string) => void;
+  organizationList: Organization[];
+  userList: UserItem[];
 }
 
 interface FieldConfig {
   type: string;
-  groupInfo: unknown;
+  attrList: AttrFieldType[];
+  formInfo: unknown;
   subTitle: string;
   title: string;
 }
@@ -31,23 +38,26 @@ export interface FieldModalRef {
 }
 
 const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
-  ({ onSuccess }, ref) => {
+  ({ onSuccess, userList, organizationList }, ref) => {
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("");
+    const [formItems, setFormItems] = useState<AttrFieldType[]>([]);
     const [form] = Form.useForm();
     const { t } = useTranslation();
+    const { RangePicker } = DatePicker;
 
     useImperativeHandle(ref, () => ({
-      showModal: ({ type, groupInfo, subTitle, title }) => {
+      showModal: ({ type, attrList, subTitle, title, formInfo }) => {
         // 开启弹窗的交互
         setGroupVisible(true);
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
+        setFormItems(deepClone(attrList));
         form.resetFields();
-        form.setFieldsValue(groupInfo);
+        form.setFieldsValue(formInfo);
       },
     }));
 
@@ -65,12 +75,6 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const handleCancel = () => {
       setGroupVisible(false);
     };
-
-    useEffect(() => {
-      return () => {
-        console.log("Component unmounted");
-      };
-    }, []);
 
     return (
       <div>
@@ -93,13 +97,55 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           }
         >
           <Form form={form} layout="vertical">
-            <Form.Item<FieldType>
-              name="name"
-              label="Name"
-              rules={[{ required: true, message: t("required") }]}
-            >
-              <Input />
-            </Form.Item>
+            {formItems.map((item) => (
+              <Form.Item
+                key={item.attr_id}
+                name={item.attr_id}
+                label={item.attr_name}
+                rules={[{ required: true, message: t("required") }]}
+              >
+                {(() => {
+                  switch (item.attr_type) {
+                    case "user":
+                      return (
+                        <Select>
+                          {userList.map((opt) => (
+                            <Select.Option key={opt.id} value={opt.id}>
+                              {opt.username}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      );
+                    case "enum":
+                      return (
+                        <Select>
+                          {item.option?.map((opt) => (
+                            <Select.Option key={opt} value={opt}>
+                              {opt}
+                            </Select.Option>
+                          ))}
+                        </Select>
+                      );
+                    case "organization":
+                      return (
+                        <Cascader
+                          style={{ width: 200 }}
+                          options={organizationList}
+                        />
+                      );
+                    case "time":
+                      return (
+                        <RangePicker
+                          showTime={{ format: "HH:mm" }}
+                          format="YYYY-MM-DD HH:mm"
+                        />
+                      );
+                    default:
+                      return <Input />;
+                  }
+                })()}
+              </Form.Item>
+            ))}
           </Form>
         </OperateModal>
       </div>

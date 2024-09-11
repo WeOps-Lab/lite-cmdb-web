@@ -1,59 +1,62 @@
-.assetData {
+.assetLoading {
     width: 100%;
 
-    .assetList {
-        padding: 0 20px 20px 20px;
-        height: calc(100vh - 140px);
-        background: var(--color-bg-1);
-    }
+    .assetData {
 
-    .groupSelector {
-        :global {
-            .ant-radio-button-wrapper {
-                margin-right: 10px;
-                border: none;
-                background: transparent;
-                border-radius: 4px !important;
+        .assetList {
+            padding: 0 20px 20px 20px;
+            height: calc(100vh - 140px);
+            background: var(--color-bg-1);
+        }
 
-                &::before {
-                    width: 0;
+        .groupSelector {
+            :global {
+                .ant-radio-button-wrapper {
+                    border: none;
+                    background: transparent;
+                    border-radius: 4px !important;
+
+                    &::before {
+                        width: 0;
+                    }
+
+                    &:hover {
+                        color: var(--color-primary);
+                        background: var(--color-bg-1);
+                    }
                 }
 
-                &:hover {
-                    color: var(--color-primary);
+                .ant-radio-button-wrapper-checked {
                     background: var(--color-bg-1);
+                    color: var(--color-primary);
                 }
-            }
 
-            .ant-radio-button-wrapper-checked {
-                background: var(--color-bg-1);
-                color: var(--color-primary);
-            }
-
-            .ant-radio-group-solid {
-                display: flex;
-                overflow-x: auto;
+                .ant-radio-group-solid {
+                    display: flex;
+                    overflow-x: auto;
+                    overflow-y: hidden;
+                }
             }
         }
-    }
 
-    .owner {
-        display: flex;
-        align-items: center;
-
-        .userAvatar {
-            display: flex;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            margin-right: 10px;
+        .owner {
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: var(--color-fill-3);
-            color: var(--color-bg-1);
-            font-size: 12px;
-        }
-    }
 
+            .userAvatar {
+                display: flex;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                margin-right: 10px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--color-fill-3);
+                color: var(--color-bg-1);
+                font-size: 12px;
+            }
+        }
+
+    }
 }
