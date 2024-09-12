@@ -34,10 +34,12 @@ import {
 import axios from "axios";
 import { useAuth } from "@/context/auth";
 import type { MenuProps } from "antd";
+import { useRouter } from "next/navigation";
 
 interface ModelTabs {
   key: string;
   label: string;
+  icn: string;
 }
 interface FieldRef {
   showModal: (config: FieldConfig) => void;
@@ -88,6 +90,7 @@ const AssetData = () => {
   const authContext = useAuth();
   const token = authContext?.token || null;
   const tokenRef = useRef(token);
+  const router = useRouter();
 
   const handleExport = async () => {
     try {
@@ -169,6 +172,13 @@ const AssetData = () => {
               <Button
                 type="link"
                 className="mr-[10px]"
+                onClick={() => checkDetail(record)}
+              >
+                {t("detail")}
+              </Button>
+              <Button
+                type="link"
+                className="mr-[10px]"
                 onClick={() => showAttrModal("edit", record)}
               >
                 {t("edit")}
@@ -242,6 +252,7 @@ const AssetData = () => {
             .map((item) => ({
               key: item.model_id,
               label: item.model_name,
+              icn: item.icn,
             }));
           const defaultModelId = _modelList[0].key;
           setModelList(_modelList);
@@ -331,6 +342,7 @@ const AssetData = () => {
     ).map((item) => ({
       key: item.model_id,
       label: item.model_name,
+      icn: item.icn,
     }));
     const currentModelId = currentModelList[0].key;
     setModelList(currentModelList);
@@ -412,6 +424,15 @@ const AssetData = () => {
 
   const handleSearch = (condition: unknown) => {
     setQueryList(condition);
+  };
+
+  const checkDetail = (row = { _id: "" }) => {
+    const modelItem = modelList.find((item) => item.key === modelId);
+    router.push(
+      `/assetData/detail/baseInfo?icn=${modelItem?.icn || ""}&model_name=${
+        modelItem?.label || ""
+      }&model_id=${modelId}&classification_id=${groupId}&inst_id=${row._id}`
+    );
   };
 
   return (

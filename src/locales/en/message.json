@@ -26,6 +26,7 @@
   "edit": "Edit",
   "delete": "Delete",
   "add": "Add",
+  "detail": "Detail",
   "export": "Export",
   "import": "Import",
   "uploadAction": "Click or drag file to this area to upload",
@@ -71,6 +72,7 @@
     "associationType": "Association Type",
     "effect": "Effect",
     "isExactSearch": "Accurate search",
-    "uploadDescription": "Only files of xls or xlsx type can be uploaded"
+    "uploadDescription": "Only files of xls or xlsx type can be uploaded",
+    "baseInfo": "Basic information"
   }
 }
