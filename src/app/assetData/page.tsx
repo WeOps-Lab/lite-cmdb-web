@@ -72,8 +72,10 @@ const AssetData = () => {
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
+  const [displayFieldKeys, setDisplayFieldKeys] = useState<string[]>([]);
   const [organizationList, setOrganizationList] = useState<Organization[]>([]);
   const [columns, setColumns] = useState<ColumnItem[]>([]);
+  const [currentColumns, setCurrentColumns] = useState<ColumnItem[]>([]);
   const [queryList, setQueryList] = useState<unknown>(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
@@ -179,8 +181,13 @@ const AssetData = () => {
         },
       ];
       setColumns(tableColumns);
+      setCurrentColumns(
+        tableColumns.filter(
+          (item) => displayFieldKeys.includes(item.key) || item.key === "action"
+        )
+      );
     }
-  }, [propertyList, userList]);
+  }, [propertyList, userList, displayFieldKeys]);
 
   const fetchData = async () => {
     setTableLoading(true);
@@ -267,13 +274,18 @@ const AssetData = () => {
       ...tableParmas,
       model_id: id,
     });
+    const getDisplayFields = get(`/api/instance/${id}/show_field/detail/`);
     setLoading(true);
     try {
-      Promise.all([getAttrList, getInstList])
+      Promise.all([getAttrList, getInstList, getDisplayFields])
         .then((res) => {
           pagination.total = res[1].count;
-          setPropertyList(res[0]);
           const tableList = res[1].insts;
+          const fieldKeys =
+            res[2]?.show_fields ||
+            res[0].map((item: AttrFieldType) => item.attr_id);
+          setDisplayFieldKeys(fieldKeys);
+          setPropertyList(res[0]);
           setTableData(tableList);
           setPagination(pagination);
         })
@@ -297,6 +309,17 @@ const AssetData = () => {
   const rowSelection = {
     selectedRowKeys,
     onChange: onSelectChange,
+  };
+
+  const onSelectFields = async (fields: string[]) => {
+    setLoading(true);
+    try {
+      await post(`/api/instance/${modelId}/show_field/settings/`, fields);
+      message.success(t("successfulSetted"));
+      getInitData(modelId);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onGroupChange = (e: RadioChangeEvent) => {
@@ -453,9 +476,15 @@ const AssetData = () => {
           <CustomTable
             rowSelection={rowSelection}
             dataSource={tableData}
-            columns={columns}
+            columns={currentColumns}
             pagination={pagination}
             loading={tableLoading}
+            fieldSetting={{
+              showSetting: true,
+              displayFieldKeys,
+              choosableFields: columns.filter((item) => item.key !== "action"),
+            }}
+            onSelectFields={onSelectFields}
             rowKey="_id"
             onChange={handleTableChange}
           />
