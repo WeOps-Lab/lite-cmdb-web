@@ -230,6 +230,7 @@ const Attributes = () => {
           dataSource={tableData}
           pagination={pagination}
           loading={loading}
+          rowKey="attr_id"
           onChange={handleTableChange}
         ></CustomTable>
       </div>

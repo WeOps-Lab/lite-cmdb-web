@@ -249,6 +249,7 @@ const Associations = () => {
           dataSource={tableData}
           pagination={pagination}
           loading={loading}
+          rowKey="_id"
           onChange={handleTableChange}
         ></CustomTable>
       </div>

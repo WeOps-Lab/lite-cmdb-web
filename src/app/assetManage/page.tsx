@@ -245,7 +245,7 @@ const AssetManage = () => {
                       onDragEnd={() => handleDragEnd(groupIndex)}
                     >
                       <div
-                        className={`${assetManageStyle.leftSide} pl-[4px]`}
+                        className={assetManageStyle.leftSide}
                         onClick={() =>
                           linkToDetial({
                             ...model,
