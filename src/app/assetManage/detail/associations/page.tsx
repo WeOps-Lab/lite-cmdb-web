@@ -244,7 +244,7 @@ const Associations = () => {
           </div>
         </div>
         <CustomTable
-          scroll={{ y: "calc(100vh - 410px)" }}
+          scroll={{ y: "calc(100vh - 390px)" }}
           columns={columns}
           dataSource={tableData}
           pagination={pagination}

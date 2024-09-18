@@ -9,6 +9,8 @@ import {
   Select,
   Cascader,
   DatePicker,
+  Col,
+  Row,
 } from "antd";
 import OperateModal from "@/components/operate-modal";
 import { useTranslation } from "@/utils/i18n";
@@ -140,6 +142,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
+          width={700}
           onCancel={handleCancel}
           footer={
             <div>
@@ -155,65 +158,99 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             </div>
           }
         >
-          <Form form={form} layout="vertical">
-            {formItems.map((item) => (
-              <Form.Item
-                key={item.attr_id}
-                name={item.attr_id}
-                label={item.attr_name}
-                rules={[
-                  {
-                    required: item.is_required && type !== "batchEdit",
-                    message: t("required"),
-                  },
-                ]}
-              >
-                {(() => {
-                  switch (item.attr_type) {
-                    case "user":
-                      return (
-                        <Select disabled={!item.editable && type !== "add"}>
-                          {userList.map((opt) => (
-                            <Select.Option key={opt.id} value={opt.id}>
-                              {opt.username}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      );
-                    case "enum":
-                      return (
-                        <Select disabled={!item.editable && type !== "add"}>
-                          {item.option?.map((opt) => (
-                            <Select.Option key={opt} value={opt}>
-                              {opt}
-                            </Select.Option>
-                          ))}
-                        </Select>
-                      );
-                    case "organization":
-                      return (
-                        <Cascader
-                          disabled={!item.editable && type !== "add"}
-                          style={{ width: 200 }}
-                          options={organizationList}
-                        />
-                      );
-                    case "time":
-                      return (
-                        <RangePicker
-                          disabled={!item.editable && type !== "add"}
-                          showTime={{ format: "HH:mm" }}
-                          format="YYYY-MM-DD HH:mm"
-                        />
-                      );
-                    default:
-                      return (
-                        <Input disabled={!item.editable && type !== "add"} />
-                      );
-                  }
-                })()}
-              </Form.Item>
-            ))}
+          <Form form={form}>
+            <div className="font-[600] text-[var(--color-text-2)] text-[18px] pl-[12px] pb-[14px]">
+              {t("group")}
+            </div>
+            <Row gutter={24}>
+              {formItems
+                .filter((formItem) => formItem.attr_id === "organization")
+                .map((item) => (
+                  <Col span={12} key={item.attr_id}>
+                    <Form.Item
+                      name={item.attr_id}
+                      label={item.attr_name}
+                      labelCol={{ span: 7 }}
+                      rules={[
+                        {
+                          required: item.is_required && type !== "batchEdit",
+                          message: t("required"),
+                        },
+                      ]}
+                    >
+                      <Cascader
+                        disabled={!item.editable && type !== "add"}
+                        options={organizationList}
+                      />
+                    </Form.Item>
+                  </Col>
+                ))}
+            </Row>
+            <div className="font-[600] text-[var(--color-text-2)] text-[18px] pl-[12px] pb-[14px]">
+              {t("information")}
+            </div>
+            <Row gutter={24}>
+              {formItems
+                .filter((formItem) => formItem.attr_id !== "organization")
+                .map((item) => (
+                  <Col span={12} key={item.attr_id}>
+                    <Form.Item
+                      name={item.attr_id}
+                      label={item.attr_name}
+                      labelCol={{ span: 7 }}
+                      rules={[
+                        {
+                          required: item.is_required && type !== "batchEdit",
+                          message: t("required"),
+                        },
+                      ]}
+                    >
+                      {(() => {
+                        switch (item.attr_type) {
+                          case "user":
+                            return (
+                              <Select
+                                disabled={!item.editable && type !== "add"}
+                              >
+                                {userList.map((opt) => (
+                                  <Select.Option key={opt.id} value={opt.id}>
+                                    {opt.username}
+                                  </Select.Option>
+                                ))}
+                              </Select>
+                            );
+                          case "enum":
+                            return (
+                              <Select
+                                disabled={!item.editable && type !== "add"}
+                              >
+                                {item.option?.map((opt) => (
+                                  <Select.Option key={opt} value={opt}>
+                                    {opt}
+                                  </Select.Option>
+                                ))}
+                              </Select>
+                            );
+                          case "time":
+                            return (
+                              <RangePicker
+                                disabled={!item.editable && type !== "add"}
+                                showTime={{ format: "HH:mm" }}
+                                format="YYYY-MM-DD HH:mm"
+                              />
+                            );
+                          default:
+                            return (
+                              <Input
+                                disabled={!item.editable && type !== "add"}
+                              />
+                            );
+                        }
+                      })()}
+                    </Form.Item>
+                  </Col>
+                ))}
+            </Row>
           </Form>
         </OperateModal>
       </div>
