@@ -65,11 +65,11 @@ export const authOptions: AuthOptions = {
             const userInfo = await fetchUserInfo(token.accessToken);
             token.locale = userInfo.locale || 'en';
             token.roles = userInfo.roles || [];
+            token.username = userInfo.preferred_username || '';
           } catch (error) {
             console.error("Error fetching user info", error);
           }
         }
-
         return token;
       }
 
@@ -92,6 +92,7 @@ export const authOptions: AuthOptions = {
           try {
             const userInfo = await fetchUserInfo(updatedToken?.accessToken ?? '');
             updatedToken.locale = userInfo.locale || 'en';
+            updatedToken.username = userInfo.preferred_username || '';
           } catch (error) {
             console.error("Error fetching user info", error);
           }
@@ -110,12 +111,13 @@ export const authOptions: AuthOptions = {
       if (token.error) {
         session.error = token.error;
       }
-
-      // 将更多的用户信息添加到 session 中
+      if (token.username) {
+        session.username = token.username;
+      }
       if (token.locale) {
         session.locale = token.locale;
       }
       return session;
     },
   },
-};
+}

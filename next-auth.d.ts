@@ -1,4 +1,3 @@
-// next-auth.d.ts
 import { JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
@@ -6,6 +5,7 @@ declare module "next-auth" {
     accessToken?: string;
     error?: string;
     locale?: string;
+    username?: string;
   }
 }
 
@@ -17,5 +17,6 @@ declare module "next-auth/jwt" {
     expiresAt?: number;
     locale?: string;
     error?: string;
+    username?: string;
   }
 }
