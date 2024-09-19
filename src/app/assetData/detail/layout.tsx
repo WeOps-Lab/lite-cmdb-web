@@ -32,7 +32,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
 
   useEffect(() => {
     if (isLoading) return;
-    getGroups();
+    // getGroups();
   }, [isLoading, get]);
 
   const getGroups = async () => {

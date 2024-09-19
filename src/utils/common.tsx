@@ -1,7 +1,7 @@
 import { BUILD_IN_MODEL } from "@/constants/asset";
 import { getSvgIcon } from "./utils";
 import { AttrFieldType } from "@/types/assetManage";
-import { Tag } from "antd";
+import { Tag, Select, Input, Cascader, DatePicker } from "antd";
 import {
   ModelIconItem,
   ColumnItem,
@@ -9,8 +9,9 @@ import {
   SubGroupItem,
   Organization,
   OriginOrganization,
-  OriginSubGroupItem
+  OriginSubGroupItem,
 } from "@/types/assetManage";
+const { RangePicker } = DatePicker;
 
 export const iconList = getSvgIcon();
 export function getIconUrl(tex: ModelIconItem) {
@@ -115,15 +116,17 @@ export const findNameByIds = (list: Array<any>, ids: Array<string>) => {
 };
 
 // 组织改造成联级数据
-export const convertArray = (arr:Array<OriginOrganization | OriginSubGroupItem>) => {
-  const result:any = [];
+export const convertArray = (
+  arr: Array<OriginOrganization | OriginSubGroupItem>
+) => {
+  const result: any = [];
   arr.forEach((item) => {
     const newItem = {
       value: item.id,
       label: item.name,
-      children: []
+      children: [],
     };
-    const subGroups: OriginSubGroupItem[] = item.subGroups
+    const subGroups: OriginSubGroupItem[] = item.subGroups;
     if (subGroups && !!subGroups.length) {
       newItem.children = convertArray(subGroups);
     }
@@ -201,4 +204,61 @@ export const getAssetColumns = (config: {
         };
     }
   });
+};
+
+export const getFieldItem = (config: {
+  fieldItem: AttrFieldType;
+  userList?: UserItem[];
+  groupList?: Organization[];
+  isEdit: boolean;
+  value?: any;
+}) => {
+  if (config.isEdit) {
+    switch (config.fieldItem.attr_type) {
+      case "user":
+        return (
+          <Select>
+            {config.userList?.map((opt: UserItem) => (
+              <Select.Option key={opt.id} value={opt.id}>
+                {opt.username}
+              </Select.Option>
+            ))}
+          </Select>
+        );
+      case "enum":
+        return (
+          <Select>
+            {config.fieldItem.option?.map((opt: string) => (
+              <Select.Option key={opt} value={opt}>
+                {opt}
+              </Select.Option>
+            ))}
+          </Select>
+        );
+      case "organization":
+        return <Cascader options={config.groupList} />;
+      case "time":
+        return (
+          <RangePicker
+            showTime={{ format: "HH:mm" }}
+            format="YYYY-MM-DD HH:mm"
+          />
+        );
+      default:
+        return <Input />;
+    }
+  }
+  switch (config.fieldItem.attr_type) {
+    case "user":
+      return (
+        (config.userList || []).find((item) => item.id === config.value)
+          ?.username || "--"
+      );
+    case "organization":
+      return findGroupNameById(config.groupList || [], config.value[0]) || "--";
+    case "bool":
+      return config.value ? "yes" : "no";
+    default:
+      return config.value || "--";
+  }
 };

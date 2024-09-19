@@ -95,16 +95,30 @@ export interface Organization {
 }
 
 export interface OriginSubGroupItem {
-    id:string;
-    name:string;
-    parentId:string;
-    subGroupCount: number;
-    subGroups: Array<OriginSubGroupItem>
+  id: string;
+  name: string;
+  parentId: string;
+  subGroupCount: number;
+  subGroups: Array<OriginSubGroupItem>;
 }
 export interface OriginOrganization {
-    id:string;
-    name: string;
-    subGroupCount:number;
-    subGroups: Array<OriginSubGroupItem>;
-    [key: string]: unknown;
+  id: string;
+  name: string;
+  subGroupCount: number;
+  subGroups: Array<OriginSubGroupItem>;
+  [key: string]: unknown;
+}
+
+export interface AssetDataFieldProps {
+  propertyList: AttrFieldType[];
+  userList: UserItem[];
+  organizationList: Organization[];
+  instDetail: InstDetail;
+  onsuccessEdit: () => void;
+}
+
+export interface InstDetail {
+  inst_name?: string;
+  organization?: string;
+  [key: string]: unknown;
 }

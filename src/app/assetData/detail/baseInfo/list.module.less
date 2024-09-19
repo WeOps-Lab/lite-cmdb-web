@@ -1,0 +1,48 @@
+.list {
+    margin-bottom: 20px;
+
+    .required {
+        &::before {
+            content: "*";
+            font-size: 14px;
+            padding-right: 4px;
+            color: var(--ant-color-error);
+        }
+    }
+
+    .formItem {
+        .operateBtn {
+            visibility: hidden;
+        }
+
+        &:hover {
+            .operateBtn {
+                visibility: visible;
+            }
+        }
+    }
+
+
+    &:nth-last-child(1) {
+        margin-bottom: 0;
+    }
+
+    :global {
+        .ant-collapse-content-box {
+            padding: 0 !important;
+        }
+
+        .ant-descriptions-item-label {
+            width: 150px !important;
+        }
+
+        .ant-descriptions-item-content {
+            width: 300px !important;
+        }
+
+        .ant-btn-link {
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+}
