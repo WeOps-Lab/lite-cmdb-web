@@ -271,7 +271,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                   >
                                     <HolderOutlined className="mr-[4px]" />
                                     <Input
-                                      placeholder={t('fieldKey')}
+                                      disabled={type === "edit"}
+                                      placeholder={t("fieldKey")}
                                       className="mr-[10px] w-1/5"
                                       value={enumItem.name}
                                       onChange={(e) =>
@@ -279,7 +280,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                       }
                                     />
                                     <Input
-                                      placeholder={t('fieldValue')}
+                                      placeholder={t("fieldValue")}
                                       className="mr-[10px] w-3/5"
                                       value={enumItem.id}
                                       onChange={(e) =>

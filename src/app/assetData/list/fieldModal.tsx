@@ -80,6 +80,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setFormItems(attrList);
         setInstanceData(formInfo);
         setSelectedRows(list);
+        if (type === "add") {
+          Object.assign(formInfo, {
+            organization: organizationList[0]?.value || "",
+          });
+        }
         form.resetFields();
         form.setFieldsValue(formInfo);
       },

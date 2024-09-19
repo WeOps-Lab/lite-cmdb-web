@@ -12,7 +12,6 @@ const TopMenu = () => {
 
   // 菜单项配置
   const menuItems = [
-    { label: t('home'), icon: 'sousuo-tianchong', path: '/' },
     { label: t('menu.asset'), icon: 'zichan-quanbushebei', path: '/assetData' },
     { label: t('menu.assetManage'), icon: 'shujumoxingguanli', path: '/assetManage' }
   ];
