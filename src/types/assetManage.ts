@@ -61,7 +61,7 @@ export interface AttrFieldType {
   is_only: boolean;
   is_required: boolean;
   editable: boolean;
-  option: Array<string>;
+  option: Array<EnumList>;
   attr_group: string;
 }
 
@@ -121,4 +121,9 @@ export interface InstDetail {
   inst_name?: string;
   organization?: string;
   [key: string]: unknown;
+}
+
+export interface EnumList {
+  id: string;
+  name: string;
 }

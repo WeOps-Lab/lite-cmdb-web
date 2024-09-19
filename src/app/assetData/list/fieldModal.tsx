@@ -225,8 +225,8 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 disabled={!item.editable && type !== "add"}
                               >
                                 {item.option?.map((opt) => (
-                                  <Select.Option key={opt} value={opt}>
-                                    {opt}
+                                  <Select.Option key={opt.id} value={opt.id}>
+                                    {opt.name}
                                   </Select.Option>
                                 ))}
                               </Select>

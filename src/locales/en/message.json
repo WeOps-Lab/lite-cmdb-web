@@ -48,6 +48,8 @@
   "selected": "Selected",
   "clear": "Clear",
   "item": "items",
+  "fieldKey": "Enter the key",
+  "fieldValue": "Enter the vaule",
   "menu": {
     "log": "Log",
     "assetManage": "Model",

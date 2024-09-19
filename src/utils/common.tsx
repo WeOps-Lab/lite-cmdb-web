@@ -10,6 +10,7 @@ import {
   Organization,
   OriginOrganization,
   OriginSubGroupItem,
+  EnumList,
 } from "@/types/assetManage";
 const { RangePicker } = DatePicker;
 
@@ -197,6 +198,17 @@ export const getAssetColumns = (config: {
             </>
           ),
         };
+      case "enum":
+        return {
+          ...columnItem,
+          render: (_: unknown, record: any) => (
+            <>
+              {item.option?.find(
+                (item: EnumList) => item.id === record[attrId]
+              )?.name || "--"}
+            </>
+          ),
+        };
       default:
         return {
           ...columnItem,
@@ -228,9 +240,9 @@ export const getFieldItem = (config: {
       case "enum":
         return (
           <Select>
-            {config.fieldItem.option?.map((opt: string) => (
-              <Select.Option key={opt} value={opt}>
-                {opt}
+            {config.fieldItem.option?.map((opt) => (
+              <Select.Option key={opt.id} value={opt.id}>
+                {opt.name}
               </Select.Option>
             ))}
           </Select>
@@ -258,6 +270,10 @@ export const getFieldItem = (config: {
       return findGroupNameById(config.groupList || [], config.value[0]) || "--";
     case "bool":
       return config.value ? "yes" : "no";
+    case "enum":
+      return config.fieldItem.option?.find(
+        (item: EnumList) => item.id === config.value
+      )?.name || "--"
     default:
       return config.value || "--";
   }

@@ -109,9 +109,9 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             value={searchValue}
             onChange={(e) => onSearchValueChange(e, isExactSearch)}
           >
-            {selectedAttr.option?.map((opt: string) => (
-              <Select.Option key={opt} value={opt}>
-                {opt}
+            {selectedAttr.option?.map((opt) => (
+              <Select.Option key={opt.id} value={opt.id}>
+                {opt.name}
               </Select.Option>
             ))}
           </Select>

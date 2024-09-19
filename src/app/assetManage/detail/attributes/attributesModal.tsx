@@ -15,7 +15,7 @@ import { PlusOutlined, DeleteTwoTone, HolderOutlined } from "@ant-design/icons";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { useSearchParams } from "next/navigation";
-import { AttrFieldType } from "@/types/assetManage";
+import { AttrFieldType, EnumList } from "@/types/assetManage";
 import { useTranslation } from "@/utils/i18n";
 const { Option } = Select;
 
@@ -42,7 +42,12 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("");
     const [attrInfo, setAttrInfo] = useState<any>({});
-    const [enumList, setEnumList] = useState<string[]>([""]);
+    const [enumList, setEnumList] = useState<EnumList[]>([
+      {
+        id: "",
+        name: "",
+      },
+    ]);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const formRef = useRef<FormInstance>(null);
     const { post, put } = useApiClient();
@@ -72,7 +77,14 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             editable: false,
             is_only: false,
           });
-          setEnumList([""]);
+          setEnumList([
+            {
+              id: "",
+              name: "",
+            },
+          ]);
+        } else {
+          setEnumList(attrInfo.option || []);
         }
         setAttrInfo(attrInfo);
       },
@@ -80,7 +92,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
 
     const handleSubmit = () => {
       formRef.current?.validateFields().then((values) => {
-        const flag = enumList.every((item) => !!item);
+        const flag = enumList.every((item) => !!item.id && !!item.name);
         operateAttr({
           ...values,
           option: flag ? enumList : [],
@@ -92,7 +104,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
 
     // 自定义验证枚举列表
     const validateEnumList = async () => {
-      if (enumList.some((item) => !item)) {
+      if (enumList.some((item) => !item.id || !item.name)) {
         return Promise.reject(new Error(t("valueValidate")));
       }
       return Promise.resolve();
@@ -104,7 +116,10 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
 
     const addEnumItem = () => {
       const enumTypeList = deepClone(enumList);
-      enumTypeList.push("");
+      enumTypeList.push({
+        id: "",
+        name: "",
+      });
       setEnumList(enumTypeList);
     };
 
@@ -119,7 +134,15 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
       index: number
     ) => {
       const enumTypeList = deepClone(enumList);
-      enumTypeList[index] = e.target.value;
+      enumTypeList[index].id = e.target.value;
+      setEnumList(enumTypeList);
+    };
+    const onEnumKeyChange = (
+      e: React.ChangeEvent<HTMLInputElement>,
+      index: number
+    ) => {
+      const enumTypeList = deepClone(enumList);
+      enumTypeList[index].name = e.target.value;
       setEnumList(enumTypeList);
     };
 
@@ -248,8 +271,17 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                   >
                                     <HolderOutlined className="mr-[4px]" />
                                     <Input
-                                      className="mr-[10px] w-4/5"
-                                      value={enumItem}
+                                      placeholder={t('fieldKey')}
+                                      className="mr-[10px] w-1/5"
+                                      value={enumItem.name}
+                                      onChange={(e) =>
+                                        onEnumKeyChange(e, index)
+                                      }
+                                    />
+                                    <Input
+                                      placeholder={t('fieldValue')}
+                                      className="mr-[10px] w-3/5"
+                                      value={enumItem.id}
                                       onChange={(e) =>
                                         onEnumValChange(e, index)
                                       }
