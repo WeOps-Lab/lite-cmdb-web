@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DatePicker, Timeline, Spin } from "antd";
 import changeRecordsStyle from "./index.module.less";
 import useApiClient from "@/utils/request";
+import RecordDetail from "./recordDetail";
+import { useTranslation } from "@/utils/i18n";
 
 const { RangePicker } = DatePicker;
 
@@ -15,6 +17,7 @@ interface RecordItemList {
   type: string;
   created_at: string;
   operator: string;
+  id: number;
   [key: string]: unknown;
 }
 
@@ -23,19 +26,35 @@ interface RecordItem {
   list: RecordItemList[];
 }
 
-const MyPage: React.FC = () => {
+interface detailRef {
+  showModal: (config: {
+    subTitle: string;
+    title: string;
+    recordRow: any;
+  }) => void;
+}
+
+const ChangeRecords: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [enumList, setEnumList] = useState<RecordsEnum>({});
   const [recordList, setRecordList] = useState<RecordItem[]>([]);
-  const [selectedLog, setSelectedLog] = useState<any>({});
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { get, isLoading } = useApiClient();
+  const detailRef = useRef<detailRef>(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isLoading) return;
     // 初始加载数据
     initData();
   }, [get, isLoading]);
+
+  const showDetailModal = (log: RecordItemList) => {
+    detailRef.current?.showModal({
+      title: enumList[log.type] + log.model_id,
+      subTitle: "",
+      recordRow: log,
+    });
+  };
 
   const initData = async (dates = null) => {
     const getChangeRecordLists = get("/api/change_record/");
@@ -110,15 +129,6 @@ const MyPage: React.FC = () => {
     }
   };
 
-  const handleLogClick = (log: any) => {
-    setIsModalVisible(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalVisible(false);
-    setSelectedLog(null);
-  };
-
   return (
     <Spin spinning={loading}>
       <div className={changeRecordsStyle.changeRecords}>
@@ -141,7 +151,7 @@ const MyPage: React.FC = () => {
                 {event.list.map((log, logIndex) => (
                   <Timeline.Item key={logIndex}>
                     <div
-                      onClick={() => handleLogClick(log)}
+                      onClick={() => showDetailModal(log)}
                       className="cursor-pointer"
                     >
                       <div className="mb-[4px]">
@@ -165,8 +175,9 @@ const MyPage: React.FC = () => {
           ))}
         </div>
       </div>
+      <RecordDetail ref={detailRef} userList={[]} propertyList={[]}/>
     </Spin>
   );
 };
 
-export default MyPage;
+export default ChangeRecords;
