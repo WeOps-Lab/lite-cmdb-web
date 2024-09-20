@@ -77,8 +77,8 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
       item.key = item.attr_id;
       item.label = item.is_required ? (
         <>
-          <span className={informationList.required}></span>
           {item.attr_name}
+          <span className={informationList.required}></span>
         </>
       ) : (
         <>{item.attr_name}</>
@@ -97,7 +97,7 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
                   rules={[
                     {
                       required: item.is_required,
-                      message: t("required"),
+                      message: '',
                     },
                   ]}
                   initialValue={item.value}
@@ -129,11 +129,14 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
                 <>
                   <Button
                     type="link"
+                    size="small"
+                    className="ml-[4px]"
                     icon={<CheckOutlined />}
                     onClick={() => confirmEdit(item.key)}
                   />
                   <Button
                     type="link"
+                    size="small"
                     icon={<CloseOutlined />}
                     onClick={() => cancelEdit(item.key)}
                   />
@@ -143,12 +146,15 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
                   {item.editable && (
                     <Button
                       type="link"
+                      size="small"
+                      className="ml-[4px]"
                       icon={<EditOutlined />}
                       onClick={() => enableEdit(item.key)}
                     />
                   )}
                   <Button
                     type="link"
+                    size="small"
                     icon={<CopyOutlined />}
                     onClick={() => onCopy(item, item.value)}
                   />

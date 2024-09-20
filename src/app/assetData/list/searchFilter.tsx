@@ -40,7 +40,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
     };
     // 排除布尔类型的false || 多选框没选时的空数组
     if (
-      (!value && value !== false) ||
+      (!value && value !== false && value !== 0) ||
       (Array.isArray(value) && !value.length)
     ) {
       condition = null;
@@ -110,6 +110,24 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             onChange={(e) => onSearchValueChange(e, isExactSearch)}
           >
             {selectedAttr.option?.map((opt) => (
+              <Select.Option key={opt.id} value={opt.id}>
+                {opt.name}
+              </Select.Option>
+            ))}
+          </Select>
+        );
+      case "bool":
+        return (
+          <Select
+            className="value"
+            style={{ width: 200 }}
+            value={searchValue}
+            onChange={(e) => onSearchValueChange(e, isExactSearch)}
+          >
+            {[
+              { id: 1, name: "Yes" },
+              { id: 0, name: "No" },
+            ].map((opt) => (
               <Select.Option key={opt.id} value={opt.id}>
                 {opt.name}
               </Select.Option>

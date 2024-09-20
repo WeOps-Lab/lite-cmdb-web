@@ -236,6 +236,21 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 ))}
                               </Select>
                             );
+                          case "bool":
+                            return (
+                              <Select
+                                disabled={!item.editable && type !== "add"}
+                              >
+                                {[
+                                  { id: 1, name: "Yes" },
+                                  { id: 0, name: "No" },
+                                ].map((opt) => (
+                                  <Select.Option key={opt.id} value={opt.id}>
+                                    {opt.name}
+                                  </Select.Option>
+                                ))}
+                              </Select>
+                            );
                           case "time":
                             return (
                               <RangePicker

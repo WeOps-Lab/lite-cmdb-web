@@ -203,9 +203,8 @@ export const getAssetColumns = (config: {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
-              {item.option?.find(
-                (item: EnumList) => item.id === record[attrId]
-              )?.name || "--"}
+              {item.option?.find((item: EnumList) => item.id === record[attrId])
+                ?.name || "--"}
             </>
           ),
         };
@@ -247,6 +246,19 @@ export const getFieldItem = (config: {
             ))}
           </Select>
         );
+      case "bool":
+        return (
+          <Select>
+            {[
+              { id: 1, name: "Yes" },
+              { id: 0, name: "No" },
+            ].map((opt) => (
+              <Select.Option key={opt.id} value={opt.id}>
+                {opt.name}
+              </Select.Option>
+            ))}
+          </Select>
+        );
       case "organization":
         return <Cascader options={config.groupList} />;
       case "time":
@@ -269,11 +281,13 @@ export const getFieldItem = (config: {
     case "organization":
       return findGroupNameById(config.groupList || [], config.value[0]) || "--";
     case "bool":
-      return config.value ? "yes" : "no";
+      return config.value ? "Yes" : "No";
     case "enum":
-      return config.fieldItem.option?.find(
-        (item: EnumList) => item.id === config.value
-      )?.name || "--"
+      return (
+        config.fieldItem.option?.find(
+          (item: EnumList) => item.id === config.value
+        )?.name || "--"
+      );
     default:
       return config.value || "--";
   }

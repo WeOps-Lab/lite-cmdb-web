@@ -2,10 +2,10 @@
     margin-bottom: 20px;
 
     .required {
-        &::before {
+        &::after {
             content: "*";
             font-size: 14px;
-            padding-right: 4px;
+            padding-left: 4px;
             color: var(--ant-color-error);
         }
     }
@@ -28,6 +28,20 @@
     }
 
     :global {
+        .ant-collapse-header {
+            background: var(--color-fill-1);
+            margin-bottom: 6px;
+        }
+        .ant-collapse-expand-icon {
+            color: var(--color-text-2);
+        }
+        .ant-collapse-item {
+            background: var(--color-bg-1);
+        }
+        .ant-descriptions-item-label {
+            background: var(--color-fill-1) !important;
+            padding: 10px !important;
+        }
         .ant-collapse-content-box {
             padding: 0 !important;
         }
@@ -38,6 +52,7 @@
 
         .ant-descriptions-item-content {
             width: 300px !important;
+            padding: 10px !important;
         }
 
         .ant-btn-link {
