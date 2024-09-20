@@ -77,6 +77,7 @@
     "effect": "Effect",
     "isExactSearch": "Accurate search",
     "uploadDescription": "Only files of xls or xlsx type can be uploaded",
-    "baseInfo": "Basic information"
+    "baseInfo": "Basic Information",
+    "changeRecords":"Change Records"
   }
 }

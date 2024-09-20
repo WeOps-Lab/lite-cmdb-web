@@ -28,6 +28,10 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       label: t("Model.relationships"),
       path: "/assetData/detail/ralationships",
     },
+    {
+      label: t("Model.changeRecords"),
+      path: "/assetData/detail/changeRecords",
+    },
   ];
 
   useEffect(() => {
