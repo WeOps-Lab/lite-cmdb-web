@@ -6,6 +6,14 @@ import changeRecordsStyle from "./index.module.less";
 import useApiClient from "@/utils/request";
 import RecordDetail from "./recordDetail";
 import { useTranslation } from "@/utils/i18n";
+import { useSearchParams } from "next/navigation";
+import {
+  AttrFieldType,
+  ModelItem,
+  Organization,
+  UserItem,
+  AssoTypeItem,
+} from "@/types/assetManage";
 
 const { RangePicker } = DatePicker;
 
@@ -38,9 +46,16 @@ const ChangeRecords: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [enumList, setEnumList] = useState<RecordsEnum>({});
   const [recordList, setRecordList] = useState<RecordItem[]>([]);
+  const [attrList, setAttrList] = useState<AttrFieldType[]>([]);
   const { get, isLoading } = useApiClient();
+  const [modelList, setModelList] = useState<ModelItem[]>([]);
+  const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
+  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
+  const [userList, setUserList] = useState<UserItem[]>([]);
   const detailRef = useRef<detailRef>(null);
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const modelId: string = searchParams.get("model_id") || "";
 
   useEffect(() => {
     if (isLoading) return;
@@ -50,22 +65,44 @@ const ChangeRecords: React.FC = () => {
 
   const showDetailModal = (log: RecordItemList) => {
     detailRef.current?.showModal({
-      title: enumList[log.type] + log.model_id,
+      title: enumList[log.type] + showModelName(log.model_id),
       subTitle: "",
       recordRow: log,
     });
   };
 
+  const showModelName = (id: unknown) => {
+    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+  };
+
   const initData = async (dates = null) => {
     const getChangeRecordLists = get("/api/change_record/");
     const getEnumData = get("/api/change_record/enum_data/");
+    const getAttrList = get(`/api/model/${modelId}/attr_list/`);
+    const getModelList = get("/api/model/");
+    const getGroupList = get("/api/user_group/group_list/");
+    const getUserList = get("/api/user_group/user_list/");
+    const getAssoType = get("/api/model/model_association_type/");
     try {
       setLoading(true);
-      Promise.all([getChangeRecordLists, getEnumData])
+      Promise.all([
+        getChangeRecordLists,
+        getEnumData,
+        getAttrList,
+        getModelList,
+        getGroupList,
+        getUserList,
+        getAssoType,
+      ])
         .then((res) => {
           const enumData = res[1];
           setEnumList(enumData);
           dealRecordList(res[0]);
+          setAttrList(res[2] || []);
+          setModelList(res[3] || []);
+          setOrganizationList(res[4] || []);
+          setUserList(res[5] || []);
+          setAssoTypes(res[6] || []);
         })
         .finally(() => {
           setLoading(false);
@@ -155,7 +192,7 @@ const ChangeRecords: React.FC = () => {
                       className="cursor-pointer"
                     >
                       <div className="mb-[4px]">
-                        {enumList[log.type] + log.model_id}
+                        {enumList[log.type] + showModelName(log.model_id)}
                       </div>
                       <div className="flex items-center text-[12px]">
                         <span className="text-[var(--color-text-3)]">
@@ -164,7 +201,7 @@ const ChangeRecords: React.FC = () => {
                         <span
                           className={`${changeRecordsStyle.operator} text-[var(--color-text-3)]`}
                         >
-                          操作人: {log.operator}
+                          {t("Model.operator")}: {log.operator}
                         </span>
                       </div>
                     </div>
@@ -175,7 +212,15 @@ const ChangeRecords: React.FC = () => {
           ))}
         </div>
       </div>
-      <RecordDetail ref={detailRef} userList={[]} propertyList={[]}/>
+      <RecordDetail
+        ref={detailRef}
+        userList={userList}
+        propertyList={attrList}
+        modelList={modelList}
+        groupList={organizationList}
+        enumList={enumList}
+        connectTypeList={assoTypes}
+      />
     </Spin>
   );
 };

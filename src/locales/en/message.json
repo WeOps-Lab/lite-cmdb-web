@@ -78,6 +78,17 @@
     "isExactSearch": "Accurate search",
     "uploadDescription": "Only files of xls or xlsx type can be uploaded",
     "baseInfo": "Basic Information",
-    "changeRecords":"Change Records"
+    "changeRecords": "Change Records",
+    "operator": "Operator",
+    "action": "Action",
+    "modelType": "Model type",
+    "operationExamples": "Operation examples",
+    "operationTime": "Operation time",
+    "operateAccount": "Operate account",
+    "attribute": "Attribute",
+    "beforeTheChange": "Before the change",
+    "afterTheChange": "After the change",
+    "objectType": "object type",
+    "relatedRelationships": "Related relationships"
   }
 }

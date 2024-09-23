@@ -279,7 +279,12 @@ export const getFieldItem = (config: {
           ?.username || "--"
       );
     case "organization":
-      return findGroupNameById(config.groupList || [], config.value[0]) || "--";
+      return (
+        findGroupNameById(
+          config.groupList || [],
+          Array.isArray(config.value) ? config.value?.[0] : config.value
+        ) || "--"
+      );
     case "bool":
       return config.value ? "Yes" : "No";
     case "enum":
