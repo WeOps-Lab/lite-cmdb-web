@@ -54,15 +54,15 @@ export interface AssoFieldType {
 }
 
 export interface AttrFieldType {
-  model_id: string;
+  model_id?: string;
   attr_id: string;
   attr_name: string;
   attr_type: string;
-  is_only: boolean;
+  is_only?: boolean;
   is_required: boolean;
   editable: boolean;
   option: Array<EnumList>;
-  attr_group: string;
+  attr_group?: string;
   [key: string]: unknown;
 }
 
@@ -125,6 +125,18 @@ export interface InstDetail {
 }
 
 export interface EnumList {
-  id: string;
+  id: string | number;
   name: string;
+}
+
+export interface CredentialListItem {
+  classification_name: string;
+  classification_id: string;
+  list: CredentialChildItem[];
+}
+
+export interface CredentialChildItem {
+  model_id: string;
+  model_name: string;
+  attrs: AttrFieldType[];
 }

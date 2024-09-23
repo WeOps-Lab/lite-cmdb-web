@@ -53,7 +53,8 @@
   "menu": {
     "log": "Log",
     "assetManage": "Model",
-    "asset": "Asset"
+    "asset": "Asset",
+    "credential": "Credential"
   },
   "Model": {
     "addModel": "Add Model",

@@ -1,3 +1,4 @@
+import { CredentialListItem } from "@/types/assetManage";
 export const BUILD_IN_MODEL: Array<{
   key: string;
   icon: string;
@@ -456,5 +457,96 @@ export const CONSTRAINT_List = [
   {
     id: "1:1",
     name: "1-1",
+  },
+];
+
+export const CREDENTIAL_LIST: CredentialListItem[] = [
+  {
+    classification_name: "主机管理",
+    classification_id: "host_manage",
+    list: [
+      {
+        model_id: "host",
+        model_name: "主机",
+        attrs: [
+          {
+            attr_id: "inst_name",
+            attr_name: "实例名",
+            attr_type: "str",
+            option: [],
+            editable: true,
+            is_required: true,
+          },
+          {
+            attr_id: "operate_system",
+            attr_name: "system",
+            attr_type: "enum",
+            option: [
+              {
+                name: "Windows",
+                id: 0,
+              },
+              {
+                name: "Linux",
+                id: 1,
+              },
+            ],
+            editable: true,
+            is_required: true,
+          },
+        ],
+      },
+      {
+        model_id: "host1",
+        model_name: "主机1",
+        attrs: [
+          {
+            attr_id: "inst_name",
+            attr_name: "实例名",
+            attr_type: "str",
+            option: [],
+            editable: true,
+            is_required: true,
+          },
+          {
+            attr_id: "operate_system",
+            attr_name: "system",
+            attr_type: "enum",
+            option: [
+              {
+                name: "Windows",
+                id: 0,
+              },
+              {
+                name: "Linux",
+                id: 1,
+              },
+            ],
+            editable: true,
+            is_required: true,
+          },
+        ],
+      },
+    ],
+  },
+  {
+    classification_name: "数据库",
+    classification_id: "database",
+    list: [
+      {
+        model_id: "mysql",
+        model_name: "Mysql",
+        attrs: [
+          {
+            attr_id: "inst_name",
+            attr_name: "实例名",
+            attr_type: "str",
+            option: [],
+            editable: true,
+            is_required: true,
+          },
+        ],
+      },
+    ],
   },
 ];
