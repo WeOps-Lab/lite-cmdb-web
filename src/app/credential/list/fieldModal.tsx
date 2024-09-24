@@ -243,7 +243,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 <div className="flex items-center">
                                   <Form.Item
                                     name={item.attr_id}
-                                    className="mb-[0px]"
+                                    className="mb-[0px] w-full"
                                   >
                                     <Input.Password
                                       visibilityToggle={false}
