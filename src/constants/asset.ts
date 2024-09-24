@@ -470,9 +470,17 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
         model_name: "主机",
         attrs: [
           {
-            attr_id: "inst_name",
-            attr_name: "实例名",
+            attr_id: "name",
+            attr_name: "名称",
             attr_type: "str",
+            option: [],
+            editable: true,
+            is_required: true,
+          },
+          {
+            attr_id: "password",
+            attr_name: "加密字段",
+            attr_type: "pwd",
             option: [],
             editable: true,
             is_required: true,
@@ -501,27 +509,18 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
         model_name: "主机1",
         attrs: [
           {
-            attr_id: "inst_name",
-            attr_name: "实例名",
+            attr_id: "name",
+            attr_name: "名称",
             attr_type: "str",
             option: [],
             editable: true,
             is_required: true,
           },
           {
-            attr_id: "operate_system",
-            attr_name: "system",
-            attr_type: "enum",
-            option: [
-              {
-                name: "Windows",
-                id: 0,
-              },
-              {
-                name: "Linux",
-                id: 1,
-              },
-            ],
+            attr_id: "version",
+            attr_name: "版本",
+            attr_type: "str",
+            option: [],
             editable: true,
             is_required: true,
           },
@@ -538,8 +537,8 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
         model_name: "Mysql",
         attrs: [
           {
-            attr_id: "inst_name",
-            attr_name: "实例名",
+            attr_id: "name",
+            attr_name: "名称",
             attr_type: "str",
             option: [],
             editable: true,

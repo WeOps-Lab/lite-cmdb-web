@@ -20,13 +20,7 @@ import FieldModal from "./list/fieldModal";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
 const { confirm } = Modal;
-import { deepClone, getAssetColumns } from "@/utils/common";
-import {
-  GroupItem,
-  ColumnItem,
-  UserItem,
-  AttrFieldType,
-} from "@/types/assetManage";
+import { ColumnItem, UserItem, AttrFieldType } from "@/types/assetManage";
 import { CREDENTIAL_LIST } from "@/constants/asset";
 
 interface ModelTabs {
@@ -57,7 +51,6 @@ const Credential = () => {
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
-  const [currentColumns, setCurrentColumns] = useState<ColumnItem[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
@@ -66,7 +59,43 @@ const Credential = () => {
   });
   const [searchText, setSearchText] = useState<string>("");
   const { t } = useTranslation();
-  const { get, del, post, isLoading } = useApiClient();
+  const { get, del, isLoading } = useApiClient();
+  const currentColumns: ColumnItem[] = [
+    {
+      title: t("name"),
+      key: "name",
+      dataIndex: "name",
+    },
+    {
+      title: t("creator"),
+      key: "_creator",
+      dataIndex: "_creator",
+    },
+    {
+      title: t("updateTime"),
+      key: "update_time",
+      dataIndex: "update_time",
+    },
+    {
+      title: t("action"),
+      key: "action",
+      dataIndex: "action",
+      render: (_: unknown, record: any) => (
+        <>
+          <Button
+            type="link"
+            className="mr-[10px]"
+            onClick={() => showAttrModal("edit", record)}
+          >
+            {t("edit")}
+          </Button>
+          <Button type="link" onClick={() => showDeleteConfirm(record)}>
+            {t("delete")}
+          </Button>
+        </>
+      ),
+    },
+  ];
 
   useEffect(() => {
     if (isLoading) return;
@@ -78,39 +107,6 @@ const Credential = () => {
       fetchData();
     }
   }, [pagination?.current, pagination?.pageSize]);
-
-  useEffect(() => {
-    if (propertyList.length && userList.length) {
-      const attrList = getAssetColumns({
-        attrList: propertyList,
-        userList,
-        t,
-      });
-      const tableColumns = [
-        ...attrList,
-        {
-          title: t("action"),
-          key: "action",
-          dataIndex: "action",
-          render: (_: unknown, record: any) => (
-            <>
-              <Button
-                type="link"
-                className="mr-[10px]"
-                onClick={() => showAttrModal("edit", record)}
-              >
-                {t("edit")}
-              </Button>
-              <Button type="link" onClick={() => showDeleteConfirm(record)}>
-                {t("delete")}
-              </Button>
-            </>
-          ),
-        },
-      ];
-      setCurrentColumns(tableColumns);
-    }
-  }, [propertyList, userList]);
 
   const onSearchTxtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -128,12 +124,18 @@ const Credential = () => {
     fetchData();
   };
 
-  const fetchData = async () => {
+  const fetchData = async (requestParams?: any) => {
     setTableLoading(true);
-    const params = getTableParams();
+    let params = getTableParams();
+    params.credential_type = modelId;
+    if (requestParams) {
+      params = requestParams;
+    }
     try {
-      const data = await post(`/api/instance/search/`, params);
-      setTableData(data.insts);
+      const data = await get(`/api/credential/`, {
+        params,
+      });
+      setTableData(data.items);
       pagination.total = data.count;
       setPagination(pagination);
     } catch (error) {
@@ -171,8 +173,8 @@ const Credential = () => {
         .then((res) => {
           const userData: UserItem[] = res[0].users;
           setUserList(userData);
-          pagination.total = res[0].count;
-          const tableList = res[0].insts;
+          pagination.total = res[1].count;
+          const tableList = res[1].items;
           setTableData(tableList);
           setPagination(pagination);
         })
@@ -193,24 +195,16 @@ const Credential = () => {
     };
   };
 
-  const getTableList = async (id: string) => {
-    const properties = modelList.find((item) => item.key === id)?.attrs || [];
+  const getTableList = async (id: string, list?: ModelTabs[]) => {
+    const properties =
+      (list || modelList).find((item) => item.key === id)?.attrs || [];
     setPropertyList(properties);
     const tableParmas = getTableParams();
-    setLoading(true);
-    try {
-      const responseData = await get("/api/credential/", {
-        params: {
-          ...tableParmas,
-          credential_type: id,
-        },
-      });
-      pagination.total = responseData.count;
-      setTableData(responseData.insts);
-      setPagination(pagination);
-    } finally {
-      setLoading(false);
-    }
+    const params = {
+      ...tableParmas,
+      credential_type: id,
+    };
+    fetchData(params);
   };
 
   const onSelectChange = (selectedKeys: any) => {
@@ -241,10 +235,13 @@ const Credential = () => {
     const currentModelId = currentModelList[0].key;
     setModelList(currentModelList);
     setModelId(currentModelId);
-    getTableList(currentModelId);
+    getTableList(currentModelId, currentModelList);
   };
 
-  const showDeleteConfirm = (row = { _id: "" }) => {
+  const showDeleteConfirm = (row: any) => {
+    const params = {
+      ids: Array.isArray(row) ? row.join(",") : row._id,
+    };
     confirm({
       title: t("deleteTitle"),
       content: t("deleteContent"),
@@ -252,33 +249,9 @@ const Credential = () => {
       onOk() {
         return new Promise(async (resolve) => {
           try {
-            await del(`/api/instance/${row._id}/`);
-            message.success(t("successfullyDeleted"));
-            if (pagination?.current) {
-              pagination.current > 1 &&
-                tableData.length === 1 &&
-                pagination.current--;
-            }
-            setSelectedRowKeys([]);
-            fetchData();
-          } finally {
-            resolve(true);
-          }
-        });
-      },
-    });
-  };
-
-  const batchDeleteConfirm = () => {
-    confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
-      centered: true,
-      onOk() {
-        return new Promise(async (resolve) => {
-          try {
-            const list = selectedRowKeys;
-            await post("/api/instance/batch_delete/", list);
+            await del(`/api/credential/batch_delete/`, {
+              params,
+            });
             message.success(t("successfullyDeleted"));
             if (pagination?.current) {
               pagination.current > 1 &&
@@ -362,7 +335,7 @@ const Credential = () => {
                 {t("add")}
               </Button>
               <Button
-                onClick={batchDeleteConfirm}
+                onClick={() => showDeleteConfirm(selectedRowKeys)}
                 disabled={!selectedRowKeys.length}
               >
                 {t("delete")}
@@ -381,7 +354,6 @@ const Credential = () => {
           <FieldModal
             ref={fieldRef}
             userList={userList}
-            organizationList={[]}
             onSuccess={updateFieldList}
           />
         </div>

@@ -50,6 +50,8 @@
   "item": "items",
   "fieldKey": "Enter the key",
   "fieldValue": "Enter the vaule",
+  "creator":"Creator",
+  "updateTime":"Update Time",
   "menu": {
     "log": "Log",
     "assetManage": "Model",
