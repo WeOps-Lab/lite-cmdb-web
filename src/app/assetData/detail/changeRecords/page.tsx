@@ -56,6 +56,7 @@ const ChangeRecords: React.FC = () => {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
   const modelId: string = searchParams.get("model_id") || "";
+  const instId: string = searchParams.get("inst_id") || "";
 
   useEffect(() => {
     if (isLoading) return;
@@ -75,8 +76,10 @@ const ChangeRecords: React.FC = () => {
     return modelList.find((item) => item.model_id === id)?.model_name || "--";
   };
 
-  const initData = async (dates = null) => {
-    const getChangeRecordLists = get("/api/change_record/");
+  const initData = async () => {
+    const getChangeRecordLists = get("/api/change_record/", {
+      params: getParams(),
+    });
     const getEnumData = get("/api/change_record/enum_data/");
     const getAttrList = get(`/api/model/${modelId}/attr_list/`);
     const getModelList = get("/api/model/");
@@ -110,6 +113,13 @@ const ChangeRecords: React.FC = () => {
     } catch (error) {
       setLoading(false);
     }
+  };
+
+  const getParams = () => {
+    return {
+      model_id: modelId,
+      inst_id: instId,
+    };
   };
 
   const dealRecordList = (data: RecordItemList[]) => {
@@ -149,10 +159,7 @@ const ChangeRecords: React.FC = () => {
   };
 
   const handleDateChange = async (dateString: any = []) => {
-    const params = {
-      created_at_after: "",
-      created_at_before: "",
-    };
+    const params: any = getParams();
     params.created_at_after = dateString[0] || "";
     params.created_at_before = dateString[1] || "";
     setLoading(true);
