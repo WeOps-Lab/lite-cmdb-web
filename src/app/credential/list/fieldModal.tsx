@@ -18,6 +18,7 @@ import { AttrFieldType, UserItem } from "@/types/assetManage";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { EditOutlined, CopyOutlined } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 interface FieldModalProps {
   onSuccess: () => void;
@@ -81,6 +82,17 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           try {
             _formInfo = await get(`/api/credential/${formInfo._id}/`);
             _formInfo._id = formInfo._id;
+            for (const key in _formInfo) {
+              const target = attrList.find((item) => item.attr_id === key);
+              if (
+                target?.attr_type === "time" &&
+                _formInfo[key].every((item: string) => !!item)
+              ) {
+                _formInfo[key] = _formInfo[key].map((date: string) =>
+                  dayjs(date, "YYYY-MM-DD HH:mm:ss")
+                );
+              }
+            }
           } finally {
             setLoading(false);
           }
@@ -93,6 +105,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
 
     const handleSubmit = () => {
       form.validateFields().then((values) => {
+        for (const key in values) {
+          const target = formItems.find((item) => item.attr_id === key);
+          if (target?.attr_type === "time") {
+            values[key] = values[key].map((date: any) =>
+              date.format("YYYY-MM-DD HH:mm:ss")
+            );
+          }
+        }
         operateAttr(values);
       });
     };
@@ -234,8 +254,8 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                               return (
                                 <RangePicker
                                   disabled={!item.editable}
-                                  showTime={{ format: "HH:mm" }}
-                                  format="YYYY-MM-DD HH:mm"
+                                  showTime
+                                  format="YYYY-MM-DD HH:mm:ss"
                                 />
                               );
                             case "pwd":
