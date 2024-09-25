@@ -64,6 +64,7 @@ export interface AttrFieldType {
   option: Array<EnumList>;
   attr_group?: string;
   isEdit?: boolean;
+  children?: AttrFieldType[]
   [key: string]: unknown;
 }
 

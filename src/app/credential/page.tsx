@@ -17,10 +17,17 @@ import { PlusOutlined } from "@ant-design/icons";
 import type { RadioChangeEvent } from "antd";
 import assetDataStyle from "./index.module.less";
 import FieldModal from "./list/fieldModal";
+import SelectInstance from "./list/selectInstance";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
 const { confirm } = Modal;
-import { ColumnItem, UserItem, AttrFieldType } from "@/types/assetManage";
+import {
+  ColumnItem,
+  UserItem,
+  AttrFieldType,
+  Organization,
+} from "@/types/assetManage";
+import { deepClone, getAssetColumns, convertArray } from "@/utils/common";
 import { CREDENTIAL_LIST } from "@/constants/asset";
 
 interface ModelTabs {
@@ -29,6 +36,9 @@ interface ModelTabs {
   attrs: AttrFieldType[];
 }
 interface FieldRef {
+  showModal: (config: FieldConfig) => void;
+}
+interface SelectInstanceRef {
   showModal: (config: FieldConfig) => void;
 }
 interface FieldConfig {
@@ -43,6 +53,7 @@ interface FieldConfig {
 
 const Credential = () => {
   const fieldRef = useRef<FieldRef>(null);
+  const selectInstanceRef = useRef<SelectInstanceRef>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
@@ -51,7 +62,11 @@ const Credential = () => {
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
+  const [intancePropertyList, setIntancePropertyList] = useState<
+    AttrFieldType[]
+  >([]);
   const [tableData, setTableData] = useState<any[]>([]);
+  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     total: 0,
@@ -89,11 +104,42 @@ const Credential = () => {
           >
             {t("edit")}
           </Button>
+          <Button
+            type="link"
+            className="mr-[10px]"
+            onClick={() => showSelectInstanceModal(record)}
+          >
+            {t("Model.association")}
+          </Button>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
             {t("delete")}
           </Button>
         </>
       ),
+    },
+  ];
+  const instanceModels = [
+    {
+      _id: 16,
+      _label: "model",
+      is_pre: true,
+      model_name: "Oracle",
+      icn: "cc-oracle-Oracle",
+      classification_id: "database",
+      model_id: "oracle",
+      attrs:
+        '[{"attr_id": "inst_name", "attr_name": "\u6570\u636e\u5e93\u540d\u79f0", "attr_type": "str", "option": "", "attr_group": "", "is_only": true, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "organization", "attr_name": "\u6240\u5c5e\u7ec4\u7ec7", "attr_type": "organization", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "ip_addr", "attr_name": "IP\u5730\u5740", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "port", "attr_name": "\u7aef\u53e3", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "sid", "attr_name": "SID", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_mem", "attr_name": "\u6700\u5927\u5185\u5b58", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_conn", "attr_name": "\u6700\u5927\u8fde\u63a5\u6570", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "version", "attr_name": "\u6570\u636e\u5e93\u7248\u672c", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "database_role", "attr_name": "\u6570\u636e\u5e93\u89d2\u8272", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}]',
+    },
+    {
+      _id: 17,
+      _label: "model",
+      is_pre: true,
+      model_name: "MySQL",
+      icn: "cc-mysql-MySQL",
+      classification_id: "database",
+      model_id: "mysql",
+      attrs:
+        '[{"attr_id": "inst_name", "attr_name": "\u6570\u636e\u5e93\u540d\u79f0", "attr_type": "str", "option": "", "attr_group": "", "is_only": true, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "organization", "attr_name": "\u6240\u5c5e\u7ec4\u7ec7", "attr_type": "organization", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "ip_addr", "attr_name": "IP\u5730\u5740", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "port", "attr_name": "\u7aef\u53e3", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "version", "attr_name": "\u6570\u636e\u5e93\u7248\u672c", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "enable_binlog", "attr_name": "\u662f\u5426\u5f00\u542fbinlog", "attr_type": "bool", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_conn", "attr_name": "\u6700\u5927\u8fde\u63a5\u6570", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_mem", "attr_name": "\u6700\u5927\u5185\u5b58", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "database_role", "attr_name": "\u6570\u636e\u5e93\u89d2\u8272", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_name": "\u64cd\u4f5c\u65f6\u95f4", "attr_id": "operate_time", "attr_type": "time", "editable": true, "is_only": false, "is_required": false, "option": [], "attr_group": "database", "model_id": "mysql"}]',
     },
   ];
 
@@ -167,15 +213,25 @@ const Credential = () => {
     const getCredentialList = get("/api/credential/", {
       params,
     });
+    const getOrganizationList = get("/api/user_group/group_list/");
+    const getAttrList = get(`/api/model/mysql/attr_list/`);
     setLoading(true);
     try {
-      Promise.all([getUserList, getCredentialList])
+      Promise.all([
+        getUserList,
+        getCredentialList,
+        getOrganizationList,
+        getAttrList,
+      ])
         .then((res) => {
           const userData: UserItem[] = res[0].users;
-          setUserList(userData);
+          const organizationData: Organization[] = convertArray(res[2]);
           pagination.total = res[1].count;
           const tableList = res[1].items;
+          setOrganizationList(organizationData);
+          setUserList(userData);
           setTableData(tableList);
+          setIntancePropertyList(res[3]);
           setPagination(pagination);
         })
         .finally(() => {
@@ -285,6 +341,18 @@ const Credential = () => {
     });
   };
 
+  const showSelectInstanceModal = (row = {}) => {
+    selectInstanceRef.current?.showModal({
+      title: t("Model.selectInstance"),
+      type: "",
+      attrList: propertyList,
+      formInfo: row,
+      subTitle: "",
+      model_id: modelId,
+      list: selectedRowKeys,
+    });
+  };
+
   const handleTableChange = (pagination = {}) => {
     setPagination(pagination);
   };
@@ -354,6 +422,14 @@ const Credential = () => {
           <FieldModal
             ref={fieldRef}
             userList={userList}
+            onSuccess={updateFieldList}
+          />
+          <SelectInstance
+            ref={selectInstanceRef}
+            userList={userList}
+            organizationList={organizationList}
+            propertyList={intancePropertyList}
+            instanceModels={instanceModels}
             onSuccess={updateFieldList}
           />
         </div>

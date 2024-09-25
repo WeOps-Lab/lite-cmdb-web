@@ -50,8 +50,8 @@
   "item": "items",
   "fieldKey": "Enter the key",
   "fieldValue": "Enter the vaule",
-  "creator":"Creator",
-  "updateTime":"Update Time",
+  "creator": "Creator",
+  "updateTime": "Update Time",
   "menu": {
     "log": "Log",
     "assetManage": "Model",
@@ -92,6 +92,8 @@
     "beforeTheChange": "Before the change",
     "afterTheChange": "After the change",
     "objectType": "object type",
-    "relatedRelationships": "Related relationships"
+    "relatedRelationships": "Related relationships",
+    "association": "Association",
+    "selectInstance": "Select instance"
   }
 }

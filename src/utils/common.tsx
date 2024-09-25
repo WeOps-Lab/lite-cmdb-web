@@ -150,6 +150,10 @@ export const getAssetColumns = (config: {
       title: attrName,
       dataIndex: attrId,
       key: attrId,
+      width: 100,
+      ellipsis: {
+        showTitle: true
+      }
     };
     switch (attrType) {
       case "user":

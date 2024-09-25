@@ -19,7 +19,6 @@ import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { EditOutlined, CopyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-
 interface FieldModalProps {
   onSuccess: () => void;
   userList: UserItem[];
@@ -69,13 +68,15 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         formInfo,
         model_id,
       }) => {
-        // 开启弹窗的交互
         setGroupVisible(true);
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
         setModelId(model_id);
         setFormItems(attrList);
+        const processedAttrList = deepClone(attrList);
+        initializeVisibility(processedAttrList);
+        setFormItems(processedAttrList);
         let _formInfo = formInfo;
         if (type === "edit") {
           setLoading(true);
@@ -114,6 +115,19 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           }
         }
         operateAttr(values);
+      });
+    };
+
+    const initializeVisibility = (items: AttrFieldType[]) => {
+      items.forEach((item) => {
+        if (item.children) {
+          item.children.forEach((child) => {
+            child.visible = false;
+            if (child.children) {
+              initializeVisibility(child.children);
+            }
+          });
+        }
       });
     };
 
@@ -161,7 +175,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       setFormItems(fields);
     };
 
-    const onCopy = async (item: any, value: string) => {
+    const onCopy = async (item: AttrFieldType) => {
       const params = {
         id: instanceData._id,
         field: item.attr_id,
@@ -174,13 +188,155 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       message.success(t("successfulCopied"));
     };
 
+    const renderFormItem = (item: AttrFieldType) => {
+      switch (item.attr_type) {
+        case "user":
+          return (
+            <Select disabled={!item.editable}>
+              {userList.map((opt) => (
+                <Select.Option key={opt.id} value={opt.id}>
+                  {opt.username}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        case "enum":
+          return (
+            <Select
+              disabled={!item.editable}
+              onChange={(value) => handleEnumChange(item, value)}
+            >
+              {item.option.map((opt) => (
+                <Select.Option key={opt.id} value={opt.id}>
+                  {opt.name}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        case "bool":
+          return (
+            <Select disabled={!item.editable}>
+              {[
+                { id: 1, name: "Yes" },
+                { id: 0, name: "No" },
+              ].map((opt) => (
+                <Select.Option key={opt.id} value={opt.id}>
+                  {opt.name}
+                </Select.Option>
+              ))}
+            </Select>
+          );
+        case "time":
+          return (
+            <RangePicker
+              disabled={!item.editable}
+              showTime
+              format="YYYY-MM-DD HH:mm:ss"
+            />
+          );
+        case "pwd":
+          return (
+            <div className="flex items-center">
+              <Form.Item name={item.attr_id} className="mb-[0px] w-full">
+                <Input.Password
+                  visibilityToggle={false}
+                  disabled={type !== "add" && (!item.editable || !item.isEdit)}
+                />
+              </Form.Item>
+              {!item.isEdit && type !== "add" && (
+                <>
+                  <EditOutlined
+                    className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
+                    onClick={() => editPassword(item)}
+                  />
+                  <CopyOutlined
+                    className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
+                    onClick={() => onCopy(item)}
+                  />
+                </>
+              )}
+            </div>
+          );
+        default:
+          return <Input disabled={!item.editable && type !== "add"} />;
+      }
+    };
+
+    const handleEnumChange = (item: AttrFieldType, value: unknown) => {
+      const newFormItems = deepClone(formItems);
+      const updateFormItems: any = (
+        items: AttrFieldType[],
+        targetItem: AttrFieldType,
+        value: unknown
+      ) => {
+        return items.map((field) => {
+          if (field.attr_id === targetItem.attr_id) {
+            // 操作当前项
+            if (field.children) {
+              field.children.forEach((child) => {
+                child.visible = child.parent_id === value;
+                if (child.children) {
+                  child.children.forEach((grandChild) => {
+                    grandChild.visible = false;
+                  });
+                }
+              });
+            }
+            // 操作目标项
+            if (targetItem.children) {
+              targetItem.visible = true;
+              targetItem.children.forEach((grandChild) => {
+                grandChild.visible = value === grandChild.parent_id;
+              });
+            }
+            return { ...field, ...targetItem };
+          } else if (field.children) {
+            return {
+              ...field,
+              children: updateFormItems(field.children, targetItem, value),
+            };
+          } else {
+            return field;
+          }
+        });
+      };
+
+      const updatedItems = updateFormItems(newFormItems, item, value);
+      setFormItems(updatedItems);
+    };
+
+    const renderFormItems = (items: AttrFieldType[]) => {
+      return items.map((item) => {
+        if (item.visible === false) return null;
+        return (
+          <Col span={24} key={item.attr_id}>
+            <Form.Item
+              name={item.attr_id}
+              label={item.attr_name}
+              labelCol={{ span: 7 }}
+              className="w-full"
+              rules={[
+                {
+                  required: item.is_required,
+                  message: t("required"),
+                },
+              ]}
+            >
+              {renderFormItem(item)}
+            </Form.Item>
+            <>{item.children && renderFormItems(item.children)}</>
+          </Col>
+        );
+      });
+    };
+
     return (
       <div>
         <OperateModal
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
-          width={700}
+          width={500}
           onCancel={handleCancel}
           footer={
             <div>
@@ -199,111 +355,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         >
           <Spin spinning={loading}>
             <Form form={form}>
-              <Row gutter={24}>
-                {formItems
-                  .filter((formItem) => formItem.attr_id !== "organization")
-                  .map((item) => (
-                    <Col span={12} key={item.attr_id}>
-                      <Form.Item
-                        name={item.attr_id}
-                        label={item.attr_name}
-                        labelCol={{ span: 7 }}
-                        rules={[
-                          {
-                            required: item.is_required,
-                            message: t("required"),
-                          },
-                        ]}
-                      >
-                        {(() => {
-                          switch (item.attr_type) {
-                            case "user":
-                              return (
-                                <Select disabled={!item.editable}>
-                                  {userList.map((opt) => (
-                                    <Select.Option key={opt.id} value={opt.id}>
-                                      {opt.username}
-                                    </Select.Option>
-                                  ))}
-                                </Select>
-                              );
-                            case "enum":
-                              return (
-                                <Select disabled={!item.editable}>
-                                  {item.option.map((opt) => (
-                                    <Select.Option key={opt.id} value={opt.id}>
-                                      {opt.name}
-                                    </Select.Option>
-                                  ))}
-                                </Select>
-                              );
-                            case "bool":
-                              return (
-                                <Select disabled={!item.editable}>
-                                  {[
-                                    { id: 1, name: "Yes" },
-                                    { id: 0, name: "No" },
-                                  ].map((opt) => (
-                                    <Select.Option key={opt.id} value={opt.id}>
-                                      {opt.name}
-                                    </Select.Option>
-                                  ))}
-                                </Select>
-                              );
-                            case "time":
-                              return (
-                                <RangePicker
-                                  disabled={!item.editable}
-                                  showTime
-                                  format="YYYY-MM-DD HH:mm:ss"
-                                />
-                              );
-                            case "pwd":
-                              return (
-                                <div className="flex items-center">
-                                  <Form.Item
-                                    name={item.attr_id}
-                                    className="mb-[0px] w-full"
-                                  >
-                                    <Input.Password
-                                      visibilityToggle={false}
-                                      disabled={
-                                        type !== "add" &&
-                                        (!item.editable || !item.isEdit)
-                                      }
-                                    />
-                                  </Form.Item>
-                                  {!item.isEdit && type !== "add" && (
-                                    <>
-                                      <EditOutlined
-                                        className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
-                                        onClick={() => editPassword(item)}
-                                      />
-                                      <CopyOutlined
-                                        className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
-                                        onClick={() =>
-                                          onCopy(
-                                            item,
-                                            instanceData[item.attr_id]
-                                          )
-                                        }
-                                      />
-                                    </>
-                                  )}
-                                </div>
-                              );
-                            default:
-                              return (
-                                <Input
-                                  disabled={!item.editable && type !== "add"}
-                                />
-                              );
-                          }
-                        })()}
-                      </Form.Item>
-                    </Col>
-                  ))}
-              </Row>
+              <Row gutter={24}>{renderFormItems(formItems)}</Row>
             </Form>
           </Spin>
         </OperateModal>

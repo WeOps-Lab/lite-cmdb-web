@@ -218,10 +218,10 @@ const AssetData = () => {
     const getCroupList = get("/api/classification/");
     const getModelList = get("/api/model/");
     const getUserList = get("/api/user_group/user_list/");
-    const getGroupList = get("/api/user_group/group_list/");
+    const getOrganizationList= get("/api/user_group/group_list/");
     setLoading(true);
     try {
-      Promise.all([getModelList, getCroupList, getUserList, getGroupList])
+      Promise.all([getModelList, getCroupList, getUserList, getOrganizationList])
         .then((res) => {
           const modeldata: ModelItem[] = res[0];
           const groupData: GroupItem[] = res[1];
