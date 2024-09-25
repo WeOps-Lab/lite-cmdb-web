@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useEffect,
+} from "react";
 import {
   Input,
   Button,
@@ -17,7 +22,7 @@ import { useTranslation } from "@/utils/i18n";
 import { AttrFieldType, Organization, UserItem } from "@/types/assetManage";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
-
+import dayjs from "dayjs";
 interface FieldModalProps {
   onSuccess: () => void;
   organizationList: Organization[];
@@ -61,6 +66,13 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const { post } = useApiClient();
     const { RangePicker } = DatePicker;
 
+    useEffect(() => {
+      if (groupVisible) {
+        form.resetFields();
+        form.setFieldsValue(instanceData);
+      }
+    }, [groupVisible, instanceData]);
+
     useImperativeHandle(ref, () => ({
       showModal: ({
         type,
@@ -78,20 +90,39 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setTitle(title);
         setModelId(model_id);
         setFormItems(attrList);
-        setInstanceData(formInfo);
         setSelectedRows(list);
+        const forms = deepClone(formInfo);
         if (type === "add") {
-          Object.assign(formInfo, {
+          Object.assign(forms, {
             organization: organizationList[0]?.value || "",
           });
+        } else {
+          for (const key in forms) {
+            const target = attrList.find((item) => item.attr_id === key);
+            if (
+              target?.attr_type === "time" &&
+              forms[key].every((item: string) => !!item)
+            ) {
+              forms[key] = forms[key].map((date: string) =>
+                dayjs(date, "YYYY-MM-DD HH:mm:ss")
+              );
+            }
+          }
         }
-        form.resetFields();
-        form.setFieldsValue(formInfo);
+        setInstanceData(forms);
       },
     }));
 
     const handleSubmit = () => {
       form.validateFields().then((values) => {
+        for (const key in values) {
+          const target = formItems.find((item) => item.attr_id === key);
+          if (target?.attr_type === "time") {
+            values[key] = values[key].map((date: any) =>
+              date.format("YYYY-MM-DD HH:mm:ss")
+            );
+          }
+        }
         operateAttr(values);
       });
     };
@@ -99,7 +130,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const operateAttr = async (params: AttrFieldType) => {
       try {
         setConfirmLoading(true);
-        const formData = deepClone(params);
+        const formData = params;
         const msg: string = t(
           type === "add" ? "successfullyAdded" : "successfullyModified"
         );
@@ -254,9 +285,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                           case "time":
                             return (
                               <RangePicker
+                                showTime
                                 disabled={!item.editable && type !== "add"}
-                                showTime={{ format: "HH:mm" }}
-                                format="YYYY-MM-DD HH:mm"
+                                format="YYYY-MM-DD HH:mm:ss"
                               />
                             );
                           default:

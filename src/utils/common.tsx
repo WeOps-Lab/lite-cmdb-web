@@ -208,6 +208,13 @@ export const getAssetColumns = (config: {
             </>
           ),
         };
+      case "time":
+        return {
+          ...columnItem,
+          render: (_: unknown, record: any) => (
+            <>{record[attrId] ? record[attrId].join("-") : "--"}</>
+          ),
+        };
       default:
         return {
           ...columnItem,
