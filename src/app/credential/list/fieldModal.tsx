@@ -19,6 +19,7 @@ import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { EditOutlined, CopyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import fieldModalStyle from "./fieldModal.module.less";
 interface FieldModalProps {
   onSuccess: () => void;
   userList: UserItem[];
@@ -75,8 +76,6 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setModelId(model_id);
         setFormItems(attrList);
         const processedAttrList = deepClone(attrList);
-        initializeVisibility(processedAttrList);
-        setFormItems(processedAttrList);
         let _formInfo = formInfo;
         if (type === "edit") {
           setLoading(true);
@@ -94,10 +93,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 );
               }
             }
+            initializeVisibility(processedAttrList, _formInfo);
           } finally {
             setLoading(false);
           }
+        } else {
+          initializeVisibility(processedAttrList);
         }
+        setFormItems(processedAttrList);
         setInstanceData(_formInfo);
         form.resetFields();
         form.setFieldsValue(_formInfo);
@@ -118,13 +121,15 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       });
     };
 
-    const initializeVisibility = (items: AttrFieldType[]) => {
+    const initializeVisibility = (items: AttrFieldType[], formInfo?: any) => {
       items.forEach((item) => {
         if (item.children) {
           item.children.forEach((child) => {
-            child.visible = false;
+            child.visible = formInfo
+              ? formInfo[item.attr_id] === child.parent_id
+              : false;
             if (child.children) {
-              initializeVisibility(child.children);
+              initializeVisibility(child.children, formInfo);
             }
           });
         }
@@ -167,11 +172,26 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     };
 
     const editPassword = (item: AttrFieldType) => {
-      const fieldIndex = formItems.findIndex(
-        (tex) => tex.attr_id === item.attr_id
-      );
       const fields = deepClone(formItems);
-      fields[fieldIndex].isEdit = true;
+      const updateField = (
+        items: AttrFieldType[],
+        targetItem: AttrFieldType
+      ) => {
+        for (let i = 0; i < items.length; i++) {
+          if (items[i].attr_id === targetItem.attr_id) {
+            items[i].isEdit = true;
+            // 清空对应的表单项的值
+            form.setFieldsValue({ [targetItem.attr_id]: "" });
+            return true;
+          } else if (items[i].children?.length) {
+            if (updateField(items[i].children || [], targetItem)) {
+              return true;
+            }
+          }
+        }
+        return false;
+      };
+      updateField(fields, item);
       setFormItems(fields);
     };
 
@@ -284,12 +304,16 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             }
             // 操作目标项
             if (targetItem.children) {
-              targetItem.visible = true;
-              targetItem.children.forEach((grandChild) => {
-                grandChild.visible = value === grandChild.parent_id;
+              targetItem.children.forEach((child) => {
+                child.visible = value === child.parent_id;
+                if (child.children) {
+                  child.children.forEach((grandChild) => {
+                    grandChild.visible = false;
+                  });
+                }
               });
             }
-            return { ...field, ...targetItem };
+            return { ...field };
           } else if (field.children) {
             return {
               ...field,
@@ -300,32 +324,33 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           }
         });
       };
-
       const updatedItems = updateFormItems(newFormItems, item, value);
       setFormItems(updatedItems);
     };
 
-    const renderFormItems = (items: AttrFieldType[]) => {
+    const renderFormItems: any = (items: AttrFieldType[]) => {
       return items.map((item) => {
         if (item.visible === false) return null;
         return (
-          <Col span={24} key={item.attr_id}>
-            <Form.Item
-              name={item.attr_id}
-              label={item.attr_name}
-              labelCol={{ span: 7 }}
-              className="w-full"
-              rules={[
-                {
-                  required: item.is_required,
-                  message: t("required"),
-                },
-              ]}
-            >
-              {renderFormItem(item)}
-            </Form.Item>
-            <>{item.children && renderFormItems(item.children)}</>
-          </Col>
+          <>
+            <Col span={12} key={item.attr_id}>
+              <Form.Item
+                name={item.attr_id}
+                label={<span>{item.attr_name}</span>}
+                labelCol={{ span: 7 }}
+                className="w-full"
+                rules={[
+                  {
+                    required: item.is_required,
+                    message: t("required"),
+                  },
+                ]}
+              >
+                {renderFormItem(item)}
+              </Form.Item>
+            </Col>
+            {item.children && renderFormItems(item.children)}
+          </>
         );
       });
     };
@@ -336,7 +361,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
-          width={500}
+          width={850}
           onCancel={handleCancel}
           footer={
             <div>
@@ -354,7 +379,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           }
         >
           <Spin spinning={loading}>
-            <Form form={form}>
+            <Form form={form} className={fieldModalStyle.fieldModal}>
               <Row gutter={24}>{renderFormItems(formItems)}</Row>
             </Form>
           </Spin>
