@@ -16,7 +16,7 @@ import {
   ModelItem,
   ColumnItem,
 } from "@/types/assetManage";
-import { deepClone, getAssetColumns } from "@/utils/common";
+import { getAssetColumns } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import SearchFilter from "@/app/assetData/list/searchFilter";
 import CustomTable from "@/components/custom-table";
@@ -41,11 +41,6 @@ interface FieldConfig {
   list: Array<any>;
 }
 
-interface RequestParams {
-  credential_type?: string;
-  data: object;
-}
-
 export interface FieldModalRef {
   showModal: (info: FieldConfig) => void;
 }
@@ -62,7 +57,6 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     });
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
     const [instanceData, setInstanceData] = useState<any>({});
     const [modelId, setModelId] = useState<string>("");
     const [credentialModelId, setCredentialModelId] = useState<string>("");
@@ -75,7 +69,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
       AttrFieldType[]
     >([]);
     const { t } = useTranslation();
-    const { post, patch, get } = useApiClient();
+    const { post, get } = useApiClient();
 
     useEffect(() => {
       if (modelId) {
@@ -84,42 +78,53 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     }, [pagination?.current, pagination?.pageSize, queryList]);
 
     useImperativeHandle(ref, () => ({
-      showModal: async ({ type, subTitle, title, formInfo, model_id }) => {
+      showModal: async ({ subTitle, title, formInfo, model_id }) => {
         // 开启弹窗的交互
         const defaultModelId = instanceModels[0].model_id;
         setGroupVisible(true);
         setSubTitle(subTitle);
-        setType(type);
         setTitle(title);
         setModelId(model_id);
         setInstanceData(formInfo);
         setCredentialModelId(defaultModelId);
-        initPage(defaultModelId);
+        initPage(defaultModelId, formInfo);
       },
     }));
 
-    const initPage = async (modelId: string) => {
+    const initPage = async (modelId: string, formInfo?: any) => {
       setLoading(true);
       try {
         const params = getTableParams();
+        const credentialParams = {
+          credential_id: formInfo._id || instanceData._id,
+        };
         params.model_id = modelId;
         const attrList = get(`/api/model/${modelId}/attr_list/`);
         const getInstanseList = post(`/api/instance/search/`, params);
-        Promise.all([attrList, getInstanseList]).then((res) => {
-          setIntancePropertyList(res[0]);
-          const columns = getAssetColumns({
-            attrList: res[0],
-            userList,
-            groupList: organizationList,
-            t,
+        const getAssoInsts = post(
+          "/api/credential/credential_association_inst_list/",
+          credentialParams
+        );
+        Promise.all([attrList, getInstanseList, getAssoInsts])
+          .then((res) => {
+            setIntancePropertyList(res[0]);
+            const columns = getAssetColumns({
+              attrList: res[0],
+              userList,
+              groupList: organizationList,
+              t,
+            });
+            columns[0].fixed = true;
+            setColumns(columns);
+            setTableData(res[1].insts);
+            pagination.total = res[1].count;
+            setPagination(pagination);
+            setLoading(false);
+            setSelectedRowKeys(res[2].map((item: any) => item._id));
+          })
+          .catch(() => {
+            setLoading(false);
           });
-          columns[0].fixed = true;
-          setColumns(columns);
-          setTableData(res[0].insts);
-          pagination.total = res[0].count;
-          setPagination(pagination);
-          setLoading(false);
-        });
       } catch {
         setLoading(false);
       }
@@ -134,36 +139,16 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
       onChange: onSelectChange,
     };
 
-    const handleSubmit = () => {
-      operateAttr({});
-    };
-
-    const operateAttr = async (params: any) => {
+    const handleSubmit = async () => {
+      setConfirmLoading(true);
       try {
-        setConfirmLoading(true);
-        const formData = deepClone(params);
-        const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
-        );
-        const url: string =
-          type === "add"
-            ? `/api/credential/`
-            : `/api/credential/${instanceData._id}/`;
-        let requestParams: RequestParams = {
-          credential_type: modelId,
-          data: formData,
+        const params = {
+          credential_id: instanceData._id,
+          instance_ids: selectedRowKeys,
         };
-        let requestType = post;
-        if (type === "edit") {
-          requestType = patch;
-          requestParams = formData;
-        }
-        await requestType(url, requestParams);
-        message.success(msg);
-        onSuccess();
+        await post(`/api/credential/credential_association_inst/`, params);
+        message.success(t("successfullyAssociated"));
         handleCancel();
-      } catch (error) {
-        console.log(error);
       } finally {
         setConfirmLoading(false);
       }
@@ -197,6 +182,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
 
     const handleCancel = () => {
       setGroupVisible(false);
+      setSelectedRowKeys([]); // 清空选中项
     };
 
     const handleSearch = (condition: unknown) => {
@@ -208,8 +194,17 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     };
 
     const handleModelChange = (model: string) => {
-      setCredentialModelId(model)
-      initPage(model)
+      setCredentialModelId(model);
+      initPage(model);
+    };
+
+    const handleClearSelection = () => {
+      setSelectedRowKeys([]); // 清空选中项
+    };
+
+    const handleRemoveItem = (key: string) => {
+      const newSelectedRowKeys = selectedRowKeys.filter((item) => item !== key);
+      setSelectedRowKeys(newSelectedRowKeys);
     };
 
     return (
@@ -225,6 +220,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
               <Button
                 className="mr-[10px]"
                 type="primary"
+                disabled={!selectedRowKeys.length}
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
@@ -274,27 +270,30 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
                   <span>
                     已选择（共
                     <span className="text-[var(--color-primary)] px-[4px]">
-                      1
+                      {selectedRowKeys.length}
                     </span>
                     条）
                   </span>
-                  <span className="text-[var(--color-primary)] cursor-pointer">
+                  <span
+                    className="text-[var(--color-primary)] cursor-pointer"
+                    onClick={handleClearSelection}
+                  >
                     清空
                   </span>
                 </div>
                 <ul className={selectInstanceStyle.list}>
-                  <li className={selectInstanceStyle.listItem}>
-                    <span>setFieldsValue</span>
-                    <CloseOutlined
-                      className={`text-[12px] ${selectInstanceStyle.operate}`}
-                    />
-                  </li>
-                  <li className={selectInstanceStyle.listItem}>
-                    <span>setFieldsValue</span>
-                    <CloseOutlined
-                      className={`text-[12px] ${selectInstanceStyle.operate}`}
-                    />
-                  </li>
+                  {selectedRowKeys.map((key) => {
+                    const item = tableData.find((data) => data._id === key);
+                    return (
+                      <li className={selectInstanceStyle.listItem} key={key}>
+                        <span>{item?.inst_name || "--"}</span>
+                        <CloseOutlined
+                          className={`text-[12px] ${selectInstanceStyle.operate}`}
+                          onClick={() => handleRemoveItem(key)}
+                        />
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
