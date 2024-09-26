@@ -94,7 +94,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         const forms = deepClone(formInfo);
         if (type === "add") {
           Object.assign(forms, {
-            organization: organizationList[0]?.value || "",
+            organization: organizationList[0]?.value
+              ? [organizationList[0]?.value]
+              : "",
           });
         } else {
           for (const key in forms) {

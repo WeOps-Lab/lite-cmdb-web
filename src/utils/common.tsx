@@ -152,8 +152,8 @@ export const getAssetColumns = (config: {
       key: attrId,
       width: 100,
       ellipsis: {
-        showTitle: true
-      }
+        showTitle: true,
+      },
     };
     switch (attrType) {
       case "user":
@@ -216,7 +216,11 @@ export const getAssetColumns = (config: {
         return {
           ...columnItem,
           render: (_: unknown, record: any) => (
-            <>{record[attrId] ? record[attrId].join("-") : "--"}</>
+            <>
+              {Array.isArray(record[attrId])
+                ? record[attrId].join("-")
+                : record[attrId] || "--"}
+            </>
           ),
         };
       default:

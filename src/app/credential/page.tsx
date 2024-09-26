@@ -26,8 +26,9 @@ import {
   UserItem,
   AttrFieldType,
   Organization,
+  ModelItem,
 } from "@/types/assetManage";
-import { deepClone, getAssetColumns, convertArray } from "@/utils/common";
+import { convertArray } from "@/utils/common";
 import { CREDENTIAL_LIST } from "@/constants/asset";
 
 interface ModelTabs {
@@ -62,11 +63,10 @@ const Credential = () => {
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
-  const [intancePropertyList, setIntancePropertyList] = useState<
-    AttrFieldType[]
-  >([]);
   const [tableData, setTableData] = useState<any[]>([]);
   const [organizationList, setOrganizationList] = useState<Organization[]>([]);
+  const [instanceModels, setInstanceModels] = useState<ModelItem[]>([]);
+  const [crendentialModels, setCrendentialModels] = useState<ModelItem[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     total: 0,
@@ -118,30 +118,6 @@ const Credential = () => {
       ),
     },
   ];
-  const instanceModels = [
-    {
-      _id: 16,
-      _label: "model",
-      is_pre: true,
-      model_name: "Oracle",
-      icn: "cc-oracle-Oracle",
-      classification_id: "database",
-      model_id: "oracle",
-      attrs:
-        '[{"attr_id": "inst_name", "attr_name": "\u6570\u636e\u5e93\u540d\u79f0", "attr_type": "str", "option": "", "attr_group": "", "is_only": true, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "organization", "attr_name": "\u6240\u5c5e\u7ec4\u7ec7", "attr_type": "organization", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "ip_addr", "attr_name": "IP\u5730\u5740", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "port", "attr_name": "\u7aef\u53e3", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "sid", "attr_name": "SID", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_mem", "attr_name": "\u6700\u5927\u5185\u5b58", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_conn", "attr_name": "\u6700\u5927\u8fde\u63a5\u6570", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "version", "attr_name": "\u6570\u636e\u5e93\u7248\u672c", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "database_role", "attr_name": "\u6570\u636e\u5e93\u89d2\u8272", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}]',
-    },
-    {
-      _id: 17,
-      _label: "model",
-      is_pre: true,
-      model_name: "MySQL",
-      icn: "cc-mysql-MySQL",
-      classification_id: "database",
-      model_id: "mysql",
-      attrs:
-        '[{"attr_id": "inst_name", "attr_name": "\u6570\u636e\u5e93\u540d\u79f0", "attr_type": "str", "option": "", "attr_group": "", "is_only": true, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "organization", "attr_name": "\u6240\u5c5e\u7ec4\u7ec7", "attr_type": "organization", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "ip_addr", "attr_name": "IP\u5730\u5740", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": true, "is_pre": true}, {"attr_id": "port", "attr_name": "\u7aef\u53e3", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "version", "attr_name": "\u6570\u636e\u5e93\u7248\u672c", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "enable_binlog", "attr_name": "\u662f\u5426\u5f00\u542fbinlog", "attr_type": "bool", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_conn", "attr_name": "\u6700\u5927\u8fde\u63a5\u6570", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "max_mem", "attr_name": "\u6700\u5927\u5185\u5b58", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_id": "database_role", "attr_name": "\u6570\u636e\u5e93\u89d2\u8272", "attr_type": "str", "option": "", "attr_group": "", "is_only": false, "editable": true, "is_required": false, "is_pre": true}, {"attr_name": "\u64cd\u4f5c\u65f6\u95f4", "attr_id": "operate_time", "attr_type": "time", "editable": true, "is_only": false, "is_required": false, "option": [], "attr_group": "database", "model_id": "mysql"}]',
-    },
-  ];
 
   useEffect(() => {
     if (isLoading) return;
@@ -153,6 +129,21 @@ const Credential = () => {
       fetchData();
     }
   }, [pagination?.current, pagination?.pageSize]);
+
+  useEffect(() => {
+    if (instanceModels.length && modelId) {
+      CREDENTIAL_LIST.forEach((item) => {
+        const target = item.list.find((tex) => tex.model_id === modelId);
+        if (target) {
+          setCrendentialModels(
+            instanceModels.filter((model) =>
+              target.assoModelIds.includes(model.model_id)
+            )
+          );
+        }
+      });
+    }
+  }, [instanceModels, modelId]);
 
   const onSearchTxtChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -214,24 +205,24 @@ const Credential = () => {
       params,
     });
     const getOrganizationList = get("/api/user_group/group_list/");
-    const getAttrList = get(`/api/model/mysql/attr_list/`);
+    const getModelList = get("/api/model/");
     setLoading(true);
     try {
       Promise.all([
         getUserList,
         getCredentialList,
         getOrganizationList,
-        getAttrList,
+        getModelList,
       ])
         .then((res) => {
           const userData: UserItem[] = res[0].users;
           const organizationData: Organization[] = convertArray(res[2]);
           pagination.total = res[1].count;
           const tableList = res[1].items;
+          setInstanceModels(res[3]);
           setOrganizationList(organizationData);
           setUserList(userData);
           setTableData(tableList);
-          setIntancePropertyList(res[3]);
           setPagination(pagination);
         })
         .finally(() => {
@@ -428,8 +419,7 @@ const Credential = () => {
             ref={selectInstanceRef}
             userList={userList}
             organizationList={organizationList}
-            propertyList={intancePropertyList}
-            instanceModels={instanceModels}
+            instanceModels={crendentialModels}
             onSuccess={updateFieldList}
           />
         </div>

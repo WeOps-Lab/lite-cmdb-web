@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useEffect,
 } from "react";
-import { Select, Button, message, TablePaginationConfig } from "antd";
+import { Select, Button, message, TablePaginationConfig, Spin } from "antd";
 import OperateModal from "@/components/operate-modal";
 import { useTranslation } from "@/utils/i18n";
 import {
@@ -28,7 +28,6 @@ interface FieldModalProps {
   onSuccess: () => void;
   userList: UserItem[];
   organizationList: Organization[];
-  propertyList: AttrFieldType[];
   instanceModels: ModelItem[];
 }
 
@@ -52,12 +51,10 @@ export interface FieldModalRef {
 }
 
 const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
-  (
-    { onSuccess, userList, organizationList, propertyList, instanceModels },
-    ref
-  ) => {
+  ({ onSuccess, userList, organizationList, instanceModels }, ref) => {
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(false);
     const [pagination, setPagination] = useState<TablePaginationConfig>({
       current: 1,
       total: 0,
@@ -66,14 +63,17 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
     const [type, setType] = useState<string>("");
-    const [formItems, setFormItems] = useState<AttrFieldType[]>([]);
     const [instanceData, setInstanceData] = useState<any>({});
     const [modelId, setModelId] = useState<string>("");
+    const [credentialModelId, setCredentialModelId] = useState<string>("");
     const [tableLoading, setTableLoading] = useState<boolean>(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
     const [columns, setColumns] = useState<ColumnItem[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
     const [queryList, setQueryList] = useState<unknown>(null);
+    const [intancePropertyList, setIntancePropertyList] = useState<
+      AttrFieldType[]
+    >([]);
     const { t } = useTranslation();
     const { post, patch, get } = useApiClient();
 
@@ -84,33 +84,46 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     }, [pagination?.current, pagination?.pageSize, queryList]);
 
     useImperativeHandle(ref, () => ({
-      showModal: async ({
-        type,
-        attrList,
-        subTitle,
-        title,
-        formInfo,
-        model_id,
-      }) => {
+      showModal: async ({ type, subTitle, title, formInfo, model_id }) => {
         // 开启弹窗的交互
+        const defaultModelId = instanceModels[0].model_id;
         setGroupVisible(true);
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
         setModelId(model_id);
-        setFormItems(attrList);
         setInstanceData(formInfo);
-        const columns = getAssetColumns({
-          attrList: propertyList,
-          userList,
-          groupList: organizationList,
-          t,
-        });
-        columns[0].fixed = true;
-        setColumns(columns);
-        fetchData();
+        setCredentialModelId(defaultModelId);
+        initPage(defaultModelId);
       },
     }));
+
+    const initPage = async (modelId: string) => {
+      setLoading(true);
+      try {
+        const params = getTableParams();
+        params.model_id = modelId;
+        const attrList = get(`/api/model/${modelId}/attr_list/`);
+        const getInstanseList = post(`/api/instance/search/`, params);
+        Promise.all([attrList, getInstanseList]).then((res) => {
+          setIntancePropertyList(res[0]);
+          const columns = getAssetColumns({
+            attrList: res[0],
+            userList,
+            groupList: organizationList,
+            t,
+          });
+          columns[0].fixed = true;
+          setColumns(columns);
+          setTableData(res[0].insts);
+          pagination.total = res[0].count;
+          setPagination(pagination);
+          setLoading(false);
+        });
+      } catch {
+        setLoading(false);
+      }
+    };
 
     const onSelectChange = (selectedKeys: any) => {
       setSelectedRowKeys(selectedKeys);
@@ -177,7 +190,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
         page: pagination.current,
         page_size: pagination.pageSize,
         order: "",
-        model_id: "mysql",
+        model_id: credentialModelId,
         role: "",
       };
     };
@@ -192,6 +205,11 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
 
     const handleTableChange = (pagination = {}) => {
       setPagination(pagination);
+    };
+
+    const handleModelChange = (model: string) => {
+      setCredentialModelId(model)
+      initPage(model)
     };
 
     return (
@@ -216,59 +234,71 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
             </div>
           }
         >
-          <div className={selectInstanceStyle.selectInstance}>
-            <div className={selectInstanceStyle.instanceList}>
-              <div className="flex items-center justify-between mb-[10px]">
-                <Select className="w-[140px]">
-                  {instanceModels.map((item) => {
-                    return (
-                      <Option value={item.model_id} key={item.model_id}>
-                        {item.model_name}
-                      </Option>
-                    );
-                  })}
-                </Select>
-                <SearchFilter
-                  userList={userList}
-                  attrList={propertyList}
-                  organizationList={organizationList}
-                  onSearch={handleSearch}
+          <Spin spinning={loading}>
+            <div className={selectInstanceStyle.selectInstance}>
+              <div className={selectInstanceStyle.instanceList}>
+                <div className="flex items-center justify-between mb-[10px]">
+                  <Select
+                    className="w-[140px]"
+                    value={credentialModelId}
+                    onChange={handleModelChange}
+                  >
+                    {instanceModels.map((item) => {
+                      return (
+                        <Option value={item.model_id} key={item.model_id}>
+                          {item.model_name}
+                        </Option>
+                      );
+                    })}
+                  </Select>
+                  <SearchFilter
+                    userList={userList}
+                    attrList={intancePropertyList}
+                    organizationList={organizationList}
+                    onSearch={handleSearch}
+                  />
+                </div>
+                <CustomTable
+                  rowSelection={rowSelection}
+                  dataSource={tableData}
+                  columns={columns}
+                  pagination={pagination}
+                  loading={tableLoading}
+                  rowKey="_id"
+                  scroll={{ x: 620, y: "calc(100vh - 200px)" }}
+                  onChange={handleTableChange}
                 />
               </div>
-              <CustomTable
-                rowSelection={rowSelection}
-                dataSource={tableData}
-                columns={columns}
-                pagination={pagination}
-                loading={tableLoading}
-                rowKey="_id"
-                scroll={{ x: 620, y: "calc(100vh - 200px)" }}
-                onChange={handleTableChange}
-              />
-            </div>
-            <div className={selectInstanceStyle.previewList}>
-              <div className="flex items-center justify-between mb-[10px]">
-                <span>
-                  已选择（共
-                  <span className="text-[var(--color-primary)] px-[4px]">
-                    1
+              <div className={selectInstanceStyle.previewList}>
+                <div className="flex items-center justify-between mb-[10px]">
+                  <span>
+                    已选择（共
+                    <span className="text-[var(--color-primary)] px-[4px]">
+                      1
+                    </span>
+                    条）
                   </span>
-                  条）
-                </span>
-                <span className="text-[var(--color-primary)] cursor-pointer">清空</span>
+                  <span className="text-[var(--color-primary)] cursor-pointer">
+                    清空
+                  </span>
+                </div>
+                <ul className={selectInstanceStyle.list}>
+                  <li className={selectInstanceStyle.listItem}>
+                    <span>setFieldsValue</span>
+                    <CloseOutlined
+                      className={`text-[12px] ${selectInstanceStyle.operate}`}
+                    />
+                  </li>
+                  <li className={selectInstanceStyle.listItem}>
+                    <span>setFieldsValue</span>
+                    <CloseOutlined
+                      className={`text-[12px] ${selectInstanceStyle.operate}`}
+                    />
+                  </li>
+                </ul>
               </div>
-              <ul className={selectInstanceStyle.list}>
-                <li className={selectInstanceStyle.listItem}>
-                  <span>setFieldsValue</span>
-                  <CloseOutlined className={`text-[12px] ${selectInstanceStyle.operate}`} />
-                </li>
-                <li className={selectInstanceStyle.listItem}>
-                  <span>setFieldsValue</span>
-                  <CloseOutlined className={`text-[12px] ${selectInstanceStyle.operate}`} />
-                </li>
-              </ul>
             </div>
-          </div>
+          </Spin>
         </OperateModal>
       </div>
     );

@@ -468,6 +468,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "host",
         model_name: "Host",
+        assoModelIds: ["host"],
         attrs: [
           {
             attr_id: "name",
@@ -520,6 +521,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "mysql",
         model_name: "MySQL",
+        assoModelIds: ["mysql"],
         attrs: [
           {
             attr_id: "name",
@@ -566,6 +568,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "oracle",
         model_name: "Oracle",
+        assoModelIds: ["oracle"],
         attrs: [
           {
             attr_id: "name",
@@ -618,6 +621,15 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "snmp",
         model_name: "SNMP",
+        assoModelIds: [
+          "switch",
+          "router",
+          "loadbalance",
+          "firewall",
+          "hard_server",
+          "storage",
+          "security_equipment",
+        ],
         attrs: [
           {
             attr_id: "name",
@@ -797,6 +809,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "alibabacloud",
         model_name: "Alibaba Cloud",
+        assoModelIds: ["tencentcloud_platform"],
         attrs: [
           {
             attr_id: "name",
@@ -835,6 +848,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "tencentcloud",
         model_name: "Tencent Cloud",
+        assoModelIds: ["alibabacloud_platform"],
         attrs: [
           {
             attr_id: "name",
@@ -873,6 +887,7 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: "azure",
         model_name: "Azure",
+        assoModelIds: ["azure_platform"],
         attrs: [
           {
             attr_id: "name",

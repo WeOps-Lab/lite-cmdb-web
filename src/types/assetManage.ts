@@ -64,7 +64,7 @@ export interface AttrFieldType {
   option: Array<EnumList>;
   attr_group?: string;
   isEdit?: boolean;
-  children?: AttrFieldType[]
+  children?: AttrFieldType[];
   [key: string]: unknown;
 }
 
@@ -140,5 +140,6 @@ export interface CredentialListItem {
 export interface CredentialChildItem {
   model_id: string;
   model_name: string;
+  assoModelIds: string[];
   attrs: AttrFieldType[];
 }
