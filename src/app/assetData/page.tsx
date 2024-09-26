@@ -167,7 +167,7 @@ const AssetData = () => {
           title: t("action"),
           key: "action",
           dataIndex: "action",
-          width: 100,
+          width: 160,
           fixed: "right",
           render: (_: unknown, record: any) => (
             <>
