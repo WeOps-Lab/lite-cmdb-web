@@ -76,27 +76,20 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setModelId(model_id);
         setFormItems(attrList);
         const processedAttrList = deepClone(attrList);
-        let _formInfo = formInfo;
+        const _formInfo = deepClone(formInfo);
         if (type === "edit") {
-          setLoading(true);
-          try {
-            _formInfo = await get(`/api/credential/${formInfo._id}/`);
-            _formInfo._id = formInfo._id;
-            for (const key in _formInfo) {
-              const target = attrList.find((item) => item.attr_id === key);
-              if (
-                target?.attr_type === "time" &&
-                _formInfo[key].every((item: string) => !!item)
-              ) {
-                _formInfo[key] = _formInfo[key].map((date: string) =>
-                  dayjs(date, "YYYY-MM-DD HH:mm:ss")
-                );
-              }
+          for (const key in _formInfo) {
+            const target = attrList.find((item) => item.attr_id === key);
+            if (
+              target?.attr_type === "time" &&
+              _formInfo[key].every((item: string) => !!item)
+            ) {
+              _formInfo[key] = _formInfo[key].map((date: string) =>
+                dayjs(date, "YYYY-MM-DD HH:mm:ss")
+              );
             }
-            initializeVisibility(processedAttrList, _formInfo);
-          } finally {
-            setLoading(false);
           }
+          initializeVisibility(processedAttrList, _formInfo);
         } else {
           initializeVisibility(processedAttrList);
         }

@@ -145,6 +145,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
         const params = {
           credential_id: instanceData._id,
           instance_ids: selectedRowKeys,
+          model_id: credentialModelId
         };
         await post(`/api/credential/credential_association_inst/`, params);
         message.success(t("successfullyAssociated"));

@@ -143,3 +143,20 @@ export interface CredentialChildItem {
   assoModelIds: string[];
   attrs: AttrFieldType[];
 }
+
+export interface crentialsAssoInstItem {
+  key: string;
+  label: string;
+  model_asst_id: string;
+  children: JSX.Element;
+  [key: string]: unknown;
+}
+
+export interface crentialsAssoDetailItem {
+  asst_id: string;
+  src_model_id: string;
+  model_asst_id: string;
+  dst_model_id: string;
+  inst_list: InstDetail[];
+  [key: string]: unknown;
+}
