@@ -95,6 +95,8 @@
     "objectType": "object type",
     "relatedRelationships": "Related relationships",
     "association": "Association",
-    "selectInstance": "Select instance"
+    "disassociation": "Disassociation",
+    "selectInstance": "Select instance",
+    "credentialManagement": "Credential Manage"
   }
 }

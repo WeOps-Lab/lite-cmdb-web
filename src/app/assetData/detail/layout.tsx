@@ -32,6 +32,10 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       label: t("Model.changeRecords"),
       path: "/assetData/detail/changeRecords",
     },
+    {
+      label: t("Model.credentialManagement"),
+      path: "/assetData/detail/credentials",
+    },
   ];
 
   useEffect(() => {
