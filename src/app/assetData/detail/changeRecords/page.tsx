@@ -104,7 +104,7 @@ const ChangeRecords: React.FC = () => {
           setAttrList(res[2] || []);
           setModelList(res[3] || []);
           setOrganizationList(res[4] || []);
-          setUserList(res[5] || []);
+          setUserList(res[5]?.users || []);
           setAssoTypes(res[6] || []);
         })
         .finally(() => {
