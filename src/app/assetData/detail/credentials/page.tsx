@@ -60,9 +60,8 @@ const Credentials = () => {
     row = {},
     properties: AttrFieldType[]
   ) => {
-    const title = type === "add" ? "Add" : "Edit";
     fieldRef.current?.showModal({
-      title,
+      title: "Detail",
       type,
       attrList: properties,
       formInfo: row,
@@ -141,7 +140,7 @@ const Credentials = () => {
             <a
               className="text-[var(--color-primary)]"
               onClick={() =>
-                showAttrModal("edit", record, findAndFlattenAttrs(item.key))
+                showAttrModal("detail", record, getFiledAttrs(item.key))
               }
             >
               {record[columns[0].dataIndex]}
@@ -176,6 +175,17 @@ const Credentials = () => {
       }
     });
     return name;
+  };
+
+  const getFiledAttrs = (id: string) => {
+    let list: any[] = [];
+    CREDENTIAL_LIST.forEach((item) => {
+      const target = item.list.find((tex) => tex.model_id === id);
+      if (target) {
+        list = target.attrs || [];
+      }
+    });
+    return list;
   };
 
   const handleCollapseChange = (keys: any) => {

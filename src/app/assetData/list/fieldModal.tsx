@@ -217,6 +217,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                       ]}
                     >
                       <Cascader
+                        showSearch
                         disabled={!item.editable && type !== "add"}
                         options={organizationList}
                       />
@@ -248,6 +249,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                           case "user":
                             return (
                               <Select
+                                showSearch
                                 disabled={!item.editable && type !== "add"}
                               >
                                 {userList.map((opt) => (

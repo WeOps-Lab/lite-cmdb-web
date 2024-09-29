@@ -77,7 +77,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setFormItems(attrList);
         const processedAttrList = deepClone(attrList);
         const _formInfo = deepClone(formInfo);
-        if (type === "edit") {
+        if (["detail", "edit"].includes(type)) {
           for (const key in _formInfo) {
             const target = attrList.find((item) => item.attr_id === key);
             if (
@@ -205,7 +205,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       switch (item.attr_type) {
         case "user":
           return (
-            <Select disabled={!item.editable}>
+            <Select disabled={!item.editable || type === "detail"}>
               {userList.map((opt) => (
                 <Select.Option key={opt.id} value={opt.id}>
                   {opt.username}
@@ -216,7 +216,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         case "enum":
           return (
             <Select
-              disabled={!item.editable}
+              disabled={!item.editable || type === "detail"}
               onChange={(value) => handleEnumChange(item, value)}
             >
               {item.option.map((opt) => (
@@ -228,7 +228,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           );
         case "bool":
           return (
-            <Select disabled={!item.editable}>
+            <Select disabled={!item.editable || type === "detail"}>
               {[
                 { id: 1, name: "Yes" },
                 { id: 0, name: "No" },
@@ -242,7 +242,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         case "time":
           return (
             <RangePicker
-              disabled={!item.editable}
+              disabled={!item.editable || type === "detail"}
               showTime
               format="YYYY-MM-DD HH:mm:ss"
             />
@@ -258,10 +258,12 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
               </Form.Item>
               {!item.isEdit && type !== "add" && (
                 <>
-                  <EditOutlined
-                    className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
-                    onClick={() => editPassword(item)}
-                  />
+                  {type !== "detail" && (
+                    <EditOutlined
+                      className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
+                      onClick={() => editPassword(item)}
+                    />
+                  )}
                   <CopyOutlined
                     className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
                     onClick={() => onCopy(item)}
@@ -271,7 +273,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             </div>
           );
         default:
-          return <Input disabled={!item.editable && type !== "add"} />;
+          return (
+            <Input
+              disabled={(!item.editable && type !== "add") || type === "detail"}
+            />
+          );
       }
     };
 
@@ -358,15 +364,17 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button
-                className="mr-[10px]"
-                type="primary"
-                loading={confirmLoading}
-                disabled={loading}
-                onClick={handleSubmit}
-              >
-                {t("confirm")}
-              </Button>
+              {type !== "detail" && (
+                <Button
+                  className="mr-[10px]"
+                  type="primary"
+                  loading={confirmLoading}
+                  disabled={loading}
+                  onClick={handleSubmit}
+                >
+                  {t("confirm")}
+                </Button>
+              )}
               <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
           }

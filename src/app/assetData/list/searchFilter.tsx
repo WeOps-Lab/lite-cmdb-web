@@ -89,6 +89,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       case "user":
         return (
           <Select
+            showSearch
             className="value"
             style={{ width: 200 }}
             value={searchValue}
@@ -137,6 +138,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       case "organization":
         return (
           <Cascader
+            showSearch
             className="value"
             style={{ width: 200 }}
             options={organizationList}
