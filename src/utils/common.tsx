@@ -1,4 +1,4 @@
-import { BUILD_IN_MODEL } from "@/constants/asset";
+import { BUILD_IN_MODEL, CREDENTIAL_LIST } from "@/constants/asset";
 import { getSvgIcon } from "./utils";
 import { AttrFieldType } from "@/types/assetManage";
 import { Tag, Select, Input, Cascader, DatePicker } from "antd";
@@ -311,4 +311,32 @@ export const getFieldItem = (config: {
     default:
       return config.value || "--";
   }
+};
+
+export const findAndFlattenAttrs = (modelId: string) => {
+  let resultAttrs: AttrFieldType[] = [];
+  function flattenChildren(attrs: AttrFieldType[]) {
+    const flattenedAttrs: any[] = [];
+    attrs.forEach((attr: AttrFieldType) => {
+      const { children, ...rest } = attr;
+      flattenedAttrs.push(rest);
+      if (children?.length) {
+        const nestedAttrs = flattenChildren(children);
+        flattenedAttrs.push(...nestedAttrs);
+      }
+    });
+    return flattenedAttrs;
+  }
+  function searchModel(list: any[]) {
+    for (const item of list) {
+      if (item.model_id === modelId) {
+        resultAttrs = flattenChildren(item.attrs);
+        return;
+      } else if (item.list?.length) {
+        searchModel(item.list);
+      }
+    }
+  }
+  searchModel(CREDENTIAL_LIST);
+  return resultAttrs;
 };
