@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import List from "./list";
 import {
@@ -8,9 +8,10 @@ import {
   Organization,
   InstDetail,
 } from "@/types/assetManage";
-import { convertArray } from "@/utils/common";
+import { convertArray, filterNodesWithAllParents } from "@/utils/common";
 import { Spin } from "antd";
 import useApiClient from "@/utils/request";
+import { useCommon } from "@/context/common";
 
 const BaseInfo = () => {
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
@@ -22,6 +23,9 @@ const BaseInfo = () => {
   const { get, isLoading } = useApiClient();
   const modelId: string = searchParams.get("model_id") || "";
   const instId: string = searchParams.get("inst_id") || "";
+  const commonContext = useCommon();
+  const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
+  const groupsInfoRef = useRef(permissionGroupsInfo);
 
   useEffect(() => {
     if (isLoading) return;
@@ -38,7 +42,15 @@ const BaseInfo = () => {
       Promise.all([getUserList, getGroupList, getAttrList, getInstDetail])
         .then((res) => {
           const userData: UserItem[] = res[0].users;
-          const organizationData: Organization[] = convertArray(res[1]);
+          const groupIds = groupsInfoRef.current?.group_ids || [];
+          const isAdmin = groupsInfoRef.current?.is_all || false;
+          const permissionOrganizations = filterNodesWithAllParents(
+            res[1],
+            groupIds
+          );
+          const organizationData: Organization[] = convertArray(
+            isAdmin ? res[1] : permissionOrganizations
+          );
           const propertData: AttrFieldType[] = res[2];
           const instDetail: InstDetail = res[3];
           setUserList(userData);

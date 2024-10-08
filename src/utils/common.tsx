@@ -340,3 +340,40 @@ export const findAndFlattenAttrs = (modelId: string) => {
   searchModel(CREDENTIAL_LIST);
   return resultAttrs;
 };
+
+// 用于查节点及其所有父级节点
+export const findNodeWithParents: any = (
+  nodes: any[],
+  id: string,
+  parent: any = null
+) => {
+  for (const node of nodes) {
+    if (node.id === id) {
+      return parent ? [node, ...findNodeWithParents(nodes, parent.id)] : [node];
+    }
+    if (node.subGroups && node.subGroups.length > 0) {
+      const result: any = findNodeWithParents(node.subGroups, id, node);
+      if (result) {
+        return result;
+      }
+    }
+  }
+  return null;
+};
+
+// 过滤出所有给定ID的节点及其所有父级节点
+export const filterNodesWithAllParents = (nodes: any, ids: any[]) => {
+  const result: any[] = [];
+  const uniqueIds: any = new Set(ids);
+  for (const id of uniqueIds) {
+    const nodeWithParents = findNodeWithParents(nodes, id);
+    if (nodeWithParents) {
+      for (const node of nodeWithParents) {
+        if (!result.find((n) => n.id === node.id)) {
+          result.push(node);
+        }
+      }
+    }
+  }
+  return result;
+};

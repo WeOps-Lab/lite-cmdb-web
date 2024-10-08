@@ -191,6 +191,29 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
               };
             })
             .filter((attr) => !!attr.attr);
+        } else if (label.includes("credential")) {
+          let before = "--";
+          let after = "--";
+          if (type === "create_edge") {
+            after = `${afterData.src.name}关联${showModelName(
+              afterData.dst.model_id
+            )}(${afterData.dst.inst_name})`;
+          } else {
+            before = `${beforeData.src.name}取消关联${showModelName(
+              beforeData.dst.model_id
+            )}(${beforeData.dst.inst_name})`;
+          }
+          form.attrList = [
+            {
+              attr: t("Model.relatedRelationships"),
+              id: 1,
+              before,
+              after,
+            },
+          ];
+          setInstInfo({
+            name: beforeData.dst?.inst_name || afterData.dst?.inst_name || "--",
+          });
         } else {
           let before = "--";
           let after = "--";
@@ -223,6 +246,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           form.attrList = [
             {
               attr: t("Model.relatedRelationships"),
+              id: 1,
               before,
               after,
             },

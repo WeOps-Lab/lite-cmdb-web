@@ -221,7 +221,6 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
               <Button
                 className="mr-[10px]"
                 type="primary"
-                disabled={!selectedRowKeys.length}
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >

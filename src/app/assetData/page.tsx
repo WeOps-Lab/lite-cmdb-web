@@ -22,7 +22,12 @@ import FieldModal from "./list/fieldModal";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
 const { confirm } = Modal;
-import { deepClone, getAssetColumns, convertArray } from "@/utils/common";
+import {
+  deepClone,
+  getAssetColumns,
+  convertArray,
+  filterNodesWithAllParents,
+} from "@/utils/common";
 import {
   GroupItem,
   ModelItem,
@@ -33,6 +38,8 @@ import {
 } from "@/types/assetManage";
 import axios from "axios";
 import { useAuth } from "@/context/auth";
+import { useCommon } from "@/context/common";
+
 import type { MenuProps } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -91,6 +98,9 @@ const AssetData = () => {
   const token = authContext?.token || null;
   const tokenRef = useRef(token);
   const router = useRouter();
+  const commonContext = useCommon();
+  const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
+  const groupsInfoRef = useRef(permissionGroupsInfo);
 
   const handleExport = async () => {
     try {
@@ -233,7 +243,15 @@ const AssetData = () => {
           const modeldata: ModelItem[] = res[0];
           const groupData: GroupItem[] = res[1];
           const userData: UserItem[] = res[2].users;
-          const organizationData: Organization[] = convertArray(res[3]);
+          const groupIds = groupsInfoRef.current?.group_ids || [];
+          const isAdmin = groupsInfoRef.current?.is_all || false;
+          const permissionOrganizations = filterNodesWithAllParents(
+            res[3],
+            groupIds
+          );
+          const organizationData: Organization[] = convertArray(
+            isAdmin ? res[3] : permissionOrganizations
+          );
           setUserList(userData);
           setOrganizationList(organizationData);
           const groups = deepClone(groupData).map((item: GroupItem) => ({
