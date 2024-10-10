@@ -51,6 +51,8 @@ export interface AssoFieldType {
   src_model_id: string;
   dst_model_id: string;
   mapping: string;
+  _id?: string;
+  [key: string]: unknown;
 }
 
 export interface AttrFieldType {
@@ -144,7 +146,7 @@ export interface CredentialChildItem {
   attrs: AttrFieldType[];
 }
 
-export interface assoInstItem {
+export interface AssoInstItem {
   key: string;
   label: string;
   model_asst_id: string;
@@ -152,7 +154,7 @@ export interface assoInstItem {
   [key: string]: unknown;
 }
 
-export interface assoDetailItem {
+export interface AssoDetailItem {
   asst_id: string;
   src_model_id: string;
   model_asst_id: string;
@@ -161,16 +163,44 @@ export interface assoDetailItem {
   [key: string]: unknown;
 }
 
-export interface crentialsAssoInstItem {
+export interface CrentialsAssoInstItem {
   key: string;
   label: string;
   children: JSX.Element;
-  inst_list: crentialsAssoDetailItem[];
+  inst_list: CrentialsAssoDetailItem[];
   [key: string]: unknown;
 }
 
-export interface crentialsAssoDetailItem {
+export interface CrentialsAssoDetailItem {
   credential_type: string;
   name?: string;
+  _id?: number | string | undefined;
+  inst_asst_id?: number | string | undefined;
   [key: string]: unknown;
+}
+
+export interface AssoListRef {
+  expandAll: (isExpand: boolean) => void;
+  showRelateModal: () => void;
+}
+
+export interface ListItem {
+  name: string;
+  id: string | number;
+  [key: string]: unknown;
+}
+
+export interface RelationListInstItem {
+  id: string | number | undefined;
+  inst_asst_id: string | number | undefined;
+}
+
+export interface RelationInstanceConfig {
+  model_id: string;
+  list: RelationListInstItem[];
+  title: string;
+  instId: string;
+}
+export interface RelationInstanceRef {
+  showModal: (config: RelationInstanceConfig) => void;
 }

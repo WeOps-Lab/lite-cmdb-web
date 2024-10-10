@@ -3,8 +3,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   AttrFieldType,
-  crentialsAssoInstItem,
-  crentialsAssoDetailItem,
+  CrentialsAssoInstItem,
+  CrentialsAssoDetailItem,
   UserItem,
   Organization,
 } from "@/types/assetManage";
@@ -38,10 +38,9 @@ interface FieldConfig {
 const Credentials = () => {
   const { t } = useTranslation();
   const [userList, setUserList] = useState<UserItem[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
   const [activeKey, setActiveKey] = useState<string[]>([]);
   const [assoCredentials, setAssoCredentials] = useState<
-    crentialsAssoInstItem[]
+    CrentialsAssoInstItem[]
   >([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const searchParams = useSearchParams();
@@ -87,7 +86,6 @@ const Credentials = () => {
           const userData: UserItem[] = res[0].users;
           const organizationData: Organization[] = convertArray(res[1]);
           setUserList(userData);
-          setOrganizationList(organizationData);
           drawPage({
             userData,
             organizationData,
@@ -108,11 +106,11 @@ const Credentials = () => {
   const drawPage = (config: {
     userData: UserItem[];
     organizationData: Organization[];
-    instAssoCredentials: crentialsAssoDetailItem[];
+    instAssoCredentials: CrentialsAssoDetailItem[];
   }) => {
     const { userData, organizationData, instAssoCredentials } = config;
     const assoCredentailList = instAssoCredentials
-      .reduce((pre: any, cur: crentialsAssoDetailItem) => {
+      .reduce((pre: any, cur: CrentialsAssoDetailItem) => {
         const target = pre.find(
           (item: any) => item.key === cur.credential_type
         );
@@ -162,7 +160,7 @@ const Credentials = () => {
       });
     setAssoCredentials(assoCredentailList);
     setActiveKey(
-      assoCredentailList.map((item: crentialsAssoInstItem) => item.key)
+      assoCredentailList.map((item: CrentialsAssoInstItem) => item.key)
     );
   };
 
