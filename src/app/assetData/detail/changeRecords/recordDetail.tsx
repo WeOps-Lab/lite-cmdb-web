@@ -134,7 +134,9 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
     };
 
     const showConnectType = (id: string) => {
-      return connectTypeList.find((item) => item.id === id)?.asst_id || "--";
+      return (
+        connectTypeList.find((item) => item.asst_id === id)?.asst_id || "--"
+      );
     };
 
     const getDisplayName = (id: string) => {
@@ -221,7 +223,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           if (type === "delete_edge") {
             before = `${showModelName(beforeData.edge.src_model_id)}(${
               beforeData.src.inst_name
-            })${showConnectType(beforeData.edge.asst_id)}${showModelName(
+            }) ${showConnectType(beforeData.edge.asst_id)} ${showModelName(
               beforeData.edge.dst_model_id
             )}(${beforeData.dst.inst_name})`;
             setInstInfo({
@@ -233,7 +235,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           } else {
             after = `${showModelName(afterData.edge.src_model_id)}(${
               afterData.src.inst_name
-            })${showConnectType(afterData.edge.asst_id)}${showModelName(
+            }) ${showConnectType(afterData.edge.asst_id)} ${showModelName(
               afterData.edge.dst_model_id
             )}(${afterData.dst.inst_name})`;
             setInstInfo({
