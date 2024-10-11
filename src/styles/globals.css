@@ -255,17 +255,23 @@ html:not(.dark) body {
   align-items: center;
 }
 .column-user .user-avatar {
-    display: flex;
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    margin-right: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--color-fill-3);
-    color: var(--color-bg-1);
-    font-size: 12px;
+  display: flex;
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-fill-3);
+  color: var(--color-bg-1);
+  font-size: 12px;
+}
+.column-user .user-name {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @keyframes rt {

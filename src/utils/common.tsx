@@ -164,14 +164,14 @@ export const getAssetColumns = (config: {
               (config.userList || []).find((item) => item.id === record[attrId])
                 ?.username || "--";
             return (
-              <div className="column-user">
+              <div className="column-user" title={userName}>
                 <span
                   className="user-avatar"
                   style={{ background: getRandomColor() }}
                 >
                   {userName.slice(0, 1).toLocaleUpperCase()}
                 </span>
-                {userName}
+                <span className="user-name">{userName}</span>
               </div>
             );
           },
@@ -289,9 +289,19 @@ export const getFieldItem = (config: {
   }
   switch (config.fieldItem.attr_type) {
     case "user":
-      return (
+      const userName =
         (config.userList || []).find((item) => item.id === config.value)
-          ?.username || "--"
+          ?.username || "--";
+      return (
+        <div className="column-user">
+          <span
+            className="user-avatar"
+            style={{ background: getRandomColor() }}
+          >
+            {userName.slice(0, 1).toLocaleUpperCase()}
+          </span>
+          {userName}
+        </div>
       );
     case "organization":
       return (

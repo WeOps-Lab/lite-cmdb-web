@@ -102,14 +102,14 @@ const AssetData = () => {
   const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
   const groupsInfoRef = useRef(permissionGroupsInfo);
 
-  const handleExport = async () => {
+  const handleExport = async (keys: string[]) => {
     try {
       setExportLoading(true);
       const response = await axios({
         url: `/reqApi/api/instance/${modelId}/inst_export/`, // 替换为你的导出数据的API端点
         method: "POST",
         responseType: "blob", // 确保响应类型为blob
-        data: selectedRowKeys,
+        data: keys,
         headers: {
           Authorization: `Bearer ${tokenRef.current}`,
         },
@@ -426,6 +426,49 @@ const AssetData = () => {
     });
   };
 
+  const batchOperateItems: MenuProps["items"] = [
+    {
+      key: "batchEdit",
+      label: (
+        <a
+          onClick={() => {
+            showAttrModal("batchEdit");
+          }}
+        >
+          {t("batchEdit")}
+        </a>
+      ),
+      disabled: !selectedRowKeys.length,
+    },
+    {
+      key: "batchDelete",
+      label: <a onClick={batchDeleteConfirm}>{t("batchDelete")}</a>,
+      disabled: !selectedRowKeys.length,
+    },
+  ];
+
+  const exportItems: MenuProps["items"] = [
+    {
+      key: "batchExport",
+      label: (
+        <a onClick={() => handleExport(selectedRowKeys)}>{t("selected")}</a>
+      ),
+      disabled: !selectedRowKeys.length,
+    },
+    {
+      key: "exportCurrentPage",
+      label: (
+        <a onClick={() => handleExport(tableData.map((item) => item._id))}>
+          {t("currentPage")}
+        </a>
+      ),
+    },
+    {
+      key: "exportAll",
+      label: <a onClick={() => handleExport([])}>{t("all")}</a>,
+    },
+  ];
+
   const updateFieldList = () => {
     fetchData();
   };
@@ -498,25 +541,22 @@ const AssetData = () => {
                   {t("add")}
                 </Button>
               </Dropdown>
-              <Button
-                disabled={!selectedRowKeys.length}
-                loading={exportLoading}
-                onClick={handleExport}
+              <Dropdown
+                menu={{ items: exportItems }}
+                disabled={exportLoading}
+                placement="bottom"
+                arrow
               >
-                {t("export")}
-              </Button>
-              <Button
-                onClick={() => showAttrModal("batchEdit")}
+                <Button>{t("export")}</Button>
+              </Dropdown>
+              <Dropdown
+                menu={{ items: batchOperateItems }}
                 disabled={!selectedRowKeys.length}
+                placement="bottom"
+                arrow
               >
-                {t("edit")}
-              </Button>
-              <Button
-                onClick={batchDeleteConfirm}
-                disabled={!selectedRowKeys.length}
-              >
-                {t("delete")}
-              </Button>
+                <Button>{t("more")}</Button>
+              </Dropdown>
             </Space>
           </div>
           <CustomTable

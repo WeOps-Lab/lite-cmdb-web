@@ -19,7 +19,6 @@ import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import { EditOutlined, CopyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import fieldModalStyle from "./fieldModal.module.less";
 interface FieldModalProps {
   onSuccess: () => void;
   userList: UserItem[];
@@ -360,7 +359,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
-          width={850}
+          width={900}
           onCancel={handleCancel}
           footer={
             <div>
@@ -380,7 +379,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           }
         >
           <Spin spinning={loading}>
-            <Form form={form} className={fieldModalStyle.fieldModal}>
+            <Form form={form}>
               <Row gutter={24}>{renderFormItems(formItems)}</Row>
             </Form>
           </Spin>

@@ -180,7 +180,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
-          width={700}
+          width={800}
           onCancel={handleCancel}
           footer={
             <div>
