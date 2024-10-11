@@ -95,6 +95,7 @@ export interface SubGroupItem {
 export interface Organization {
   id: string;
   name: string;
+  value?: string;
   children: Array<SubGroupItem>;
   [key: string]: unknown;
 }

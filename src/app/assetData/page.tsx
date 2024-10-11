@@ -10,7 +10,9 @@ import {
   message,
   Spin,
   Dropdown,
+  Cascader,
   TablePaginationConfig,
+  CascaderProps,
 } from "antd";
 import CustomTable from "@/components/custom-table";
 import SearchFilter from "./list/searchFilter";
@@ -91,6 +93,7 @@ const AssetData = () => {
   const [currentColumns, setCurrentColumns] = useState<ColumnItem[]>([]);
   const [queryList, setQueryList] = useState<unknown>(null);
   const [tableData, setTableData] = useState<any[]>([]);
+  const [organization, setOrganization] = useState<string[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
     current: 1,
     total: 0,
@@ -156,7 +159,7 @@ const AssetData = () => {
     if (modelId) {
       fetchData();
     }
-  }, [pagination?.current, pagination?.pageSize, queryList]);
+  }, [pagination?.current, pagination?.pageSize, queryList, organization]);
 
   useEffect(() => {
     if (propertyList.length) {
@@ -269,8 +272,11 @@ const AssetData = () => {
   };
 
   const getTableParams = () => {
+    const conditions = organization?.length
+      ? [{ field: "organization", type: "list[]", value: organization }]
+      : [];
     return {
-      query_list: queryList ? [queryList] : [],
+      query_list: queryList ? [queryList, ...conditions] : conditions,
       page: pagination.current,
       page_size: pagination.pageSize,
       order: "",
@@ -479,6 +485,12 @@ const AssetData = () => {
     );
   };
 
+  const selectOrganization: CascaderProps<Organization>["onChange"] = (
+    value
+  ) => {
+    setOrganization(value);
+  };
+
   return (
     <Spin spinning={loading} wrapperClassName={assetDataStyle.assetLoading}>
       <div className={assetDataStyle.assetData}>
@@ -500,17 +512,26 @@ const AssetData = () => {
         </div>
         <div className={assetDataStyle.assetList}>
           <Tabs
-            defaultActiveKey={modelId}
+            activeKey={modelId}
             items={modelList}
             onChange={onChangeModel}
           />
           <div className="flex justify-between mb-4">
-            <SearchFilter
-              userList={userList}
-              attrList={propertyList}
-              organizationList={organizationList}
-              onSearch={handleSearch}
-            />
+            <Space>
+              <Cascader
+                options={organizationList}
+                value={organization}
+                onChange={selectOrganization}
+              />
+              <SearchFilter
+                userList={userList}
+                attrList={propertyList.filter(
+                  (item) => item.attr_type !== "organization"
+                )}
+                organizationList={organizationList}
+                onSearch={handleSearch}
+              />
+            </Space>
             <Space>
               <Dropdown menu={{ items: addInstItems }} placement="bottom" arrow>
                 <Button icon={<PlusOutlined />} type="primary">
