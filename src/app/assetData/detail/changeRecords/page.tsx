@@ -7,6 +7,7 @@ import useApiClient from "@/utils/request";
 import RecordDetail from "./recordDetail";
 import { useTranslation } from "@/utils/i18n";
 import { useSearchParams } from "next/navigation";
+import { useCommon } from "@/context/common";
 import {
   AttrFieldType,
   ModelItem,
@@ -43,17 +44,20 @@ interface detailRef {
 }
 
 const ChangeRecords: React.FC = () => {
+  const { get, isLoading } = useApiClient();
+  const { t } = useTranslation();
+  const commonContext = useCommon();
+  const authList = useRef(commonContext?.organizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const userList: UserItem[] = users.current;
+  const detailRef = useRef<detailRef>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [enumList, setEnumList] = useState<RecordsEnum>({});
   const [recordList, setRecordList] = useState<RecordItem[]>([]);
   const [attrList, setAttrList] = useState<AttrFieldType[]>([]);
-  const { get, isLoading } = useApiClient();
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
-  const [userList, setUserList] = useState<UserItem[]>([]);
-  const detailRef = useRef<detailRef>(null);
-  const { t } = useTranslation();
   const searchParams = useSearchParams();
   const modelId: string = searchParams.get("model_id") || "";
   const instId: string = searchParams.get("inst_id") || "";
@@ -62,7 +66,7 @@ const ChangeRecords: React.FC = () => {
     if (isLoading) return;
     // 初始加载数据
     initData();
-  }, [get, isLoading]);
+  }, [isLoading]);
 
   const showDetailModal = (log: RecordItemList) => {
     detailRef.current?.showModal({
@@ -83,8 +87,6 @@ const ChangeRecords: React.FC = () => {
     const getEnumData = get("/api/change_record/enum_data/");
     const getAttrList = get(`/api/model/${modelId}/attr_list/`);
     const getModelList = get("/api/model/");
-    const getGroupList = get("/api/user_group/group_list/");
-    const getUserList = get("/api/user_group/user_list/");
     const getAssoType = get("/api/model/model_association_type/");
     try {
       setLoading(true);
@@ -93,8 +95,6 @@ const ChangeRecords: React.FC = () => {
         getEnumData,
         getAttrList,
         getModelList,
-        getGroupList,
-        getUserList,
         getAssoType,
       ])
         .then((res) => {
@@ -103,9 +103,7 @@ const ChangeRecords: React.FC = () => {
           dealRecordList(res[0]);
           setAttrList(res[2] || []);
           setModelList(res[3] || []);
-          setOrganizationList(res[4] || []);
-          setUserList(res[5]?.users || []);
-          setAssoTypes(res[6] || []);
+          setAssoTypes(res[4] || []);
         })
         .finally(() => {
           setLoading(false);

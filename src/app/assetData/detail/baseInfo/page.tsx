@@ -8,24 +8,24 @@ import {
   Organization,
   InstDetail,
 } from "@/types/assetManage";
-import { convertArray, filterNodesWithAllParents } from "@/utils/common";
 import { Spin } from "antd";
 import useApiClient from "@/utils/request";
 import { useCommon } from "@/context/common";
 
 const BaseInfo = () => {
-  const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
-  const [userList, setUserList] = useState<UserItem[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
-  const [instDetail, setInstDetail] = useState<InstDetail>({});
-  const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const searchParams = useSearchParams();
   const { get, isLoading } = useApiClient();
+  const searchParams = useSearchParams();
+  const commonContext = useCommon();
+  const authList = useRef(commonContext?.authOrganizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const userList: UserItem[] = users.current;
+  const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
+
   const modelId: string = searchParams.get("model_id") || "";
   const instId: string = searchParams.get("inst_id") || "";
-  const commonContext = useCommon();
-  const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
-  const groupsInfoRef = useRef(permissionGroupsInfo);
+  const [instDetail, setInstDetail] = useState<InstDetail>({});
+  const [pageLoading, setPageLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -33,28 +33,14 @@ const BaseInfo = () => {
   }, [isLoading]);
 
   const getInitData = () => {
-    const getUserList = get("/api/user_group/user_list/");
-    const getGroupList = get("/api/user_group/group_list/");
     const getAttrList = get(`/api/model/${modelId}/attr_list/`);
     const getInstDetail = get(`/api/instance/${instId}/`);
     setPageLoading(true);
     try {
-      Promise.all([getUserList, getGroupList, getAttrList, getInstDetail])
+      Promise.all([getAttrList, getInstDetail])
         .then((res) => {
-          const userData: UserItem[] = res[0].users;
-          const groupIds = groupsInfoRef.current?.group_ids || [];
-          const isAdmin = groupsInfoRef.current?.is_all || false;
-          const permissionOrganizations = filterNodesWithAllParents(
-            res[1],
-            groupIds
-          );
-          const organizationData: Organization[] = convertArray(
-            isAdmin ? res[1] : permissionOrganizations
-          );
-          const propertData: AttrFieldType[] = res[2];
-          const instDetail: InstDetail = res[3];
-          setUserList(userData);
-          setOrganizationList(organizationData);
+          const propertData: AttrFieldType[] = res[0];
+          const instDetail: InstDetail = res[1];
           setPropertyList(propertData);
           setInstDetail(instDetail);
         })

@@ -20,6 +20,7 @@ import FieldModal from "./list/fieldModal";
 import SelectInstance from "./list/selectInstance";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
+import { useCommon } from "@/context/common";
 const { confirm } = Modal;
 import {
   ColumnItem,
@@ -28,7 +29,6 @@ import {
   Organization,
   ModelItem,
 } from "@/types/assetManage";
-import { convertArray } from "@/utils/common";
 import { CREDENTIAL_LIST } from "@/constants/asset";
 
 interface ModelTabs {
@@ -53,6 +53,13 @@ interface FieldConfig {
 }
 
 const Credential = () => {
+  const commonContext = useCommon();
+  const { t } = useTranslation();
+  const { get, del, isLoading } = useApiClient();
+  const authList = useRef(commonContext?.organizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const userList: UserItem[] = users.current;
   const fieldRef = useRef<FieldRef>(null);
   const selectInstanceRef = useRef<SelectInstanceRef>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
@@ -61,10 +68,8 @@ const Credential = () => {
   const [groupId, setGroupId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
-  const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
   const [instanceModels, setInstanceModels] = useState<ModelItem[]>([]);
   const [crendentialModels, setCrendentialModels] = useState<ModelItem[]>([]);
   const [pagination, setPagination] = useState<TablePaginationConfig>({
@@ -73,8 +78,6 @@ const Credential = () => {
     pageSize: 20,
   });
   const [searchText, setSearchText] = useState<string>("");
-  const { t } = useTranslation();
-  const { get, del, isLoading } = useApiClient();
   const currentColumns: ColumnItem[] = [
     {
       title: t("name"),
@@ -122,7 +125,7 @@ const Credential = () => {
   useEffect(() => {
     if (isLoading) return;
     initPage();
-  }, [get, isLoading]);
+  }, [isLoading]);
 
   useEffect(() => {
     if (modelId) {
@@ -200,28 +203,17 @@ const Credential = () => {
     setModelId(defaultModelId);
     const params = getTableParams();
     params.credential_type = defaultModelId;
-    const getUserList = get("/api/user_group/user_list/");
     const getCredentialList = get("/api/credential/", {
       params,
     });
-    const getOrganizationList = get("/api/user_group/group_list/");
     const getModelList = get("/api/model/");
     setLoading(true);
     try {
-      Promise.all([
-        getUserList,
-        getCredentialList,
-        getOrganizationList,
-        getModelList,
-      ])
+      Promise.all([getCredentialList, getModelList])
         .then((res) => {
-          const userData: UserItem[] = res[0].users;
-          const organizationData: Organization[] = convertArray(res[2]);
-          pagination.total = res[1].count;
-          const tableList = res[1].items;
-          setInstanceModels(res[3]);
-          setOrganizationList(organizationData);
-          setUserList(userData);
+          pagination.total = res[0].count;
+          const tableList = res[0].items;
+          setInstanceModels(res[1]);
           setTableData(tableList);
           setPagination(pagination);
         })

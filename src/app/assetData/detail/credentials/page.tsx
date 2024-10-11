@@ -8,14 +8,11 @@ import {
   UserItem,
   Organization,
 } from "@/types/assetManage";
-import {
-  convertArray,
-  getAssetColumns,
-  findAndFlattenAttrs,
-} from "@/utils/common";
+import { getAssetColumns, findAndFlattenAttrs } from "@/utils/common";
 import CustomTable from "@/components/custom-table";
 import { Spin, Collapse } from "antd";
 import useApiClient from "@/utils/request";
+import { useCommon } from "@/context/common";
 import { CaretRightOutlined } from "@ant-design/icons";
 import credentialsStyle from "./index.module.less";
 import { useTranslation } from "@/utils/i18n";
@@ -37,17 +34,21 @@ interface FieldConfig {
 
 const Credentials = () => {
   const { t } = useTranslation();
-  const [userList, setUserList] = useState<UserItem[]>([]);
+  const { post, isLoading } = useApiClient();
+  const commonContext = useCommon();
+  const authList = useRef(commonContext?.organizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const fieldRef = useRef<FieldRef>(null);
+  const userList: UserItem[] = users.current;
+  const searchParams = useSearchParams();
+  const modelId: string = searchParams.get("model_id") || "";
+  const instId: string = searchParams.get("inst_id") || "";
   const [activeKey, setActiveKey] = useState<string[]>([]);
   const [assoCredentials, setAssoCredentials] = useState<
     CrentialsAssoInstItem[]
   >([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const searchParams = useSearchParams();
-  const { get, post, isLoading } = useApiClient();
-  const modelId: string = searchParams.get("model_id") || "";
-  const instId: string = searchParams.get("inst_id") || "";
-  const fieldRef = useRef<FieldRef>(null);
 
   useEffect(() => {
     if (isLoading) return;
@@ -70,45 +71,22 @@ const Credentials = () => {
     });
   };
 
-  const getInitData = () => {
-    const getUserList = get("/api/user_group/user_list/");
-    const getGroupList = get("/api/user_group/group_list/");
-    const getAssoInstList = post(
-      `/api/credential/credential_association_inst_list/`,
-      {
-        instance_id: instId,
-      }
-    );
+  const getInitData = async () => {
     setPageLoading(true);
     try {
-      Promise.all([getUserList, getGroupList, getAssoInstList])
-        .then((res) => {
-          const userData: UserItem[] = res[0].users;
-          const organizationData: Organization[] = convertArray(res[1]);
-          setUserList(userData);
-          drawPage({
-            userData,
-            organizationData,
-            instAssoCredentials: res[2],
-          });
-        })
-        .catch(() => {
-          setPageLoading(false);
-        })
-        .finally(() => {
-          setPageLoading(false);
-        });
-    } catch (error) {
+      const lists = await post(
+        `/api/credential/credential_association_inst_list/`,
+        {
+          instance_id: instId,
+        }
+      );
+      drawPage(lists);
+    } finally {
       setPageLoading(false);
     }
   };
 
-  const drawPage = (config: {
-    userData: UserItem[];
-    organizationData: Organization[];
-    instAssoCredentials: CrentialsAssoDetailItem[];
-  }) => {
-    const { userData, organizationData, instAssoCredentials } = config;
+  const drawPage = (instAssoCredentials: CrentialsAssoDetailItem[]) => {
     const assoCredentailList = instAssoCredentials
       .reduce((pre: any, cur: CrentialsAssoDetailItem) => {
         const target = pre.find(
@@ -128,8 +106,8 @@ const Credentials = () => {
       .map((item: any) => {
         const columns = getAssetColumns({
           attrList: findAndFlattenAttrs(item.key),
-          userList: userData,
-          groupList: organizationData,
+          userList,
+          groupList: organizationList,
           t,
         });
         if (columns[0]) {
@@ -190,10 +168,6 @@ const Credentials = () => {
     setActiveKey(keys);
   };
 
-  const getList = () => {
-    console.log(123);
-  };
-
   return (
     <Spin spinning={pageLoading}>
       <div className={credentialsStyle.credentials}>
@@ -207,7 +181,7 @@ const Credentials = () => {
           onChange={handleCollapseChange}
         />
       </div>
-      <FieldModal ref={fieldRef} userList={userList} onSuccess={getList} />
+      <FieldModal ref={fieldRef} userList={userList} />
     </Spin>
   );
 };

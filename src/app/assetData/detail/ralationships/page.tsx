@@ -8,7 +8,6 @@ import {
   AssoTypeItem,
   AssoListRef,
 } from "@/types/assetManage";
-import { convertArray, filterNodesWithAllParents } from "@/utils/common";
 import { Segmented, Button, Spin } from "antd";
 import useApiClient from "@/utils/request";
 import { GatewayOutlined } from "@ant-design/icons";
@@ -19,18 +18,18 @@ import { useCommon } from "@/context/common";
 
 const Ralationships = () => {
   const { t } = useTranslation();
-  const [userList, setUserList] = useState<UserItem[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
+  const { get, isLoading } = useApiClient();
+  const commonContext = useCommon();
+  const authList = useRef(commonContext?.authOrganizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const userList: UserItem[] = users.current;
+  const assoListRef = useRef<AssoListRef>(null);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [isExpand, setIsExpand] = useState<boolean>(true);
   const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("list");
-  const assoListRef = useRef<AssoListRef>(null);
-  const { get, isLoading } = useApiClient();
-  const commonContext = useCommon();
-  const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
-  const groupsInfoRef = useRef(permissionGroupsInfo);
 
   useEffect(() => {
     if (isLoading) return;
@@ -38,31 +37,19 @@ const Ralationships = () => {
   }, [isLoading]);
 
   const getInitData = () => {
-    const getUserList = get("/api/user_group/user_list/");
-    const getGroupList = get("/api/user_group/group_list/");
     const getModelList = get("/api/model/");
     const getAssoType = get("/api/model/model_association_type/");
     setPageLoading(true);
     try {
-      Promise.all([getUserList, getGroupList, getModelList, getAssoType]).then(
-        (res) => {
-          const userData: UserItem[] = res[0].users;
-          const groupIds = groupsInfoRef.current?.group_ids || [];
-          const isAdmin = groupsInfoRef.current?.is_all || false;
-          const permissionOrganizations = filterNodesWithAllParents(
-            res[1],
-            groupIds
-          );
-          const organizationData: Organization[] = convertArray(
-            isAdmin ? res[1] : permissionOrganizations
-          );
-          setUserList(userData);
-          setOrganizationList(organizationData);
-          setModelList(res[2] || []);
-          setAssoTypes(res[3] || []);
-        }
-      );
-    } finally {
+      Promise.all([getModelList, getAssoType])
+        .then((res) => {
+          setModelList(res[0] || []);
+          setAssoTypes(res[1] || []);
+        })
+        .finally(() => {
+          setPageLoading(false);
+        });
+    } catch {
       setPageLoading(false);
     }
   };

@@ -20,7 +20,7 @@ import useApiClient from "@/utils/request";
 import { EditOutlined, CopyOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 interface FieldModalProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   userList: UserItem[];
 }
 
@@ -150,7 +150,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         }
         await requestType(url, requestParams);
         message.success(msg);
-        onSuccess();
+        onSuccess && onSuccess();
         handleCancel();
       } catch (error) {
         console.log(error);

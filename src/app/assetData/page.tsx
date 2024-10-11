@@ -22,12 +22,7 @@ import FieldModal from "./list/fieldModal";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
 const { confirm } = Modal;
-import {
-  deepClone,
-  getAssetColumns,
-  convertArray,
-  filterNodesWithAllParents,
-} from "@/utils/common";
+import { deepClone, getAssetColumns } from "@/utils/common";
 import {
   GroupItem,
   ModelItem,
@@ -69,9 +64,20 @@ interface FieldConfig {
 }
 
 const AssetData = () => {
-  const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
+  const { t } = useTranslation();
+  const { get, del, post, isLoading } = useApiClient();
+  const router = useRouter();
+  const commonContext = useCommon();
+  const authContext = useAuth();
+  const token = authContext?.token || null;
+  const tokenRef = useRef(token);
+  const authList = useRef(commonContext?.authOrganizations || []);
+  const organizationList: Organization[] = authList.current;
+  const users = useRef(commonContext?.userList || []);
+  const userList: UserItem[] = users.current;
   const fieldRef = useRef<FieldRef>(null);
   const importRef = useRef<ImportRef>(null);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
   const [exportLoading, setExportLoading] = useState<boolean>(false);
@@ -79,10 +85,8 @@ const AssetData = () => {
   const [groupId, setGroupId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
-  const [userList, setUserList] = useState<UserItem[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
   const [displayFieldKeys, setDisplayFieldKeys] = useState<string[]>([]);
-  const [organizationList, setOrganizationList] = useState<Organization[]>([]);
   const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [currentColumns, setCurrentColumns] = useState<ColumnItem[]>([]);
   const [queryList, setQueryList] = useState<unknown>(null);
@@ -92,15 +96,6 @@ const AssetData = () => {
     total: 0,
     pageSize: 20,
   });
-  const { t } = useTranslation();
-  const { get, del, post, isLoading } = useApiClient();
-  const authContext = useAuth();
-  const token = authContext?.token || null;
-  const tokenRef = useRef(token);
-  const router = useRouter();
-  const commonContext = useCommon();
-  const permissionGroupsInfo = commonContext?.permissionGroupsInfo || null;
-  const groupsInfoRef = useRef(permissionGroupsInfo);
 
   const handleExport = async (keys: string[]) => {
     try {
@@ -164,7 +159,7 @@ const AssetData = () => {
   }, [pagination?.current, pagination?.pageSize, queryList]);
 
   useEffect(() => {
-    if (propertyList.length && userList.length) {
+    if (propertyList.length) {
       const attrList = getAssetColumns({
         attrList: propertyList,
         userList,
@@ -209,7 +204,7 @@ const AssetData = () => {
         )
       );
     }
-  }, [propertyList, userList, displayFieldKeys]);
+  }, [propertyList, displayFieldKeys]);
 
   const fetchData = async () => {
     setTableLoading(true);
@@ -229,31 +224,12 @@ const AssetData = () => {
   const getModelGroup = () => {
     const getCroupList = get("/api/classification/");
     const getModelList = get("/api/model/");
-    const getUserList = get("/api/user_group/user_list/");
-    const getOrganizationList = get("/api/user_group/group_list/");
     setLoading(true);
     try {
-      Promise.all([
-        getModelList,
-        getCroupList,
-        getUserList,
-        getOrganizationList,
-      ])
+      Promise.all([getModelList, getCroupList])
         .then((res) => {
           const modeldata: ModelItem[] = res[0];
           const groupData: GroupItem[] = res[1];
-          const userData: UserItem[] = res[2].users;
-          const groupIds = groupsInfoRef.current?.group_ids || [];
-          const isAdmin = groupsInfoRef.current?.is_all || false;
-          const permissionOrganizations = filterNodesWithAllParents(
-            res[3],
-            groupIds
-          );
-          const organizationData: Organization[] = convertArray(
-            isAdmin ? res[3] : permissionOrganizations
-          );
-          setUserList(userData);
-          setOrganizationList(organizationData);
           const groups = deepClone(groupData).map((item: GroupItem) => ({
             ...item,
             list: [],
