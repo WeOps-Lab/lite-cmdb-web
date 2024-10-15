@@ -68,7 +68,8 @@
     "log": "Log",
     "assetManage": "Model",
     "asset": "Asset",
-    "credential": "Credential"
+    "credential": "Credential",
+    "assetSearch": "Search"
   },
   "Model": {
     "addModel": "Add Model",

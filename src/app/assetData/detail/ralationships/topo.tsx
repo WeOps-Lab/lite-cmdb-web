@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { XFlow, XFlowGraph, Grid, Snapline } from "@antv/xflow";
+import { XFlow, XFlowGraph, Grid, Snapline, Minimap } from "@antv/xflow";
 import { ModelItem, AssoTypeItem, TopoData } from "@/types/assetManage";
 import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
@@ -41,11 +41,21 @@ const Topo: React.FC<AssoTopoProps> = ({
 
   return (
     <Spin spinning={loading}>
-      <div style={{ height: "calc(100vh - 200px)" }} id="container">
+      <div style={{ height: "calc(100vh - 160px)" }} id="container">
         <XFlow>
           <XFlowGraph zoomable pannable minScale={0.05} maxScale={10} fitView />
           <Grid type="dot" options={{ color: "#ccc", thickness: 1 }} />
           <Snapline sharp />
+          <Minimap
+            width={200}
+            height={120}
+            style={{
+              border: "1px solid #ccc",
+              bottom: "10px",
+              right: "10px",
+              position: "absolute",
+            }}
+          />
           <InitNode
             modelId={modelId}
             instId={instId}
