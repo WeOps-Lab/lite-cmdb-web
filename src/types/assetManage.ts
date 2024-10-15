@@ -205,3 +205,16 @@ export interface RelationInstanceConfig {
 export interface RelationInstanceRef {
   showModal: (config: RelationInstanceConfig) => void;
 }
+
+export interface NodeData {
+  _id: number;
+  model_id: string;
+  inst_name: string;
+  asst_id?: string;
+  expanded?: boolean;
+  children: NodeData[];
+}
+export interface TopoData {
+  src_result?: NodeData;
+  dst_result?: NodeData;
+}

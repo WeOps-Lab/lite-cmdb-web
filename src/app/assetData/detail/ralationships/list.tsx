@@ -180,7 +180,7 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
               pagination={false}
               dataSource={item.inst_list}
               columns={columns}
-              scroll={{ x: "calc(100vw - 300px)" }}
+              scroll={{ x: "calc(100vw - 306px)", y: 300 }}
               rowKey="_id"
             />
           ),

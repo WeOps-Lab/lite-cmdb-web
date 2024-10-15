@@ -14,12 +14,15 @@ import { GatewayOutlined } from "@ant-design/icons";
 import ralationshipsStyle from "./index.module.less";
 import { useTranslation } from "@/utils/i18n";
 import AssoList from "./list";
+import Topo from "./topo";
 import { useCommon } from "@/context/common";
+import { useSearchParams } from "next/navigation";
 
 const Ralationships = () => {
   const { t } = useTranslation();
   const { get, isLoading } = useApiClient();
   const commonContext = useCommon();
+  const searchParams = useSearchParams();
   const authList = useRef(commonContext?.authOrganizations || []);
   const organizationList: Organization[] = authList.current;
   const users = useRef(commonContext?.userList || []);
@@ -30,6 +33,8 @@ const Ralationships = () => {
   const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<string>("list");
+  const modelId: string = searchParams.get("model_id") || "";
+  const instId: string = searchParams.get("inst_id") || "";
 
   useEffect(() => {
     if (isLoading) return;
@@ -115,7 +120,12 @@ const Ralationships = () => {
           assoTypeList={assoTypes}
         />
       ) : (
-        <div>拓扑图</div>
+        <Topo
+          assoTypeList={assoTypes}
+          modelList={modelList}
+          modelId={modelId}
+          instId={instId}
+        />
       )}
     </Spin>
   );
