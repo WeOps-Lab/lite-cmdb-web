@@ -39,11 +39,11 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem('locale', newLocale);
   };
 
-  const localeMessage = flattenMessages(messages[locale])
+  const localeMessage = flattenMessages(messages[locale === 'en' ? 'en' : 'zh']);
 
   return (
     <LocaleContext.Provider value={{ locale, setLocale: changeLocale }}>
-      <IntlProvider locale={locale} messages={localeMessage}>
+      <IntlProvider locale={locale === 'en' ? 'en' : 'zh'} messages={localeMessage}>
         {children}
       </IntlProvider>
     </LocaleContext.Provider>

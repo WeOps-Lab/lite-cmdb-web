@@ -6,7 +6,7 @@ import SettingsModal from './settings';
 
 const UserInfo = () => {
   const { data: session } = useSession();
-  const username = session?.user?.name || 'Qiu-Jia';
+  const username = session?.username || 'Qiu-Jia';
   const [visible, setVisible] = useState<boolean>(false);
 
   const handleLogout = () => {

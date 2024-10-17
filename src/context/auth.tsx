@@ -14,26 +14,24 @@ const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [token, setToken] = useState<string | null>(null);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     if (status === 'loading') return;
-
-    console.log('session', session);
+    console.log('session:', session);
     if (!session) {
       signIn('keycloak');
       return;
     }
-
     if (session?.accessToken) {
       setToken(session.accessToken);
-      setIsAuthenticated(true);
+      const userLocale = session.locale || 'en';
+      localStorage.setItem('locale', userLocale);
     } else {
       console.warn('No accessToken found in session');
     }
   }, [session, status, router]);
 
-  if (status === 'loading' || !isAuthenticated) {
+  if (status === 'loading') {
     return (
       <div className='first-loader-wrapper'>
         <div className='loading-arc'></div>

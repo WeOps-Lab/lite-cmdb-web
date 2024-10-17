@@ -3,6 +3,7 @@ import { useEffect, useCallback, useState, useRef } from 'react';
 import { useAuth } from '@/context/auth';
 import { message } from 'antd';
 import { signIn } from 'next-auth/react';
+import { useTranslation } from '@/utils/i18n';
 
 const apiClient = axios.create({
   baseURL: '/reqApi',
@@ -25,6 +26,7 @@ const handleResponse = (response: AxiosResponse, onError?: () => void) => {
 };
 
 const useApiClient = () => {
+  const { t } = useTranslation();
   const authContext = useAuth();
   const token = authContext?.token || null;
   const tokenRef = useRef(token);
@@ -65,11 +67,10 @@ const useApiClient = () => {
             signIn('keycloak');
           } else if (status === 403) {
             // 处理 403 错误，显示无权限消息
-            message.error(messageText);
+            return Promise.reject(new Error(messageText));
           } else if (status === 500) {
             // 处理 500 错误，例如显示错误消息
-            console.error('Server error:', messageText);
-            message.error('服务器错误，请稍后再试');
+            return Promise.reject(new Error(t('common.serverError')));
           }
         }
         return Promise.reject(error);
