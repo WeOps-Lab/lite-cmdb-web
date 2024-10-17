@@ -32,6 +32,7 @@
   "delete": "Delete",
   "add": "Add",
   "detail": "Detail",
+  "seeMore": "More",
   "export": "Export",
   "import": "Import",
   "uploadAction": "Click or drag file to this area to upload",
@@ -64,6 +65,7 @@
   "more": "More",
   "batchDelete": "Batch Delete",
   "batchEdit": "Batch Edit",
+  "searchTxt": "Search",
   "menu": {
     "log": "Log",
     "assetManage": "Model",
@@ -110,6 +112,7 @@
     "disassociation": "Disassociate",
     "selectInstance": "Select instance",
     "credentialManagement": "Credential Manage",
-    "AssociationManagement": "Association Management"
+    "AssociationManagement": "Association Management",
+    "assetSearchTxt": "Please enter keywords and click or enter to search"
   }
 }

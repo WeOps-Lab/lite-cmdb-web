@@ -238,6 +238,7 @@ export const getFieldItem = (config: {
   groupList?: Organization[];
   isEdit: boolean;
   value?: any;
+  hideUserAvatar?: boolean;
 }) => {
   if (config.isEdit) {
     switch (config.fieldItem.attr_type) {
@@ -292,7 +293,9 @@ export const getFieldItem = (config: {
       const userName =
         (config.userList || []).find((item) => item.id === config.value)
           ?.username || "--";
-      return (
+      return config.hideUserAvatar ? (
+        userName
+      ) : (
         <div className="column-user">
           <span
             className="user-avatar"
