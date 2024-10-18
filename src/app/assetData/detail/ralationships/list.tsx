@@ -139,8 +139,8 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
       const columns = [
         ...getAssetColumns({
           attrList: responseData,
-          userList: config.userList,
-          groupList: config.organizationList,
+          userList: config.userData,
+          groupList: config.organizationData,
           t,
         }),
         {

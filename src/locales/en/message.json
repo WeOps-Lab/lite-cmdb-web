@@ -71,7 +71,8 @@
     "assetManage": "Model",
     "asset": "Asset",
     "credential": "Credential",
-    "assetSearch": "Search"
+    "assetSearch": "Search",
+    "assetsOverview": "Overview"
   },
   "Model": {
     "addModel": "Add Model",
