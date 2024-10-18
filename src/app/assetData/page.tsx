@@ -519,6 +519,7 @@ const AssetData = () => {
           <div className="flex justify-between mb-4">
             <Space>
               <Cascader
+                placeholder={t("Model.selectOrganazationPlaceholder")}
                 options={organizationList}
                 value={organization}
                 onChange={selectOrganization}
