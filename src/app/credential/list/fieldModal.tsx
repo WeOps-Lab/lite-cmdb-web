@@ -330,8 +330,8 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       return items.map((item) => {
         if (item.visible === false) return null;
         return (
-          <>
-            <Col span={12} key={item.attr_id}>
+          <React.Fragment key={item.attr_id}>
+            <Col span={12}>
               <Form.Item
                 name={item.attr_id}
                 label={<span>{item.attr_name}</span>}
@@ -348,7 +348,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
               </Form.Item>
             </Col>
             {item.children && renderFormItems(item.children)}
-          </>
+          </React.Fragment>
         );
       });
     };
