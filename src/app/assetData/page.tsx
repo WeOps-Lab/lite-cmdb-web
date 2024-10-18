@@ -263,7 +263,7 @@ const AssetData = () => {
           setModelId(defaultModelId);
           getInitData(defaultModelId);
         })
-        .finally(() => {
+        .catch(() => {
           setLoading(false);
         });
     } catch (error) {
