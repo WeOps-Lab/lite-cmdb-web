@@ -19,6 +19,7 @@ import SearchFilter from "./list/searchFilter";
 import ImportInst from "./list/importInst";
 import { PlusOutlined } from "@ant-design/icons";
 import type { RadioChangeEvent } from "antd";
+import { useSearchParams } from "next/navigation";
 import assetDataStyle from "./index.module.less";
 import FieldModal from "./list/fieldModal";
 import { useTranslation } from "@/utils/i18n";
@@ -69,6 +70,10 @@ const AssetData = () => {
   const { t } = useTranslation();
   const { get, del, post, isLoading } = useApiClient();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const assetModelId: string = searchParams.get("modelId") || "";
+  const assetClassificationId: string =
+    searchParams.get("classificationId") || "";
   const commonContext = useCommon();
   const authContext = useAuth();
   const token = authContext?.token || null;
@@ -248,7 +253,8 @@ const AssetData = () => {
               target.count++;
             }
           });
-          const defaultGroupId = groupData[0].classification_id;
+          const defaultGroupId =
+            assetClassificationId || groupData[0].classification_id;
           setGroupId(defaultGroupId);
           setModelGroup(groups);
           const _modelList = modeldata
@@ -258,7 +264,7 @@ const AssetData = () => {
               label: item.model_name,
               icn: item.icn,
             }));
-          const defaultModelId = _modelList[0].key;
+          const defaultModelId = assetModelId || _modelList[0].key;
           setModelList(_modelList);
           setModelId(defaultModelId);
           getInitData(defaultModelId);
@@ -563,7 +569,7 @@ const AssetData = () => {
             columns={currentColumns}
             pagination={pagination}
             loading={tableLoading}
-            scroll={{ x: "calc(100vw - 100px)", y: "calc(100vh - 200px)" }}
+            scroll={{ x: "calc(100vw - 100px)", y: "calc(100vh - 370px)" }}
             fieldSetting={{
               showSetting: true,
               displayFieldKeys,

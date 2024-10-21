@@ -13,9 +13,10 @@ const TopMenu = () => {
   // 菜单项配置
   const menuItems = [
     { label: t('menu.assetSearch'), icon: 'sousuo-tianchong', path: '/assetSearch' },
-    { label: t('menu.assetManage'), icon: 'shujumoxingguanli', path: '/assetManage' },
+    { label: t('menu.assetsOverview'), icon: 'mulu', path: '/assetsOverview' },
     { label: t('menu.asset'), icon: 'zichan-quanbushebei', path: '/assetData' },
-    { label: t('menu.credential'), icon: 'guanlipingju', path: '/credential' }
+    { label: t('menu.credential'), icon: 'guanlipingju', path: '/credential' },
+    { label: t('menu.assetManage'), icon: 'shujumoxingguanli', path: '/assetManage' }
   ];
 
   return (
