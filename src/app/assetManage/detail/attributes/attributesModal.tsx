@@ -73,8 +73,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
         setTitle(title);
         if (type === "add") {
           Object.assign(attrInfo, {
-            is_required: false,
-            editable: false,
+            is_required: true,
+            editable: true,
             is_only: false,
           });
           setEnumList([
@@ -180,6 +180,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     return (
       <div>
         <OperateModal
+          width={600}
           title={title}
           subTitle={subTitle}
           visible={modelVisible}

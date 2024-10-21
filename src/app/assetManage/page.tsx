@@ -100,9 +100,14 @@ const AssetManage = () => {
   };
 
   const linkToDetial = (model: ModelItem) => {
-    router.push(
-      `/assetManage/detail?icn=${model.icn}&model_name=${model.model_name}&model_id=${model.model_id}&classification_id=${model.classification_id}`
-    );
+    const params = new URLSearchParams({
+      model_id: model.model_id,
+      model_name: model.model_name,
+      icn: model.icn,
+      classification_id: model.classification_id,
+      is_pre: model.is_pre,
+    }).toString();
+    router.push(`/assetManage/detail?${params}`);
   };
 
   const handleDragStart = (item: any) => {

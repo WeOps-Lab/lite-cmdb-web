@@ -93,12 +93,14 @@ const Attributes = () => {
           <Button
             type="link"
             className="mr-[10px]"
+            disabled={record.is_pre}
             onClick={() => showAttrModal("edit", record)}
           >
             {t("edit")}
           </Button>
           <Button
             type="link"
+            disabled={record.is_pre}
             onClick={() =>
               showDeleteConfirm({
                 model_id: record.model_id,

@@ -23,6 +23,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const modelName: string = searchParams.get("model_name") || "";
   const modelId: string = searchParams.get("model_id") || "";
   const classificationId: string = searchParams.get("classification_id") || "";
+  const isPre = searchParams.get("is_pre") === "true";
   const { confirm } = Modal;
   const modelRef = useRef<any>(null);
   const { get, del, isLoading } = useApiClient();
@@ -110,27 +111,29 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
               </span>
               <span className="text-[var(--color-text-3)]">{modelId}</span>
             </div>
-            <div className="self-start">
-              <EditTwoTone
-                className="edit mr-[6px] cursor-pointer"
-                onClick={() =>
-                  shoModelModal("edit", {
-                    model_name: modelName,
-                    model_id: modelId,
-                    classification_id: classificationId,
-                    icn: objIcon,
-                  })
-                }
-              />
-              <DeleteTwoTone
-                className="delete cursor-pointer"
-                onClick={() =>
-                  showDeleteConfirm({
-                    model_id: modelId,
-                  })
-                }
-              />
-            </div>
+            {!isPre && (
+              <div className="self-start">
+                <EditTwoTone
+                  className="edit mr-[6px] cursor-pointer"
+                  onClick={() =>
+                    shoModelModal("edit", {
+                      model_name: modelName,
+                      model_id: modelId,
+                      classification_id: classificationId,
+                      icn: objIcon,
+                    })
+                  }
+                />
+                <DeleteTwoTone
+                  className="delete cursor-pointer"
+                  onClick={() =>
+                    showDeleteConfirm({
+                      model_id: modelId,
+                    })
+                  }
+                />
+              </div>
+            )}
           </header>
         </Card>
         <WithSideMenuLayout
