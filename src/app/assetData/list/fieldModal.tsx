@@ -297,7 +297,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                           default:
                             return (
                               <Input
-                                disabled={!item.editable && type !== "add"}
+                                disabled={
+                                  (!item.editable && type !== "add") ||
+                                  (type === "batchEdit" &&
+                                    item.attr_id === "inst_name")
+                                }
                               />
                             );
                         }
