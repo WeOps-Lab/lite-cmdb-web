@@ -115,6 +115,7 @@
     "credentialManagement": "Credential Manage",
     "AssociationManagement": "Association Management",
     "assetSearchTxt": "Please enter keywords and click or enter to search",
-    "selectOrganazationPlaceholder": "Select an organization"
+    "selectOrganazationPlaceholder": "Select an organization",
+    "confirmAndAssociate": "Confirm & Associate"
   }
 }

@@ -26,6 +26,7 @@ import {
   AssoFieldType,
   ListItem,
   RelationListInstItem,
+  CrentialsAssoInstItem,
   RelationInstanceRef,
 } from "@/types/assetManage";
 import { getAssetColumns } from "@/utils/common";
@@ -36,15 +37,26 @@ const { Option } = Select;
 const { confirm } = Modal;
 
 interface FieldModalProps {
-  onSuccess: () => void;
+  onSuccess?: () => void;
   userList: UserItem[];
   organizationList: Organization[];
   models: ModelItem[];
   assoTypes: AssoTypeItem[];
+  needFetchAssoInstIds?: boolean;
 }
 
 const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
-  ({ onSuccess, userList, organizationList, models, assoTypes }, ref) => {
+  (
+    {
+      onSuccess,
+      userList,
+      organizationList,
+      models,
+      assoTypes,
+      needFetchAssoInstIds,
+    },
+    ref
+  ) => {
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
     const [pagination, setPagination] = useState<TablePaginationConfig>({
@@ -117,24 +129,55 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
         setModelId(model_id);
         setInstId(instId);
         setAssoInstIds(list);
-        const assoModelList = await get(`/api/model/${model_id}/association/`);
-        const relationData = assoModelList.map((item: AssoFieldType) => {
-          return {
-            ...item,
-            name: `${showModelName(item.src_model_id)}-${showConnectType(
-              item.asst_id,
-              "asst_id"
-            )}-${showModelName(item.dst_model_id)}`,
-            id:
-              item.src_model_id === model_id
-                ? item.dst_model_id
-                : item.src_model_id,
-          };
-        });
-        const currentAssoModelId = relationData[0]?.id || "";
-        setRelationList(relationData);
-        setAssoModelId(currentAssoModelId);
-        initPage(currentAssoModelId);
+        setLoading(true);
+        try {
+          const getAssoModelList = get(`/api/model/${model_id}/association/`);
+          Promise.all([
+            getAssoModelList,
+            needFetchAssoInstIds &&
+              get(
+                `/api/instance/association_instance_list/${model_id}/${instId}/`
+              ),
+          ])
+            .then((res) => {
+              const relationData = res[0].map((item: AssoFieldType) => {
+                return {
+                  ...item,
+                  name: `${showModelName(item.src_model_id)}-${showConnectType(
+                    item.asst_id,
+                    "asst_name"
+                  )}-${showModelName(item.dst_model_id)}`,
+                  id:
+                    item.src_model_id === model_id
+                      ? item.dst_model_id
+                      : item.src_model_id,
+                };
+              });
+              const currentAssoModelId = relationData[0]?.id || "";
+              setRelationList(relationData);
+              setAssoModelId(currentAssoModelId);
+              initPage(currentAssoModelId);
+              if (needFetchAssoInstIds) {
+                const assoIds = res[1].reduce(
+                  (pre: RelationListInstItem[], cur: CrentialsAssoInstItem) => {
+                    const allInstIds = cur.inst_list.map((item) => ({
+                      id: item._id,
+                      inst_asst_id: item.inst_asst_id,
+                    }));
+                    pre = [...pre, ...allInstIds];
+                    return pre;
+                  },
+                  []
+                );
+                setAssoInstIds(assoIds);
+              }
+            })
+            .catch(() => {
+              setLoading(false);
+            });
+        } catch (error) {
+          setLoading(false);
+        }
       },
     }));
 
@@ -182,12 +225,12 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
           dst_model_id: target?.dst_model_id,
           asst_id: target?.asst_id,
           src_inst_id: target?.src_model_id === modelId ? +instId : row._id,
-          dst_inst_id: target?.dst_inst_id === modelId ? +instId : row._id,
+          dst_inst_id: target?.dst_model_id === modelId ? +instId : row._id,
         };
         await post(`/api/instance/association/`, params);
         message.success(t("successfullyAssociated"));
         handleCancel();
-        onSuccess();
+        onSuccess && onSuccess();
       } finally {
         setTableLoading(false);
       }
@@ -207,7 +250,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
               await del(`/api/instance/association/${instAsstId}/`);
               message.success(t("successfullyDisassociated"));
               handleCancel();
-              onSuccess();
+              onSuccess && onSuccess();
             } finally {
               resolve(true);
             }

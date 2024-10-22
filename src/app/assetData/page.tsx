@@ -17,6 +17,7 @@ import {
 import CustomTable from "@/components/custom-table";
 import SearchFilter from "./list/searchFilter";
 import ImportInst from "./list/importInst";
+import SelectInstance from "@/app/assetData/detail/ralationships/selectInstance";
 import { PlusOutlined } from "@ant-design/icons";
 import type { RadioChangeEvent } from "antd";
 import { useSearchParams } from "next/navigation";
@@ -33,11 +34,12 @@ import {
   UserItem,
   Organization,
   AttrFieldType,
+  RelationInstanceRef,
+  AssoTypeItem,
 } from "@/types/assetManage";
 import axios from "axios";
 import { useAuth } from "@/context/auth";
 import { useCommon } from "@/context/common";
-
 import type { MenuProps } from "antd";
 import { useRouter } from "next/navigation";
 
@@ -84,11 +86,13 @@ const AssetData = () => {
   const userList: UserItem[] = users.current;
   const fieldRef = useRef<FieldRef>(null);
   const importRef = useRef<ImportRef>(null);
+  const instanceRef = useRef<RelationInstanceRef>(null);
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
   const [exportLoading, setExportLoading] = useState<boolean>(false);
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
+  const [originModels, setOriginModels] = useState<ModelItem[]>([]);
   const [groupId, setGroupId] = useState<string>("");
   const [modelId, setModelId] = useState<string>("");
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
@@ -96,6 +100,7 @@ const AssetData = () => {
   const [displayFieldKeys, setDisplayFieldKeys] = useState<string[]>([]);
   const [columns, setColumns] = useState<ColumnItem[]>([]);
   const [currentColumns, setCurrentColumns] = useState<ColumnItem[]>([]);
+  const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
   const [queryList, setQueryList] = useState<unknown>(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const [organization, setOrganization] = useState<string[]>([]);
@@ -180,7 +185,7 @@ const AssetData = () => {
           title: t("action"),
           key: "action",
           dataIndex: "action",
-          width: 160,
+          width: 230,
           fixed: "right",
           render: (_: unknown, record: any) => (
             <>
@@ -190,6 +195,13 @@ const AssetData = () => {
                 onClick={() => checkDetail(record)}
               >
                 {t("detail")}
+              </Button>
+              <Button
+                type="link"
+                className="mr-[10px]"
+                onClick={() => showInstanceModal(record)}
+              >
+                {t("Model.association")}
               </Button>
               <Button
                 type="link"
@@ -232,9 +244,10 @@ const AssetData = () => {
   const getModelGroup = () => {
     const getCroupList = get("/api/classification/");
     const getModelList = get("/api/model/");
+    const getAssoType = get("/api/model/model_association_type/");
     setLoading(true);
     try {
-      Promise.all([getModelList, getCroupList])
+      Promise.all([getModelList, getCroupList, getAssoType])
         .then((res) => {
           const modeldata: ModelItem[] = res[0];
           const groupData: GroupItem[] = res[1];
@@ -265,6 +278,8 @@ const AssetData = () => {
               icn: item.icn,
             }));
           const defaultModelId = assetModelId || _modelList[0].key;
+          setOriginModels(res[0]);
+          setAssoTypes(res[2]);
           setModelList(_modelList);
           setModelId(defaultModelId);
           getInitData(defaultModelId);
@@ -457,8 +472,13 @@ const AssetData = () => {
     },
   ];
 
-  const updateFieldList = () => {
+  const updateFieldList = (id?: string) => {
     fetchData();
+    if (id) {
+      showInstanceModal({
+        _id: id,
+      });
+    }
   };
 
   const showAttrModal = (type: string, row = {}) => {
@@ -495,6 +515,15 @@ const AssetData = () => {
     value
   ) => {
     setOrganization(value);
+  };
+
+  const showInstanceModal = (row = { _id: "" }) => {
+    instanceRef.current?.showModal({
+      title: t("Model.AssociationManagement"),
+      model_id: modelId,
+      list: [],
+      instId: row._id,
+    });
   };
 
   return (
@@ -586,6 +615,14 @@ const AssetData = () => {
             onSuccess={updateFieldList}
           />
           <ImportInst ref={importRef} onSuccess={updateFieldList} />
+          <SelectInstance
+            ref={instanceRef}
+            userList={userList}
+            models={originModels}
+            assoTypes={assoTypes}
+            organizationList={organizationList}
+            needFetchAssoInstIds
+          />
         </div>
       </div>
     </Spin>

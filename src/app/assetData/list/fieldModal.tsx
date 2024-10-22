@@ -24,7 +24,7 @@ import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 import dayjs from "dayjs";
 interface FieldModalProps {
-  onSuccess: () => void;
+  onSuccess: (instId?: string) => void;
   organizationList: Organization[];
   userList: UserItem[];
 }
@@ -115,7 +115,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       },
     }));
 
-    const handleSubmit = () => {
+    const handleSubmit = (confirmType?: string) => {
       form.validateFields().then((values) => {
         for (const key in values) {
           const target = formItems.find((item) => item.attr_id === key);
@@ -125,11 +125,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             );
           }
         }
-        operateAttr(values);
+        operateAttr(values, confirmType);
       });
     };
 
-    const operateAttr = async (params: AttrFieldType) => {
+    const operateAttr = async (params: AttrFieldType, confirmType?: string) => {
       try {
         setConfirmLoading(true);
         const formData = params;
@@ -159,9 +159,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             update_data: formData,
           };
         }
-        await post(url, requestParams);
+        const { _id: instId } = await post(url, requestParams);
         message.success(msg);
-        onSuccess();
+        onSuccess(confirmType ? instId : "");
         handleCancel();
       } catch (error) {
         console.log(error);
@@ -188,9 +188,16 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 className="mr-[10px]"
                 type="primary"
                 loading={confirmLoading}
-                onClick={handleSubmit}
+                onClick={() => handleSubmit()}
               >
                 {t("confirm")}
+              </Button>
+              <Button
+                className="mr-[10px]"
+                loading={confirmLoading}
+                onClick={() => handleSubmit("associate")}
+              >
+                {t("Model.confirmAndAssociate")}
               </Button>
               <Button onClick={handleCancel}>{t("cancel")}</Button>
             </div>
