@@ -114,7 +114,7 @@ const AssetsOverview: React.FC = () => {
           {overViewList.map((item) => (
             <div
               key={item.classification_id}
-              className={`bg-[var(--color-bg-1)] p-[10px] mb-[20px] shadow-lg rounded`}
+              className={`bg-[var(--color-bg-1)] p-[10px] mb-[20px] rounded`}
             >
               <h2
                 className={`${assetsOverviewStyle.title} text-[16px] font-[600]`}
