@@ -133,8 +133,8 @@ const AssetsOverview: React.FC = () => {
                         src={getIconUrl(sec)}
                         className="block w-auto h-10"
                         alt={t("picture")}
-                        width={40}
-                        height={40}
+                        width={20}
+                        height={20}
                       />
                       <span title={sec.model_name}>{sec.model_name}</span>
                     </span>

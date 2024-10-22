@@ -2,12 +2,12 @@
     .my-masonry-grid {
         margin-top: 20px;
         display: flex;
-        margin-left: -30px;
+        margin-left: -20px;
         width: auto;
     }
 
     .title {
-        border-bottom: 2px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
         display: flex;
         align-items: center;
         height: 40px;
@@ -16,22 +16,26 @@
     }
 
     .list {
-        margin-bottom: 10px;
+        padding-top: 10px;
 
         .listItem {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-top: 20px;
-            padding: 0 20px;
+            padding: 0 15px;
             cursor: pointer;
+            font-size: 14px !important;
+
+            &:hover {
+                background: var(--color-fill-1);
+            }
 
             .leftSide {
                 display: flex;
                 align-items: center;
 
                 img {
-                    width: 24px;
+                    width: 20px;
                     margin-right: 10px;
                 }
 
@@ -51,13 +55,13 @@
 
     :global {
         .my-masonry-grid_column {
-            padding-left: 30px;
+            padding-left: 20px;
             background-clip: padding-box;
             min-width: 300px;
         }
 
         .my-masonry-grid_column>div {
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
     }
 }
