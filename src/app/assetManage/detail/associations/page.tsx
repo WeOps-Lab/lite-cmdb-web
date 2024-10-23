@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Input, Button, Modal, message, Tooltip } from "antd";
+import { Input, Button, Modal, message } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import CustomTable from "@/components/custom-table";
 import AssociationsModal from "./associationsModal";
@@ -9,9 +9,10 @@ import { Tag } from "antd";
 import type { TableColumnsType } from "antd";
 import { CONSTRAINT_List } from "@/constants/asset";
 import useApiClient from "@/utils/request";
-import { ModelItem, AssoTypeItem } from "@/types/assetManage";
+import { ModelItem, AssoTypeItem, GroupItem } from "@/types/assetManage";
 import { useSearchParams } from "next/navigation";
 import { useTranslation } from "@/utils/i18n";
+import { deepClone } from "@/utils/common";
 const { confirm } = Modal;
 
 const Associations = () => {
@@ -25,6 +26,7 @@ const Associations = () => {
   const [tableData, setTableData] = useState<any[]>([]);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [assoTypeList, setAssoTypeList] = useState<AssoTypeItem[]>([]);
+  const [groups, setGroups] = useState<GroupItem[]>([]);
   const assoRef = useRef<any>(null);
   const { get, del } = useApiClient();
   const searchParams = useSearchParams();
@@ -40,7 +42,8 @@ const Associations = () => {
       },
       render: (_, record) => {
         const assoName = `${showModelName(record.src_model_id)}_${
-          record.asst_id
+          assoTypeList.find((item) => item.asst_id === record.asst_id)
+            ?.asst_name || "--"
         }_${showModelName(record.dst_model_id)}`;
         return (
           <a
@@ -85,8 +88,9 @@ const Associations = () => {
         return (
           <>
             {
-              <Tag color={asst_id ? "green" : "geekblue"}>
-                {asst_id || "--"}
+              <Tag color="green">
+                {assoTypeList.find((item) => item.asst_id === asst_id)
+                  ?.asst_name || "--"}
               </Tag>
             }
           </>
@@ -137,7 +141,7 @@ const Associations = () => {
       content: t("deleteContent"),
       centered: true,
       onOk() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
           try {
             await del(`/api/model/association/${id}/`);
             message.success(t("successfullyDeleted"));
@@ -183,8 +187,6 @@ const Associations = () => {
 
   const fetchData = async (type?: string) => {
     setLoading(true);
-    const params = getTableParams();
-    console.log(params);
     try {
       const data = await get(`/api/model/${modelId}/association/`);
       setTableData(data);
@@ -201,16 +203,32 @@ const Associations = () => {
     const getAssoTypeList = get("/api/model/model_association_type/");
     const getModelList = get("/api/model/");
     const fetchAssoData = get(`/api/model/${modelId}/association/`);
+    const getCroupList = get("/api/classification/");
     setLoading(true);
-    Promise.all([getModelList, getAssoTypeList, fetchAssoData])
+    Promise.all([getModelList, getAssoTypeList, fetchAssoData, getCroupList])
       .then((res) => {
         const modeldata: ModelItem[] = res[0];
         const assoTypeData: AssoTypeItem[] = res[1];
         const assoTableData: AssoTypeItem[] = res[2];
+        const groupData: GroupItem[] = res[3];
+        const _groups = deepClone(groupData).map((item: GroupItem) => ({
+          ...item,
+          list: [],
+        }));
+        modeldata.forEach((modelItem: ModelItem) => {
+          const target = _groups.find(
+            (item: GroupItem) =>
+              item.classification_id === modelItem.classification_id
+          );
+          if (target) {
+            target.list.push(modelItem);
+          }
+        });
+        setGroups(_groups);
         setAssoTypeList(assoTypeData);
         setModelList(modeldata);
         setTableData(assoTableData);
-        //   pagination.total = res[2].count || 0
+        pagination.total = res[2].length || 0;
         setPagination(pagination);
       })
       .finally(() => {
@@ -258,6 +276,7 @@ const Associations = () => {
         constraintList={CONSTRAINT_List}
         allModelList={modelList}
         assoTypeList={assoTypeList}
+        groups={groups}
         onSuccess={updateAssoList}
       />
     </div>

@@ -16,7 +16,12 @@ import associationsModalStyle from "./associationsModal.module.less";
 import { deepClone } from "@/utils/common";
 import useApiClient from "@/utils/request";
 const { Option } = Select;
-import { AssoTypeItem, ModelItem, AssoFieldType } from "@/types/assetManage";
+import {
+  AssoTypeItem,
+  ModelItem,
+  AssoFieldType,
+  GroupItem,
+} from "@/types/assetManage";
 import { useTranslation } from "@/utils/i18n";
 
 interface AssoModalProps {
@@ -24,6 +29,7 @@ interface AssoModalProps {
   constraintList: Array<{ id: string; name: string }>;
   allModelList: ModelItem[];
   assoTypeList: AssoTypeItem[];
+  groups: GroupItem[];
 }
 
 interface AssoConfig {
@@ -38,7 +44,7 @@ export interface AssoModalRef {
 }
 
 const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
-  ({ onSuccess, constraintList, allModelList, assoTypeList }, ref) => {
+  ({ onSuccess, constraintList, allModelList, assoTypeList, groups }, ref) => {
     const [modelVisible, setModelVisible] = useState<boolean>(false);
     const [subTitle, setSubTitle] = useState<string>("");
     const [title, setTitle] = useState<string>("");
@@ -147,15 +153,18 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
               name="dst_model_id"
               rules={[{ required: true, message: t("required") }]}
             >
-              <Select allowClear>
-                {allModelList.map((item) => {
-                  return (
-                    <Option value={item.model_id} key={item.model_id}>
-                      {item.model_name}
-                    </Option>
-                  );
-                })}
-              </Select>
+              <Select
+                allowClear
+                showSearch
+                options={groups.map((item) => ({
+                  label: item.classification_name,
+                  title: item.classification_name,
+                  options: item.list.map((tex) => ({
+                    label: tex.model_name,
+                    value: tex.model_id,
+                  })),
+                }))}
+              ></Select>
             </Form.Item>
             <Form.Item<AssoFieldType>
               label={t("Model.associationType")}
@@ -171,7 +180,7 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                 {assoTypeList.map((item) => {
                   return (
                     <Option value={item.asst_id} key={item.asst_id}>
-                      {item.asst_id}
+                      {item.asst_name}
                     </Option>
                   );
                 })}
@@ -241,7 +250,9 @@ const AssociationsModal = forwardRef<AssoModalRef, AssoModalProps>(
                         <div className={associationsModalStyle.modelEdge}>
                           <div className={associationsModalStyle.connection}>
                             <span className={associationsModalStyle.name}>
-                              {getFieldValue("asst_id")}
+                              {assoTypeList.find(
+                                (tex) => tex.asst_id === getFieldValue("asst_id")
+                              )?.asst_name || "--"}
                             </span>
                           </div>
                         </div>
