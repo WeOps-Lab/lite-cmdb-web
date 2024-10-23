@@ -261,9 +261,11 @@ export const InitNode: React.FC<TopoProps> = ({
           },
           label1: {
             text: node.inst_name,
+            title: node.inst_name,
           },
           label2: {
             text: showModelName(node.model_id),
+            title: showModelName(node.model_id),
           },
           expandBtn: {
             stroke: hasChild ? "var(--color-border-3)" : "",
