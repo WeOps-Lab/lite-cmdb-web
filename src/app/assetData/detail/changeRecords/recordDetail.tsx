@@ -135,7 +135,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
 
     const showConnectType = (id: string) => {
       return (
-        connectTypeList.find((item) => item.asst_id === id)?.asst_id || "--"
+        connectTypeList.find((item) => item.asst_id === id)?.asst_name || "--"
       );
     };
 
