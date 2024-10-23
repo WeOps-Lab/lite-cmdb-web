@@ -1,14 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState, forwardRef, useImperativeHandle, useRef } from "react";
-import { Button, message, Upload } from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
-import useApiClient from "@/utils/request";
-import type { UploadProps } from "antd";
-import { InboxOutlined } from "@ant-design/icons";
-import axios from "axios";
-import { useAuth } from "@/context/auth";
+import React, {
+  useState,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
+import { Button, message, Upload } from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
+import useApiClient from '@/utils/request';
+import type { UploadProps } from 'antd';
+import { InboxOutlined } from '@ant-design/icons';
+import axios from 'axios';
+import { useAuth } from '@/context/auth';
 
 interface FieldModalProps {
   onSuccess: () => void;
@@ -29,9 +34,9 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [exportDisabled, setExportDisabled] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [modelId, setModelId] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [modelId, setModelId] = useState<string>('');
     const [fileList, setFileList] = useState<any[]>([]);
     const { t } = useTranslation();
     const { post } = useApiClient();
@@ -60,18 +65,18 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
         setExportDisabled(true);
         const response = await axios({
           url: `/reqApi/api/instance/${modelId}/download_template/`, // 替换为你的导出数据的API端点
-          method: "GET",
-          responseType: "blob", // 确保响应类型为blob
+          method: 'GET',
+          responseType: 'blob', // 确保响应类型为blob
           headers: {
             Authorization: `Bearer ${tokenRef.current}`,
           },
         });
         // 创建一个Blob对象
         const blob = new Blob([response.data], {
-          type: response.headers["content-type"],
+          type: response.headers['content-type'],
         });
         // 创建一个下载链接
-        const link = document.createElement("a");
+        const link = document.createElement('a');
         link.href = URL.createObjectURL(blob);
         link.download = `${modelId}导入模板.xlsx`; // 设置下载文件的名称
         document.body.appendChild(link);
@@ -85,26 +90,26 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
       }
     };
 
-    const handleChange: UploadProps["onChange"] = ({ fileList }) => {
+    const handleChange: UploadProps['onChange'] = ({ fileList }) => {
       setFileList(fileList);
     };
 
     const customRequest = async (options: any) => {
       const { onSuccess } = options;
-      onSuccess("Ok");
+      onSuccess('Ok');
     };
 
     const operateAttr = async () => {
       const fmData = new FormData();
-      fmData.append("file", fileList[0].originFileObj);
+      fmData.append('file', fileList[0].originFileObj);
       try {
         setConfirmLoading(true);
         await post(`/api/instance/${modelId}/inst_import/`, fmData, {
           headers: {
-            "Content-Type": "multipart/form-data",
+            'Content-Type': 'multipart/form-data',
           },
         });
-        message.success("导入成功");
+        message.success('导入成功');
         onSuccess();
         handleCancel();
       } finally {
@@ -131,9 +136,9 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -149,8 +154,8 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
               <p className="ant-upload-drag-icon">
                 <InboxOutlined />
               </p>
-              <p className="ant-upload-text">{t("uploadAction")}</p>
-              <p className="ant-upload-hint">{t("Model.uploadDescription")}</p>
+              <p className="ant-upload-text">{t('uploadAction')}</p>
+              <p className="ant-upload-hint">{t('Model.uploadDescription')}</p>
             </Dragger>
             <Button
               disabled={exportDisabled}
@@ -158,7 +163,7 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
               type="link"
               onClick={exportTemplate}
             >
-              {t("exportTemplate")}
+              {t('exportTemplate')}
             </Button>
           </div>
         </OperateModal>
@@ -166,5 +171,5 @@ const ImportInst = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-ImportInst.displayName = "importInst";
+ImportInst.displayName = 'importInst';
 export default ImportInst;

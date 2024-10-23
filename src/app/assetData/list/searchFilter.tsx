@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Select, Input, Cascader, Checkbox, DatePicker } from "antd";
-import { Organization, AttrFieldType, UserItem } from "@/types/assetManage";
-import searchFilterStyle from "./searchFilter.module.less";
-import { useTranslation } from "@/utils/i18n";
-import type { CheckboxProps } from "antd";
+import React, { useState, useEffect } from 'react';
+import { Select, Input, Cascader, Checkbox, DatePicker } from 'antd';
+import { Organization, AttrFieldType, UserItem } from '@/types/assetManage';
+import searchFilterStyle from './searchFilter.module.less';
+import { useTranslation } from '@/utils/i18n';
+import type { CheckboxProps } from 'antd';
 
 interface SearchFilterProps {
   attrList: AttrFieldType[];
@@ -18,8 +18,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   organizationList,
   onSearch,
 }) => {
-  const [searchAttr, setSearchAttr] = useState<string>("");
-  const [searchValue, setSearchValue] = useState<any>("");
+  const [searchAttr, setSearchAttr] = useState<string>('');
+  const [searchValue, setSearchValue] = useState<any>('');
   const [isExactSearch, setIsExactSearch] = useState<boolean>(false);
   const { t } = useTranslation();
   const { RangePicker } = DatePicker;
@@ -46,24 +46,24 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       condition = null;
     } else {
       switch (selectedAttr?.attr_type) {
-        case "enum":
-          condition.type = typeof value === "number" ? "int=" : "str=";
+        case 'enum':
+          condition.type = typeof value === 'number' ? 'int=' : 'str=';
           break;
-        case "str":
-          condition.type = isExact ? "str=" : "str*";
+        case 'str':
+          condition.type = isExact ? 'str=' : 'str*';
           break;
-        case "user":
-          condition.type = "user[]";
+        case 'user':
+          condition.type = 'user[]';
           condition.value = [value];
           break;
-        case "int":
-          condition.type = "int=";
+        case 'int':
+          condition.type = 'int=';
           condition.value = +condition.value;
           break;
-        case "organization":
-          condition.type = "list[]";
+        case 'organization':
+          condition.type = 'list[]';
           break;
-        case "time":
+        case 'time':
           delete condition.value;
           condition.start = value.at(1);
           condition.end = value.at(-1);
@@ -75,10 +75,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
 
   const onSearchAttrChange = (attr: string) => {
     setSearchAttr(attr);
-    setSearchValue("");
+    setSearchValue('');
   };
 
-  const onExactSearchChange: CheckboxProps["onChange"] = (e) => {
+  const onExactSearchChange: CheckboxProps['onChange'] = (e) => {
     setIsExactSearch(e.target.checked);
     onSearchValueChange(searchValue, e.target.checked);
   };
@@ -86,7 +86,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
   const renderSearchInput = () => {
     const selectedAttr = attrList.find((attr) => attr.attr_id === searchAttr);
     switch (selectedAttr?.attr_type) {
-      case "user":
+      case 'user':
         return (
           <Select
             showSearch
@@ -102,7 +102,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             ))}
           </Select>
         );
-      case "enum":
+      case 'enum':
         return (
           <Select
             className="value"
@@ -117,7 +117,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             ))}
           </Select>
         );
-      case "bool":
+      case 'bool':
         return (
           <Select
             className="value"
@@ -126,8 +126,8 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             onChange={(e) => onSearchValueChange(e, isExactSearch)}
           >
             {[
-              { id: 1, name: "Yes" },
-              { id: 0, name: "No" },
+              { id: 1, name: 'Yes' },
+              { id: 0, name: 'No' },
             ].map((opt) => (
               <Select.Option key={opt.id} value={opt.id}>
                 {opt.name}
@@ -135,7 +135,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             ))}
           </Select>
         );
-      case "organization":
+      case 'organization':
         return (
           <Cascader
             showSearch
@@ -146,10 +146,10 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
             onChange={(e) => onSearchValueChange(e, isExactSearch)}
           />
         );
-      case "time":
+      case 'time':
         return (
           <RangePicker
-            showTime={{ format: "HH:mm" }}
+            showTime={{ format: 'HH:mm' }}
             format="YYYY-MM-DD HH:mm"
             onChange={(value, dateString) => {
               onSearchValueChange(dateString, isExactSearch);
@@ -185,7 +185,7 @@ const SearchFilter: React.FC<SearchFilterProps> = ({
       </Select>
       {renderSearchInput()}
       <Checkbox onChange={onExactSearchChange}>
-        {t("Model.isExactSearch")}
+        {t('Model.isExactSearch')}
       </Checkbox>
     </div>
   );

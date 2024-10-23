@@ -1,8 +1,8 @@
-import React, { useRef } from "react";
-import { Table, TableProps } from "antd";
-import { SettingFilled } from "@ant-design/icons";
-import customTableStyle from "./index.module.less";
-import FieldSettingModal from "./fieldSettingModal";
+import React, { useRef } from 'react';
+import { Table, TableProps } from 'antd';
+import { SettingFilled } from '@ant-design/icons';
+import customTableStyle from './index.module.less';
+import FieldSettingModal from './fieldSettingModal';
 
 interface ColumnItem {
   title: string;
@@ -10,9 +10,9 @@ interface ColumnItem {
   [key: string]: unknown;
 }
 interface CustomTableProps
-  extends Omit<TableProps, "bordered" | "size" | "showSetting"> {
+  extends Omit<TableProps, 'bordered' | 'size' | 'showSetting'> {
   bordered?: boolean;
-  size?: "large" | "middle" | "small";
+  size?: 'large' | 'middle' | 'small';
   fieldSetting?: {
     showSetting: boolean;
     displayFieldKeys: string[];
@@ -28,7 +28,7 @@ interface FieldRef {
 const CustomTable: React.FC<CustomTableProps> = ({
   // 可在此处统一设置表格某属性的默认值，如果传该属性，以传入为准
   bordered = false,
-  size = "large",
+  size = 'large',
   fieldSetting = {
     showSetting: false,
     displayFieldKeys: [],

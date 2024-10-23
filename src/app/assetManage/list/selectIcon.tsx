@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
-import { Button, Tooltip } from "antd";
-import Image from "next/image";
-import OperateModal from "@/components/operate-modal";
-import { iconList } from "@/utils/common";
-import selectIconStyle from "./selectIcon.module.less";
-import { useTranslation } from "@/utils/i18n";
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import { Button, Tooltip } from 'antd';
+import Image from 'next/image';
+import OperateModal from '@/components/operate-modal';
+import { iconList } from '@/utils/common';
+import selectIconStyle from './selectIcon.module.less';
+import { useTranslation } from '@/utils/i18n';
 
 interface SelectIconProps {
   onSelect: (type: string) => void;
@@ -24,8 +24,8 @@ export interface SelectIconRef {
 const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
   ({ onSelect }, ref) => {
     const [visible, setVisible] = useState<boolean>(false);
-    const [title, setTitle] = useState<string>("");
-    const [activeIcon, setActiveIcon] = useState<string>("");
+    const [title, setTitle] = useState<string>('');
+    const [activeIcon, setActiveIcon] = useState<string>('');
     const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
@@ -75,7 +75,7 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
                   className={`${
                     selectIconStyle.modelIcon
                   } w-[50px] h-[50px] flex items-center justify-center ${
-                    activeIcon === item.key ? selectIconStyle.active : ""
+                    activeIcon === item.key ? selectIconStyle.active : ''
                   }`}
                   onClick={() => setActiveIcon(item.key)}
                 >
@@ -83,7 +83,7 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
                     <Image
                       src={require(`../../../../public/assets/assetModelIcon/${item.url}.svg`)}
                       className="block cursor-pointer"
-                      alt={t("picture")}
+                      alt={t('picture')}
                       width={25}
                       height={25}
                     />
@@ -97,5 +97,5 @@ const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
     );
   }
 );
-SelectIcon.displayName = "selectIcon";
+SelectIcon.displayName = 'selectIcon';
 export default SelectIcon;

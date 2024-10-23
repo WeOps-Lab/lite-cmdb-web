@@ -3,5 +3,5 @@ export interface Columns {
   key?: string;
   dataIndex?: string | string[];
   width?: string | number;
-  [key: string]: any
+  [key: string]: any;
 }

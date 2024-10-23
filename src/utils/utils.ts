@@ -10,16 +10,16 @@ declare const require: {
 };
 export function getSvgIcon() {
   const data = require
-    .context("../../public/assets/assetModelIcon", false, /\.svg$/)
+    .context('../../public/assets/assetModelIcon', false, /\.svg$/)
     .keys();
   for (const i in data) {
-    data[i] = data[i].replace(/\.\//g, "").replace(/\.svg/g, "");
+    data[i] = data[i].replace(/\.\//g, '').replace(/\.svg/g, '');
   }
   return data.map((item) => {
     return {
       url: item,
-      key: item.split("_")[0],
-      describe: item.split("_")[1],
+      key: item.split('_')[0],
+      describe: item.split('_')[1],
     };
   });
 }

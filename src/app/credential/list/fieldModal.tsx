@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, forwardRef, useImperativeHandle } from "react";
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import {
   Input,
   Button,
@@ -11,14 +11,14 @@ import {
   Col,
   Row,
   Spin,
-} from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
-import { AttrFieldType, UserItem } from "@/types/assetManage";
-import { deepClone } from "@/utils/common";
-import useApiClient from "@/utils/request";
-import { EditOutlined, CopyOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
+} from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
+import { AttrFieldType, UserItem } from '@/types/assetManage';
+import { deepClone } from '@/utils/common';
+import useApiClient from '@/utils/request';
+import { EditOutlined, CopyOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 interface FieldModalProps {
   onSuccess?: () => void;
   userList: UserItem[];
@@ -48,12 +48,12 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const [formItems, setFormItems] = useState<AttrFieldType[]>([]);
     const [instanceData, setInstanceData] = useState<any>({});
-    const [modelId, setModelId] = useState<string>("");
+    const [modelId, setModelId] = useState<string>('');
     const [form] = Form.useForm();
     const { t } = useTranslation();
     const { post, patch, get } = useApiClient();
@@ -76,15 +76,15 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setFormItems(attrList);
         const processedAttrList = deepClone(attrList);
         const _formInfo = deepClone(formInfo);
-        if (["detail", "edit"].includes(type)) {
+        if (['detail', 'edit'].includes(type)) {
           for (const key in _formInfo) {
             const target = attrList.find((item) => item.attr_id === key);
             if (
-              target?.attr_type === "time" &&
+              target?.attr_type === 'time' &&
               _formInfo[key].every((item: string) => !!item)
             ) {
               _formInfo[key] = _formInfo[key].map((date: string) =>
-                dayjs(date, "YYYY-MM-DD HH:mm:ss")
+                dayjs(date, 'YYYY-MM-DD HH:mm:ss')
               );
             }
           }
@@ -103,9 +103,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       form.validateFields().then((values) => {
         for (const key in values) {
           const target = formItems.find((item) => item.attr_id === key);
-          if (target?.attr_type === "time") {
+          if (target?.attr_type === 'time') {
             values[key] = values[key].map((date: any) =>
-              date.format("YYYY-MM-DD HH:mm:ss")
+              date.format('YYYY-MM-DD HH:mm:ss')
             );
           }
         }
@@ -133,10 +133,10 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setConfirmLoading(true);
         const formData = deepClone(params);
         const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
+          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
         );
         const url: string =
-          type === "add"
+          type === 'add'
             ? `/api/credential/`
             : `/api/credential/${instanceData._id}/`;
         let requestParams: RequestParams = {
@@ -144,7 +144,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           data: formData,
         };
         let requestType = post;
-        if (type === "edit") {
+        if (type === 'edit') {
           requestType = patch;
           requestParams = formData;
         }
@@ -173,7 +173,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           if (items[i].attr_id === targetItem.attr_id) {
             items[i].isEdit = true;
             // 清空对应的表单项的值
-            form.setFieldsValue({ [targetItem.attr_id]: "" });
+            form.setFieldsValue({ [targetItem.attr_id]: '' });
             return true;
           } else if (items[i].children?.length) {
             if (updateField(items[i].children || [], targetItem)) {
@@ -197,14 +197,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         params
       );
       navigator.clipboard.writeText(responseData);
-      message.success(t("successfulCopied"));
+      message.success(t('successfulCopied'));
     };
 
     const renderFormItem = (item: AttrFieldType) => {
       switch (item.attr_type) {
-        case "user":
+        case 'user':
           return (
-            <Select disabled={!item.editable || type === "detail"}>
+            <Select disabled={!item.editable || type === 'detail'}>
               {userList.map((opt) => (
                 <Select.Option key={opt.id} value={opt.id}>
                   {opt.username}
@@ -212,10 +212,10 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
               ))}
             </Select>
           );
-        case "enum":
+        case 'enum':
           return (
             <Select
-              disabled={!item.editable || type === "detail"}
+              disabled={!item.editable || type === 'detail'}
               onChange={(value) => handleEnumChange(item, value)}
             >
               {item.option.map((opt) => (
@@ -225,12 +225,12 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
               ))}
             </Select>
           );
-        case "bool":
+        case 'bool':
           return (
-            <Select disabled={!item.editable || type === "detail"}>
+            <Select disabled={!item.editable || type === 'detail'}>
               {[
-                { id: 1, name: "Yes" },
-                { id: 0, name: "No" },
+                { id: 1, name: 'Yes' },
+                { id: 0, name: 'No' },
               ].map((opt) => (
                 <Select.Option key={opt.id} value={opt.id}>
                   {opt.name}
@@ -238,26 +238,26 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
               ))}
             </Select>
           );
-        case "time":
+        case 'time':
           return (
             <RangePicker
-              disabled={!item.editable || type === "detail"}
+              disabled={!item.editable || type === 'detail'}
               showTime
               format="YYYY-MM-DD HH:mm:ss"
             />
           );
-        case "pwd":
+        case 'pwd':
           return (
             <div className="flex items-center">
               <Form.Item name={item.attr_id} className="mb-[0px] w-full">
                 <Input.Password
                   visibilityToggle={false}
-                  disabled={type !== "add" && (!item.editable || !item.isEdit)}
+                  disabled={type !== 'add' && (!item.editable || !item.isEdit)}
                 />
               </Form.Item>
-              {!item.isEdit && type !== "add" && (
+              {!item.isEdit && type !== 'add' && (
                 <>
-                  {type !== "detail" && (
+                  {type !== 'detail' && (
                     <EditOutlined
                       className="pl-[6px] text-[var(--color-primary)] cursor-pointer"
                       onClick={() => editPassword(item)}
@@ -274,7 +274,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         default:
           return (
             <Input
-              disabled={(!item.editable && type !== "add") || type === "detail"}
+              disabled={(!item.editable && type !== 'add') || type === 'detail'}
             />
           );
       }
@@ -340,7 +340,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 rules={[
                   {
                     required: item.is_required,
-                    message: t("required"),
+                    message: t('required'),
                   },
                 ]}
               >
@@ -363,7 +363,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              {type !== "detail" && (
+              {type !== 'detail' && (
                 <Button
                   className="mr-[10px]"
                   type="primary"
@@ -371,10 +371,10 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                   disabled={loading}
                   onClick={handleSubmit}
                 >
-                  {t("confirm")}
+                  {t('confirm')}
                 </Button>
               )}
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -388,5 +388,5 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-FieldMoadal.displayName = "fieldMoadal";
+FieldMoadal.displayName = 'fieldMoadal';
 export default FieldMoadal;

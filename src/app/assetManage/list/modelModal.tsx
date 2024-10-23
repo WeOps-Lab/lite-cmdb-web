@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useState,
@@ -6,18 +6,18 @@ import React, {
   useRef,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { Input, Button, Form, message, Select } from "antd";
-import Image from "next/image";
-import OperateModal from "@/components/operate-modal";
-import SelectIcon from "./selectIcon";
-import { getIconUrl } from "@/utils/common";
-import type { FormInstance } from "antd";
-import useApiClient from "@/utils/request";
-import { ModelItem, ModelConfig } from "@/types/assetManage";
-import { deepClone } from "@/utils/common";
+} from 'react';
+import { Input, Button, Form, message, Select } from 'antd';
+import Image from 'next/image';
+import OperateModal from '@/components/operate-modal';
+import SelectIcon from './selectIcon';
+import { getIconUrl } from '@/utils/common';
+import type { FormInstance } from 'antd';
+import useApiClient from '@/utils/request';
+import { ModelItem, ModelConfig } from '@/types/assetManage';
+import { deepClone } from '@/utils/common';
 const { Option } = Select;
-import { useTranslation } from "@/utils/i18n";
+import { useTranslation } from '@/utils/i18n';
 
 interface ModelModalProps {
   onSuccess: (info?: unknown) => void;
@@ -31,13 +31,13 @@ export interface ModelModalRef {
 const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
   ({ onSuccess, groupList }, ref) => {
     const [modelVisible, setModelVisible] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [modelInfo, setModelInfo] = useState<any>({});
-    const [modelIcon, setModelIcon] = useState<any>("");
-    const [iconId, setIconId] = useState<any>("");
+    const [modelIcon, setModelIcon] = useState<any>('');
+    const [iconId, setIconId] = useState<any>('');
     const formRef = useRef<FormInstance>(null);
     const selectIconRef = useRef<any>(null);
     const { post, put } = useApiClient();
@@ -57,12 +57,12 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
-        let icon = getIconUrl({ model_id: "", icn: "" });
-        if (type === "edit") {
+        let icon = getIconUrl({ model_id: '', icn: '' });
+        if (type === 'edit') {
           icon = getIconUrl(modelForm);
         }
         setModelIcon(icon);
-        setIconId(modelForm.icn || "icon-cc-host");
+        setIconId(modelForm.icn || 'icon-cc-host');
         setModelInfo(modelForm);
       },
     }));
@@ -71,19 +71,19 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
       try {
         setConfirmLoading(true);
         const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
+          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
         );
         const url: string =
-          type === "add" ? "/api/model/" : `/api/model/${modelInfo.model_id}/`;
+          type === 'add' ? '/api/model/' : `/api/model/${modelInfo.model_id}/`;
         let requestParams = deepClone(params);
-        if (type !== "add") {
+        if (type !== 'add') {
           requestParams = {
             classification_id: params.classification_id,
             model_name: params.model_name,
             icn: params.icn,
           };
         }
-        const requestType = type === "add" ? post : put;
+        const requestType = type === 'add' ? post : put;
         await requestType(url, requestParams);
         message.success(msg);
         handleCancel();
@@ -109,8 +109,8 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     };
 
     const onConfirmSelectIcon = (icon: string) => {
-      const objId = icon.replace("cc-", "");
-      const _iconId = "icon-" + icon;
+      const objId = icon.replace('cc-', '');
+      const _iconId = 'icon-' + icon;
       setModelIcon(
         getIconUrl({
           icn: _iconId,
@@ -122,7 +122,7 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
 
     const onSelectIcon = () => {
       selectIconRef.current?.showModal({
-        title: t("Model.selectIcon"),
+        title: t('Model.selectIcon'),
         defaultIcon: iconId,
       });
     };
@@ -142,9 +142,9 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -156,13 +156,13 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
               <Image
                 src={modelIcon}
                 className="block w-auto h-10"
-                alt={t("picture")}
+                alt={t('picture')}
                 width={60}
                 height={60}
               />
             </div>
             <span className="text-[var(--color-text-3)] mt-[10px] mb-[20px]">
-              {t("Model.selectIcon")}
+              {t('Model.selectIcon')}
             </span>
           </div>
           <Form
@@ -172,12 +172,12 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
             wrapperCol={{ span: 20 }}
           >
             <Form.Item<ModelItem>
-              label={t("group")}
+              label={t('group')}
               name="classification_id"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Select
-                disabled={type === "edit"}
+                disabled={type === 'edit'}
                 placeholder="Please select a country"
               >
                 {groupList.map((item) => {
@@ -193,16 +193,16 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
               </Select>
             </Form.Item>
             <Form.Item<ModelItem>
-              label={t("id")}
+              label={t('id')}
               name="model_id"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
-              <Input disabled={type === "edit"} />
+              <Input disabled={type === 'edit'} />
             </Form.Item>
             <Form.Item<ModelItem>
-              label={t("name")}
+              label={t('name')}
               name="model_name"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Input />
             </Form.Item>
@@ -216,5 +216,5 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     );
   }
 );
-ModelModal.displayName = "ModelModal";
+ModelModal.displayName = 'ModelModal';
 export default ModelModal;

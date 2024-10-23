@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import { Card } from "antd";
-import introductionStyle from "./index.module.less";
+import React from 'react';
+import { Card } from 'antd';
+import introductionStyle from './index.module.less';
 
 interface IntroductionProp {
   message: string;
@@ -13,7 +13,7 @@ const Introduction: React.FC<IntroductionProp> = ({ message, title }) => (
   <Card
     bordered={false}
     className={`${introductionStyle.introduction} mb-[16px]`}
-    style={{ width: "100%", minWidth: "800px" }}
+    style={{ width: '100%', minWidth: '800px' }}
   >
     <p className="font-extrabold text-base">{title}</p>
     <p className={`text-sm mt-[10px] sub-name ${introductionStyle.subName}`}>

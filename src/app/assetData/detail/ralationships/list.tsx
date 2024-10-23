@@ -1,12 +1,12 @@
-"use client";
+'use client';
 import React, {
   useEffect,
   useState,
   useRef,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { useSearchParams } from "next/navigation";
+} from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   CrentialsAssoInstItem,
   CrentialsAssoDetailItem,
@@ -17,15 +17,15 @@ import {
   AssoListRef,
   RelationListInstItem,
   RelationInstanceRef,
-} from "@/types/assetManage";
-import { getAssetColumns } from "@/utils/common";
-import CustomTable from "@/components/custom-table";
-import { Spin, Collapse, Button, Modal, message } from "antd";
-import useApiClient from "@/utils/request";
-import { CaretRightOutlined } from "@ant-design/icons";
-import assoListStyle from "./index.module.less";
-import { useTranslation } from "@/utils/i18n";
-import SelectInstance from "./selectInstance";
+} from '@/types/assetManage';
+import { getAssetColumns } from '@/utils/common';
+import CustomTable from '@/components/custom-table';
+import { Spin, Collapse, Button, Modal, message } from 'antd';
+import useApiClient from '@/utils/request';
+import { CaretRightOutlined } from '@ant-design/icons';
+import assoListStyle from './index.module.less';
+import { useTranslation } from '@/utils/i18n';
+import SelectInstance from './selectInstance';
 const { confirm } = Modal;
 
 interface AssoListProps {
@@ -47,8 +47,8 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
     const [pageLoading, setPageLoading] = useState<boolean>(false);
     const searchParams = useSearchParams();
     const { get, del } = useApiClient();
-    const modelId: string = searchParams.get("model_id") || "";
-    const instId: string = searchParams.get("inst_id") || "";
+    const modelId: string = searchParams.get('model_id') || '';
+    const instId: string = searchParams.get('inst_id') || '';
     const instanceRef = useRef<RelationInstanceRef>(null);
 
     useEffect(() => {
@@ -68,7 +68,7 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
       },
       showRelateModal: () => {
         instanceRef.current?.showModal({
-          title: t("Model.AssociationManagement"),
+          title: t('Model.AssociationManagement'),
           model_id: modelId,
           list: instIds,
           instId,
@@ -80,15 +80,15 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
       const linkModelId =
         item.src_model_id === modelId ? item.dst_model_id : item.src_model_id;
       const params: any = {
-        icn: "",
+        icn: '',
         model_name: showModelName(linkModelId, modelList),
         model_id: linkModelId,
-        classification_id: "",
+        classification_id: '',
         inst_id: row._id,
       };
       const queryString = new URLSearchParams(params).toString();
       const url = `/assetData/detail/baseInfo?${queryString}`;
-      window.open(url, "_blank", "noopener,noreferrer");
+      window.open(url, '_blank', 'noopener,noreferrer');
     };
 
     const getInitData = async () => {
@@ -144,23 +144,23 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
           t,
         }),
         {
-          title: t("action"),
-          dataIndex: "action",
-          key: "action",
-          fixed: "right",
+          title: t('action'),
+          dataIndex: 'action',
+          key: 'action',
+          fixed: 'right',
           width: 120,
           render: (_: unknown, record: any) => (
             <Button
               type="link"
               onClick={() => cancelRelate(record.inst_asst_id)}
             >
-              {t("Model.disassociation")}
+              {t('Model.disassociation')}
             </Button>
           ),
         },
       ];
       if (columns[0]) {
-        columns[0].fixed = "left";
+        columns[0].fixed = 'left';
         columns[0].render = (_: unknown, record: any) => (
           <a
             className="text-[var(--color-primary)]"
@@ -180,7 +180,7 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
               pagination={false}
               dataSource={item.inst_list}
               columns={columns}
-              scroll={{ x: "calc(100vw - 306px)", y: 300 }}
+              scroll={{ x: 'calc(100vw - 306px)', y: 300 }}
               rowKey="_id"
             />
           ),
@@ -196,14 +196,14 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
 
     const cancelRelate = async (id: unknown) => {
       confirm({
-        title: t("disassociationTitle"),
-        content: t("deleteContent"),
+        title: t('disassociationTitle'),
+        content: t('deleteContent'),
         centered: true,
         onOk() {
           return new Promise(async (resolve) => {
             try {
               await del(`/api/instance/association/${id}/`);
-              message.success(t("successfullyDisassociated"));
+              message.success(t('successfullyDisassociated'));
               getInitData();
             } finally {
               resolve(true);
@@ -221,11 +221,11 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
     };
 
     const showModelName = (id: string, list: ModelItem[]) => {
-      return list.find((item) => item.model_id === id)?.model_name || "--";
+      return list.find((item) => item.model_id === id)?.model_name || '--';
     };
     const showConnectType = (id: string, assoTypeList: AssoTypeItem[]) => {
       return (
-        assoTypeList.find((item) => item.asst_id === id)?.asst_name || "--"
+        assoTypeList.find((item) => item.asst_id === id)?.asst_name || '--'
       );
     };
 
@@ -270,5 +270,5 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
     );
   }
 );
-AssoList.displayName = "assoList";
+AssoList.displayName = 'assoList';
 export default AssoList;

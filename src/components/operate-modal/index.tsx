@@ -1,9 +1,9 @@
-import React from "react";
-import { Modal, ModalProps } from "antd";
-import customModalStyle from "./index.module.less";
+import React from 'react';
+import { Modal, ModalProps } from 'antd';
+import customModalStyle from './index.module.less';
 
 interface CustomModalProps
-  extends Omit<ModalProps, "title" | "footer" | "centered" | "subTitle"> {
+  extends Omit<ModalProps, 'title' | 'footer' | 'centered' | 'subTitle'> {
   title?: React.ReactNode;
   footer?: React.ReactNode;
   subTitle?: string;
@@ -14,7 +14,7 @@ const OperateModal: React.FC<CustomModalProps> = ({
   title,
   footer,
   centered = true,
-  subTitle = "",
+  subTitle = '',
   ...modalProps
 }) => {
   return (
@@ -32,12 +32,12 @@ const OperateModal: React.FC<CustomModalProps> = ({
           {subTitle && (
             <span
               style={{
-                color: "var(--color-text-3)",
-                fontSize: "12px",
-                fontWeight: "normal",
+                color: 'var(--color-text-3)',
+                fontSize: '12px',
+                fontWeight: 'normal',
               }}
             >
-              {" "}
+              {' '}
               - {subTitle}
             </span>
           )}

@@ -1,40 +1,40 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from "react";
-import { Spin } from "antd";
-import WithSideMenuLayout from "@/components/sub-layout";
-import { useRouter } from "next/navigation";
-import { getIconUrl } from "@/utils/common";
-import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import attrLayoutStyle from "./layout.module.less";
-import useApiClient from "@/utils/request";
-import { ClassificationItem } from "@/types/assetManage";
-import { useTranslation } from "@/utils/i18n";
+import React, { useState, useEffect } from 'react';
+import { Spin } from 'antd';
+import WithSideMenuLayout from '@/components/sub-layout';
+import { useRouter } from 'next/navigation';
+import { getIconUrl } from '@/utils/common';
+import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
+import attrLayoutStyle from './layout.module.less';
+import useApiClient from '@/utils/request';
+import { ClassificationItem } from '@/types/assetManage';
+import { useTranslation } from '@/utils/i18n';
 
 const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [groupList, setGroupList] = useState<ClassificationItem[]>([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const objIcon: string = searchParams.get("icn") || "";
-  const modelName: string = searchParams.get("model_name") || "";
-  const modelId: string = searchParams.get("model_id") || "";
+  const objIcon: string = searchParams.get('icn') || '';
+  const modelName: string = searchParams.get('model_name') || '';
+  const modelId: string = searchParams.get('model_id') || '';
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const menuItems = [
-    { label: t("Model.baseInfo"), path: "/assetData/detail/baseInfo" },
+    { label: t('Model.baseInfo'), path: '/assetData/detail/baseInfo' },
     {
-      label: t("Model.relationships"),
-      path: "/assetData/detail/ralationships",
+      label: t('Model.relationships'),
+      path: '/assetData/detail/ralationships',
     },
     {
-      label: t("Model.changeRecords"),
-      path: "/assetData/detail/changeRecords",
+      label: t('Model.changeRecords'),
+      path: '/assetData/detail/changeRecords',
     },
     {
-      label: t("Model.credentialManagement"),
-      path: "/assetData/detail/credentials",
+      label: t('Model.credentialManagement'),
+      path: '/assetData/detail/credentials',
     },
   ];
 
@@ -46,7 +46,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const getGroups = async () => {
     setPageLoading(true);
     try {
-      const data = await get("/api/classification/");
+      const data = await get('/api/classification/');
       setGroupList(data);
     } catch (error) {
       console.log(error);
@@ -65,7 +65,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       <Image
         src={getIconUrl({ icn: objIcon, model_id: modelId })}
         className="block mr-[10px]"
-        alt={t("picture")}
+        alt={t('picture')}
         width={30}
         height={30}
       />

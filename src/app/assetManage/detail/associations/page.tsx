@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { Input, Button, Modal, message } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import CustomTable from "@/components/custom-table";
-import AssociationsModal from "./associationsModal";
-import { Tag } from "antd";
-import type { TableColumnsType } from "antd";
-import { CONSTRAINT_List } from "@/constants/asset";
-import useApiClient from "@/utils/request";
-import { ModelItem, AssoTypeItem, GroupItem } from "@/types/assetManage";
-import { useSearchParams } from "next/navigation";
-import { useTranslation } from "@/utils/i18n";
-import { deepClone } from "@/utils/common";
+import React, { useState, useEffect, useRef } from 'react';
+import { Input, Button, Modal, message } from 'antd';
+import { PlusOutlined } from '@ant-design/icons';
+import CustomTable from '@/components/custom-table';
+import AssociationsModal from './associationsModal';
+import { Tag } from 'antd';
+import type { TableColumnsType } from 'antd';
+import { CONSTRAINT_List } from '@/constants/asset';
+import useApiClient from '@/utils/request';
+import { ModelItem, AssoTypeItem, GroupItem } from '@/types/assetManage';
+import { useSearchParams } from 'next/navigation';
+import { useTranslation } from '@/utils/i18n';
+import { deepClone } from '@/utils/common';
 const { confirm } = Modal;
 
 const Associations = () => {
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
   const [pagination, setPagination] = useState<any>({
     current: 1,
     total: 0,
@@ -30,26 +30,26 @@ const Associations = () => {
   const assoRef = useRef<any>(null);
   const { get, del } = useApiClient();
   const searchParams = useSearchParams();
-  const modelId = searchParams.get("model_id");
+  const modelId = searchParams.get('model_id');
   const { t } = useTranslation();
   const columns: TableColumnsType<any> = [
     {
-      title: t("name"),
-      dataIndex: "model_asst_id",
-      key: "model_asst_id",
+      title: t('name'),
+      dataIndex: 'model_asst_id',
+      key: 'model_asst_id',
       ellipsis: {
         showTitle: false,
       },
       render: (_, record) => {
         const assoName = `${showModelName(record.src_model_id)}_${
           assoTypeList.find((item) => item.asst_id === record.asst_id)
-            ?.asst_name || "--"
+            ?.asst_name || '--'
         }_${showModelName(record.dst_model_id)}`;
         return (
           <a
             title={assoName}
             onClick={() =>
-              showAssoModal("edit", {
+              showAssoModal('edit', {
                 ...record,
                 subTitle: assoName,
               })
@@ -61,36 +61,36 @@ const Associations = () => {
       },
     },
     {
-      title: t("Model.sourceModel"),
-      dataIndex: "src_model_id",
-      key: "src_model_id",
+      title: t('Model.sourceModel'),
+      dataIndex: 'src_model_id',
+      key: 'src_model_id',
       render: (_, { src_model_id }) => <>{showModelName(src_model_id)}</>,
     },
     {
-      title: t("Model.targetModel"),
-      dataIndex: "dst_model_id",
-      key: "dst_model_id",
+      title: t('Model.targetModel'),
+      dataIndex: 'dst_model_id',
+      key: 'dst_model_id',
       render: (_, { dst_model_id }) => <>{showModelName(dst_model_id)}</>,
     },
     {
-      title: t("Model.constraint"),
-      dataIndex: "mapping",
-      key: "mapping",
+      title: t('Model.constraint'),
+      dataIndex: 'mapping',
+      key: 'mapping',
       render: (_, { mapping }) => (
-        <>{CONSTRAINT_List.find((item) => item.id === mapping)?.name || "--"}</>
+        <>{CONSTRAINT_List.find((item) => item.id === mapping)?.name || '--'}</>
       ),
     },
     {
-      title: t("type"),
-      key: "asst_id",
-      dataIndex: "asst_id",
+      title: t('type'),
+      key: 'asst_id',
+      dataIndex: 'asst_id',
       render: (_, { asst_id }) => {
         return (
           <>
             {
               <Tag color="green">
                 {assoTypeList.find((item) => item.asst_id === asst_id)
-                  ?.asst_name || "--"}
+                  ?.asst_name || '--'}
               </Tag>
             }
           </>
@@ -98,15 +98,15 @@ const Associations = () => {
       },
     },
     {
-      title: t("action"),
-      key: "action",
+      title: t('action'),
+      key: 'action',
       render: (_, record) => (
         <>
           <Button
             type="link"
             onClick={() => showDeleteConfirm(record.model_asst_id)}
           >
-            {t("delete")}
+            {t('delete')}
           </Button>
         </>
       ),
@@ -117,11 +117,11 @@ const Associations = () => {
     getInitData();
   }, [pagination?.current, pagination?.pageSize]);
 
-  const showAssoModal = (type: string, row = { subTitle: "" }) => {
+  const showAssoModal = (type: string, row = { subTitle: '' }) => {
     const title = t(
-      type === "add" ? "Model.addAssociations" : "Model.checkAssociations"
+      type === 'add' ? 'Model.addAssociations' : 'Model.checkAssociations'
     );
-    const assorow = type === "add" ? { src_model_id: modelId } : row;
+    const assorow = type === 'add' ? { src_model_id: modelId } : row;
     const subTitle = row.subTitle;
     assoRef.current?.showModal({
       title,
@@ -132,19 +132,19 @@ const Associations = () => {
   };
 
   const showModelName = (id: string) => {
-    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+    return modelList.find((item) => item.model_id === id)?.model_name || '--';
   };
 
   const showDeleteConfirm = (id: string) => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
           try {
             await del(`/api/model/association/${id}/`);
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
@@ -200,10 +200,10 @@ const Associations = () => {
   };
 
   const getInitData = () => {
-    const getAssoTypeList = get("/api/model/model_association_type/");
-    const getModelList = get("/api/model/");
+    const getAssoTypeList = get('/api/model/model_association_type/');
+    const getModelList = get('/api/model/');
     const fetchAssoData = get(`/api/model/${modelId}/association/`);
-    const getCroupList = get("/api/classification/");
+    const getCroupList = get('/api/classification/');
     setLoading(true);
     Promise.all([getModelList, getAssoTypeList, fetchAssoData, getCroupList])
       .then((res) => {
@@ -242,7 +242,7 @@ const Associations = () => {
         <div className="nav-box flex justify-end mb-[10px]">
           <div className="left-side w-[240px] mr-[8px]">
             <Input
-              placeholder={t("search")}
+              placeholder={t('search')}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -255,14 +255,14 @@ const Associations = () => {
               type="primary"
               className="mr-[8px]"
               icon={<PlusOutlined />}
-              onClick={() => showAssoModal("add")}
+              onClick={() => showAssoModal('add')}
             >
-              {t("add")}
+              {t('add')}
             </Button>
           </div>
         </div>
         <CustomTable
-          scroll={{ y: "calc(100vh - 390px)" }}
+          scroll={{ y: 'calc(100vh - 390px)' }}
           columns={columns}
           dataSource={tableData}
           pagination={pagination}

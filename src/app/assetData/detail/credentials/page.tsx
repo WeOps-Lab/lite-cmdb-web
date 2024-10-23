@@ -1,23 +1,23 @@
-"use client";
-import React, { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
+'use client';
+import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import {
   AttrFieldType,
   CrentialsAssoInstItem,
   CrentialsAssoDetailItem,
   UserItem,
   Organization,
-} from "@/types/assetManage";
-import { getAssetColumns, findAndFlattenAttrs } from "@/utils/common";
-import CustomTable from "@/components/custom-table";
-import { Spin, Collapse } from "antd";
-import useApiClient from "@/utils/request";
-import { useCommon } from "@/context/common";
-import { CaretRightOutlined } from "@ant-design/icons";
-import credentialsStyle from "./index.module.less";
-import { useTranslation } from "@/utils/i18n";
-import FieldModal from "@/app/credential/list/fieldModal";
-import { CREDENTIAL_LIST } from "@/constants/asset";
+} from '@/types/assetManage';
+import { getAssetColumns, findAndFlattenAttrs } from '@/utils/common';
+import CustomTable from '@/components/custom-table';
+import { Spin, Collapse } from 'antd';
+import useApiClient from '@/utils/request';
+import { useCommon } from '@/context/common';
+import { CaretRightOutlined } from '@ant-design/icons';
+import credentialsStyle from './index.module.less';
+import { useTranslation } from '@/utils/i18n';
+import FieldModal from '@/app/credential/list/fieldModal';
+import { CREDENTIAL_LIST } from '@/constants/asset';
 
 interface FieldRef {
   showModal: (config: FieldConfig) => void;
@@ -42,8 +42,8 @@ const Credentials = () => {
   const fieldRef = useRef<FieldRef>(null);
   const userList: UserItem[] = users.current;
   const searchParams = useSearchParams();
-  const modelId: string = searchParams.get("model_id") || "";
-  const instId: string = searchParams.get("inst_id") || "";
+  const modelId: string = searchParams.get('model_id') || '';
+  const instId: string = searchParams.get('inst_id') || '';
   const [activeKey, setActiveKey] = useState<string[]>([]);
   const [assoCredentials, setAssoCredentials] = useState<
     CrentialsAssoInstItem[]
@@ -61,11 +61,11 @@ const Credentials = () => {
     properties: AttrFieldType[]
   ) => {
     fieldRef.current?.showModal({
-      title: "Detail",
+      title: 'Detail',
       type,
       attrList: properties,
       formInfo: row,
-      subTitle: "",
+      subTitle: '',
       model_id: modelId,
       list: [],
     });
@@ -111,12 +111,12 @@ const Credentials = () => {
           t,
         });
         if (columns[0]) {
-          columns[0].fixed = "left";
+          columns[0].fixed = 'left';
           columns[0].render = (_: unknown, record: any) => (
             <a
               className="text-[var(--color-primary)]"
               onClick={() =>
-                showAttrModal("detail", record, getFiledAttrs(item.key))
+                showAttrModal('detail', record, getFiledAttrs(item.key))
               }
             >
               {record[columns[0].dataIndex]}
@@ -130,7 +130,7 @@ const Credentials = () => {
               pagination={false}
               dataSource={item.inst_list}
               columns={columns}
-              scroll={{ x: "calc(100vw - 300px)" }}
+              scroll={{ x: 'calc(100vw - 300px)' }}
               rowKey="_id"
             />
           ),
@@ -143,11 +143,11 @@ const Credentials = () => {
   };
 
   const showCredentialName = (id: string) => {
-    let name = "--";
+    let name = '--';
     CREDENTIAL_LIST.forEach((item) => {
       const target = item.list.find((tex) => tex.model_id === id);
       if (target) {
-        name = target.model_name || "--";
+        name = target.model_name || '--';
       }
     });
     return name;

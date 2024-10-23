@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Button,
   Space,
@@ -11,16 +11,16 @@ import {
   Spin,
   TablePaginationConfig,
   Input,
-} from "antd";
-import CustomTable from "@/components/custom-table";
-import { PlusOutlined } from "@ant-design/icons";
-import type { RadioChangeEvent } from "antd";
-import assetDataStyle from "./index.module.less";
-import FieldModal from "./list/fieldModal";
-import SelectInstance from "./list/selectInstance";
-import { useTranslation } from "@/utils/i18n";
-import useApiClient from "@/utils/request";
-import { useCommon } from "@/context/common";
+} from 'antd';
+import CustomTable from '@/components/custom-table';
+import { PlusOutlined } from '@ant-design/icons';
+import type { RadioChangeEvent } from 'antd';
+import assetDataStyle from './index.module.less';
+import FieldModal from './list/fieldModal';
+import SelectInstance from './list/selectInstance';
+import { useTranslation } from '@/utils/i18n';
+import useApiClient from '@/utils/request';
+import { useCommon } from '@/context/common';
 const { confirm } = Modal;
 import {
   ColumnItem,
@@ -28,8 +28,8 @@ import {
   AttrFieldType,
   Organization,
   ModelItem,
-} from "@/types/assetManage";
-import { CREDENTIAL_LIST } from "@/constants/asset";
+} from '@/types/assetManage';
+import { CREDENTIAL_LIST } from '@/constants/asset';
 
 interface ModelTabs {
   key: string;
@@ -65,8 +65,8 @@ const Credential = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [tableLoading, setTableLoading] = useState<boolean>(false);
-  const [groupId, setGroupId] = useState<string>("");
-  const [modelId, setModelId] = useState<string>("");
+  const [groupId, setGroupId] = useState<string>('');
+  const [modelId, setModelId] = useState<string>('');
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
   const [tableData, setTableData] = useState<any[]>([]);
@@ -77,45 +77,45 @@ const Credential = () => {
     total: 0,
     pageSize: 20,
   });
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
   const currentColumns: ColumnItem[] = [
     {
-      title: t("name"),
-      key: "name",
-      dataIndex: "name",
+      title: t('name'),
+      key: 'name',
+      dataIndex: 'name',
     },
     {
-      title: t("creator"),
-      key: "_creator",
-      dataIndex: "_creator",
+      title: t('creator'),
+      key: '_creator',
+      dataIndex: '_creator',
     },
     {
-      title: t("updateTime"),
-      key: "update_time",
-      dataIndex: "update_time",
+      title: t('updateTime'),
+      key: 'update_time',
+      dataIndex: 'update_time',
     },
     {
-      title: t("action"),
-      key: "action",
-      dataIndex: "action",
+      title: t('action'),
+      key: 'action',
+      dataIndex: 'action',
       render: (_: unknown, record: any) => (
         <>
           <Button
             type="link"
             className="mr-[10px]"
-            onClick={() => showAttrModal("edit", record)}
+            onClick={() => showAttrModal('edit', record)}
           >
-            {t("edit")}
+            {t('edit')}
           </Button>
           <Button
             type="link"
             className="mr-[10px]"
             onClick={() => showSelectInstanceModal(record)}
           >
-            {t("Model.association")}
+            {t('Model.association')}
           </Button>
           <Button type="link" onClick={() => showDeleteConfirm(record)}>
-            {t("delete")}
+            {t('delete')}
           </Button>
         </>
       ),
@@ -203,10 +203,10 @@ const Credential = () => {
     setModelId(defaultModelId);
     const params = getTableParams();
     params.credential_type = defaultModelId;
-    const getCredentialList = get("/api/credential/", {
+    const getCredentialList = get('/api/credential/', {
       params,
     });
-    const getModelList = get("/api/model/");
+    const getModelList = get('/api/model/');
     setLoading(true);
     try {
       Promise.all([getCredentialList, getModelList])
@@ -279,11 +279,11 @@ const Credential = () => {
 
   const showDeleteConfirm = (row: any) => {
     const params = {
-      ids: Array.isArray(row) ? row.join(",") : row._id,
+      ids: Array.isArray(row) ? row.join(',') : row._id,
     };
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
@@ -291,7 +291,7 @@ const Credential = () => {
             await del(`/api/credential/batch_delete/`, {
               params,
             });
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             if (pagination?.current) {
               pagination.current > 1 &&
                 tableData.length === 1 &&
@@ -312,13 +312,13 @@ const Credential = () => {
   };
 
   const showAttrModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add" : "Edit";
+    const title = type === 'add' ? 'Add' : 'Edit';
     fieldRef.current?.showModal({
       title,
       type,
       attrList: propertyList,
       formInfo: row,
-      subTitle: "",
+      subTitle: '',
       model_id: modelId,
       list: selectedRowKeys,
     });
@@ -326,11 +326,11 @@ const Credential = () => {
 
   const showSelectInstanceModal = (row = {}) => {
     selectInstanceRef.current?.showModal({
-      title: t("Model.selectInstance"),
-      type: "",
+      title: t('Model.selectInstance'),
+      type: '',
       attrList: propertyList,
       formInfo: row,
-      subTitle: "",
+      subTitle: '',
       model_id: modelId,
       list: selectedRowKeys,
     });
@@ -368,9 +368,9 @@ const Credential = () => {
           <div className="flex justify-between mb-4">
             <Input
               style={{
-                width: "240px",
+                width: '240px',
               }}
-              placeholder={t("search")}
+              placeholder={t('search')}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -381,15 +381,15 @@ const Credential = () => {
               <Button
                 icon={<PlusOutlined />}
                 type="primary"
-                onClick={() => showAttrModal("add")}
+                onClick={() => showAttrModal('add')}
               >
-                {t("add")}
+                {t('add')}
               </Button>
               <Button
                 onClick={() => showDeleteConfirm(selectedRowKeys)}
                 disabled={!selectedRowKeys.length}
               >
-                {t("delete")}
+                {t('delete')}
               </Button>
             </Space>
           </div>

@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import React, {
   useState,
   forwardRef,
   useImperativeHandle,
   useEffect,
-} from "react";
+} from 'react';
 import {
   Select,
   Button,
@@ -13,9 +13,9 @@ import {
   TablePaginationConfig,
   Spin,
   Modal,
-} from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
+} from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
 import {
   AttrFieldType,
   UserItem,
@@ -28,11 +28,11 @@ import {
   RelationListInstItem,
   CrentialsAssoInstItem,
   RelationInstanceRef,
-} from "@/types/assetManage";
-import { getAssetColumns } from "@/utils/common";
-import useApiClient from "@/utils/request";
-import SearchFilter from "@/app/assetData/list/searchFilter";
-import CustomTable from "@/components/custom-table";
+} from '@/types/assetManage';
+import { getAssetColumns } from '@/utils/common';
+import useApiClient from '@/utils/request';
+import SearchFilter from '@/app/assetData/list/searchFilter';
+import CustomTable from '@/components/custom-table';
 const { Option } = Select;
 const { confirm } = Modal;
 
@@ -64,10 +64,10 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
       total: 0,
       pageSize: 20,
     });
-    const [title, setTitle] = useState<string>("");
-    const [assoModelId, setAssoModelId] = useState<string>("");
-    const [instId, setInstId] = useState<string>("");
-    const [modelId, setModelId] = useState<string>("");
+    const [title, setTitle] = useState<string>('');
+    const [assoModelId, setAssoModelId] = useState<string>('');
+    const [instId, setInstId] = useState<string>('');
+    const [modelId, setModelId] = useState<string>('');
     const [tableLoading, setTableLoading] = useState<boolean>(false);
     const [columns, setColumns] = useState<ColumnItem[]>([]);
     const [tableData, setTableData] = useState<any[]>([]);
@@ -96,10 +96,10 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
             t,
           }),
           {
-            title: t("action"),
-            dataIndex: "action",
-            key: "action",
-            fixed: "right",
+            title: t('action'),
+            dataIndex: 'action',
+            key: 'action',
+            fixed: 'right',
             width: 120,
             render: (_: unknown, record: any) => {
               const isRelated = !!assoInstIds.find(
@@ -110,7 +110,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                   type="link"
                   onClick={() => handleRelate(record, isRelated)}
                 >
-                  {t(isRelated ? "Model.disassociation" : "Model.association")}
+                  {t(isRelated ? 'Model.disassociation' : 'Model.association')}
                 </Button>
               );
             },
@@ -145,7 +145,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                   ...item,
                   name: `${showModelName(item.src_model_id)}-${showConnectType(
                     item.asst_id,
-                    "asst_name"
+                    'asst_name'
                   )}-${showModelName(item.dst_model_id)}`,
                   id:
                     item.src_model_id === model_id
@@ -153,7 +153,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                       : item.src_model_id,
                 };
               });
-              const currentAssoModelId = relationData[0]?.id || "";
+              const currentAssoModelId = relationData[0]?.id || '';
               setRelationList(relationData);
               setAssoModelId(currentAssoModelId);
               initPage(currentAssoModelId);
@@ -205,13 +205,13 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
     };
 
     const showModelName = (id: string) => {
-      return models.find((item) => item.model_id === id)?.model_name || "--";
+      return models.find((item) => item.model_id === id)?.model_name || '--';
     };
     const showConnectType = (id: string, key: string) => {
-      return assoTypes.find((item) => item.asst_id === id)?.[key] || "--";
+      return assoTypes.find((item) => item.asst_id === id)?.[key] || '--';
     };
 
-    const handleRelate = async (row = { _id: "" }, isRelated: boolean) => {
+    const handleRelate = async (row = { _id: '' }, isRelated: boolean) => {
       if (isRelated) {
         cancelRelate(row._id);
         return;
@@ -228,7 +228,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
           dst_inst_id: target?.dst_model_id === modelId ? +instId : row._id,
         };
         await post(`/api/instance/association/`, params);
-        message.success(t("successfullyAssociated"));
+        message.success(t('successfullyAssociated'));
         handleCancel();
         onSuccess && onSuccess();
       } finally {
@@ -238,8 +238,8 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
 
     const cancelRelate = async (id: unknown) => {
       confirm({
-        title: t("disassociationTitle"),
-        content: t("deleteContent"),
+        title: t('disassociationTitle'),
+        content: t('deleteContent'),
         centered: true,
         onOk() {
           return new Promise(async (resolve) => {
@@ -248,7 +248,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                 (item) => item.id === id
               )?.inst_asst_id;
               await del(`/api/instance/association/${instAsstId}/`);
-              message.success(t("successfullyDisassociated"));
+              message.success(t('successfullyDisassociated'));
               handleCancel();
               onSuccess && onSuccess();
             } finally {
@@ -279,9 +279,9 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
         query_list: queryList ? [queryList] : [],
         page: pagination.current,
         page_size: pagination.pageSize,
-        order: "",
+        order: '',
         model_id: assoModelId,
-        role: "",
+        role: '',
       };
     };
 
@@ -311,7 +311,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -345,7 +345,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                   pagination={pagination}
                   loading={tableLoading}
                   rowKey="_id"
-                  scroll={{ x: 840, y: "calc(100vh - 400px)" }}
+                  scroll={{ x: 840, y: 'calc(100vh - 400px)' }}
                   onChange={handleTableChange}
                 />
               </div>
@@ -356,5 +356,5 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
     );
   }
 );
-SelectInstance.displayName = "fieldMoadal";
+SelectInstance.displayName = 'fieldMoadal';
 export default SelectInstance;

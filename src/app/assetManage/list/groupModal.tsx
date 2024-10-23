@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useState,
@@ -6,13 +6,13 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useEffect,
-} from "react";
-import { Input, Button, Form, message } from "antd";
-import OperateModal from "@/components/operate-modal";
-import type { FormInstance } from "antd";
-import useApiClient from "@/utils/request";
-import { GroupConfig, GroupFieldType } from "@/types/assetManage";
-import { useTranslation } from "@/utils/i18n";
+} from 'react';
+import { Input, Button, Form, message } from 'antd';
+import OperateModal from '@/components/operate-modal';
+import type { FormInstance } from 'antd';
+import useApiClient from '@/utils/request';
+import { GroupConfig, GroupFieldType } from '@/types/assetManage';
+import { useTranslation } from '@/utils/i18n';
 
 interface GroupModalProps {
   onSuccess: () => void;
@@ -27,9 +27,9 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [groupForm, setGroupForm] = useState<GroupFieldType>({});
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const formRef = useRef<FormInstance>(null);
     const { post, put } = useApiClient();
     const { t } = useTranslation();
@@ -56,19 +56,19 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
       try {
         setConfirmLoading(true);
         const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
+          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
         );
         const url: string =
-          type === "add"
-            ? "/api/classification/"
+          type === 'add'
+            ? '/api/classification/'
             : `/api/classification/${groupForm.classification_id}/`;
         let requestParams = params;
-        if (type !== "add") {
+        if (type !== 'add') {
           requestParams = {
             classification_name: params.classification_name,
           };
         }
-        const requestType = type === "add" ? post : put;
+        const requestType = type === 'add' ? post : put;
         await requestType(url, params);
         message.success(msg);
         handleCancel();
@@ -105,9 +105,9 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -120,14 +120,14 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
             <Form.Item<GroupFieldType>
               label="ID"
               name="classification_id"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
-              <Input disabled={type === "edit"} />
+              <Input disabled={type === 'edit'} />
             </Form.Item>
             <Form.Item<GroupFieldType>
               label="Name"
               name="classification_name"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Input />
             </Form.Item>
@@ -137,5 +137,5 @@ const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
     );
   }
 );
-GroupMoadal.displayName = "GroupMoadal";
+GroupMoadal.displayName = 'GroupMoadal';
 export default GroupMoadal;

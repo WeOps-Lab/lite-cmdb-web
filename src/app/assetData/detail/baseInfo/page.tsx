@@ -1,16 +1,16 @@
-"use client";
-import React, { useEffect, useState, useRef } from "react";
-import { useSearchParams } from "next/navigation";
-import List from "./list";
+'use client';
+import React, { useEffect, useState, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
+import List from './list';
 import {
   AttrFieldType,
   UserItem,
   Organization,
   InstDetail,
-} from "@/types/assetManage";
-import { Spin } from "antd";
-import useApiClient from "@/utils/request";
-import { useCommon } from "@/context/common";
+} from '@/types/assetManage';
+import { Spin } from 'antd';
+import useApiClient from '@/utils/request';
+import { useCommon } from '@/context/common';
 
 const BaseInfo = () => {
   const { get, isLoading } = useApiClient();
@@ -22,8 +22,8 @@ const BaseInfo = () => {
   const userList: UserItem[] = users.current;
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
 
-  const modelId: string = searchParams.get("model_id") || "";
-  const instId: string = searchParams.get("inst_id") || "";
+  const modelId: string = searchParams.get('model_id') || '';
+  const instId: string = searchParams.get('inst_id') || '';
   const [instDetail, setInstDetail] = useState<InstDetail>({});
   const [pageLoading, setPageLoading] = useState<boolean>(false);
 

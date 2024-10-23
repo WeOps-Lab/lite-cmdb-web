@@ -1,19 +1,19 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { Input, Button, Modal, message } from "antd";
-import { useSearchParams } from "next/navigation";
-import { PlusOutlined } from "@ant-design/icons";
-import CustomTable from "@/components/custom-table";
-import AttributesModal from "./attributesModal";
-import { Tag } from "antd";
-import type { TableColumnsType } from "antd";
-import { ATTR_TYPE_LIST } from "@/constants/asset";
-import useApiClient from "@/utils/request";
-import { useTranslation } from "@/utils/i18n";
+import React, { useState, useEffect, useRef } from 'react';
+import { Input, Button, Modal, message } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import { PlusOutlined } from '@ant-design/icons';
+import CustomTable from '@/components/custom-table';
+import AttributesModal from './attributesModal';
+import { Tag } from 'antd';
+import type { TableColumnsType } from 'antd';
+import { ATTR_TYPE_LIST } from '@/constants/asset';
+import useApiClient from '@/utils/request';
+import { useTranslation } from '@/utils/i18n';
 
 const Attributes = () => {
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
   const [pagination, setPagination] = useState<any>({
     current: 1,
     total: 0,
@@ -25,78 +25,78 @@ const Attributes = () => {
   const { get, del } = useApiClient();
   const { confirm } = Modal;
   const searchParams = useSearchParams();
-  const modelId = searchParams.get("model_id");
+  const modelId = searchParams.get('model_id');
   const { t } = useTranslation();
   const columns: TableColumnsType = [
     {
-      title: t("name"),
-      dataIndex: "attr_name",
-      key: "attr_name",
+      title: t('name'),
+      dataIndex: 'attr_name',
+      key: 'attr_name',
     },
     {
-      title: t("type"),
-      dataIndex: "attr_type",
-      key: "attr_type",
+      title: t('type'),
+      dataIndex: 'attr_type',
+      key: 'attr_type',
       render: (_, { attr_type }) => (
         <>
-          {ATTR_TYPE_LIST.find((item) => item.id === attr_type)?.name || "--"}
+          {ATTR_TYPE_LIST.find((item) => item.id === attr_type)?.name || '--'}
         </>
       ),
     },
     {
-      title: t("required"),
-      key: "is_required",
-      dataIndex: "is_required",
+      title: t('required'),
+      key: 'is_required',
+      dataIndex: 'is_required',
       render: (_, { is_required }) => (
         <>
           {
-            <Tag color={is_required ? "green" : "geekblue"}>
-              {t(is_required ? "yes" : "no")}
+            <Tag color={is_required ? 'green' : 'geekblue'}>
+              {t(is_required ? 'yes' : 'no')}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: t("editable"),
-      key: "editable",
-      dataIndex: "editable",
+      title: t('editable'),
+      key: 'editable',
+      dataIndex: 'editable',
       render: (_, { editable }) => (
         <>
           {
-            <Tag color={editable ? "green" : "geekblue"}>
-              {t(editable ? "yes" : "no")}
+            <Tag color={editable ? 'green' : 'geekblue'}>
+              {t(editable ? 'yes' : 'no')}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: t("unique"),
-      key: "is_unique",
-      dataIndex: "is_unique",
+      title: t('unique'),
+      key: 'is_unique',
+      dataIndex: 'is_unique',
       render: (_, { is_only }) => (
         <>
           {
-            <Tag color={is_only ? "green" : "geekblue"}>
-              {t(is_only ? "yes" : "no")}
+            <Tag color={is_only ? 'green' : 'geekblue'}>
+              {t(is_only ? 'yes' : 'no')}
             </Tag>
           }
         </>
       ),
     },
     {
-      title: t("action"),
-      key: "action",
+      title: t('action'),
+      key: 'action',
       render: (_, record) => (
         <>
           <Button
             type="link"
             className="mr-[10px]"
             disabled={record.is_pre}
-            onClick={() => showAttrModal("edit", record)}
+            onClick={() => showAttrModal('edit', record)}
           >
-            {t("edit")}
+            {t('edit')}
           </Button>
           <Button
             type="link"
@@ -108,7 +108,7 @@ const Attributes = () => {
               })
             }
           >
-            {t("delete")}
+            {t('delete')}
           </Button>
         </>
       ),
@@ -121,26 +121,26 @@ const Attributes = () => {
 
   const showAttrModal = (type: string, row = {}) => {
     const title = t(
-      type === "add" ? "Model.addAttribute" : "Model.editAttribute"
+      type === 'add' ? 'Model.addAttribute' : 'Model.editAttribute'
     );
     attrRef.current?.showModal({
       title,
       type,
       attrInfo: row,
-      subTitle: "",
+      subTitle: '',
     });
   };
 
-  const showDeleteConfirm = (row = { model_id: "", attr_id: "" }) => {
+  const showDeleteConfirm = (row = { model_id: '', attr_id: '' }) => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
           try {
             await del(`/api/model/${row.model_id}/attr/${row.attr_id}/`);
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             if (pagination.current > 1 && tableData.length === 1) {
               pagination.current--;
             }
@@ -207,7 +207,7 @@ const Attributes = () => {
         <div className="nav-box flex justify-end mb-[10px]">
           <div className="left-side w-[240px] mr-[8px]">
             <Input
-              placeholder={t("search")}
+              placeholder={t('search')}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -220,14 +220,14 @@ const Attributes = () => {
               type="primary"
               className="mr-[8px]"
               icon={<PlusOutlined />}
-              onClick={() => showAttrModal("add")}
+              onClick={() => showAttrModal('add')}
             >
-              {t("add")}
+              {t('add')}
             </Button>
           </div>
         </div>
         <CustomTable
-          scroll={{ y: "calc(100vh - 390px)" }}
+          scroll={{ y: 'calc(100vh - 390px)' }}
           columns={columns}
           dataSource={tableData}
           pagination={pagination}

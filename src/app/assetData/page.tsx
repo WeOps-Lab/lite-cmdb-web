@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from 'react';
 import {
   Button,
   Space,
@@ -13,20 +13,20 @@ import {
   Cascader,
   TablePaginationConfig,
   CascaderProps,
-} from "antd";
-import CustomTable from "@/components/custom-table";
-import SearchFilter from "./list/searchFilter";
-import ImportInst from "./list/importInst";
-import SelectInstance from "@/app/assetData/detail/ralationships/selectInstance";
-import { PlusOutlined } from "@ant-design/icons";
-import type { RadioChangeEvent } from "antd";
-import { useSearchParams } from "next/navigation";
-import assetDataStyle from "./index.module.less";
-import FieldModal from "./list/fieldModal";
-import { useTranslation } from "@/utils/i18n";
-import useApiClient from "@/utils/request";
+} from 'antd';
+import CustomTable from '@/components/custom-table';
+import SearchFilter from './list/searchFilter';
+import ImportInst from './list/importInst';
+import SelectInstance from '@/app/assetData/detail/ralationships/selectInstance';
+import { PlusOutlined } from '@ant-design/icons';
+import type { RadioChangeEvent } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import assetDataStyle from './index.module.less';
+import FieldModal from './list/fieldModal';
+import { useTranslation } from '@/utils/i18n';
+import useApiClient from '@/utils/request';
 const { confirm } = Modal;
-import { deepClone, getAssetColumns } from "@/utils/common";
+import { deepClone, getAssetColumns } from '@/utils/common';
 import {
   GroupItem,
   ModelItem,
@@ -36,12 +36,12 @@ import {
   AttrFieldType,
   RelationInstanceRef,
   AssoTypeItem,
-} from "@/types/assetManage";
-import axios from "axios";
-import { useAuth } from "@/context/auth";
-import { useCommon } from "@/context/common";
-import type { MenuProps } from "antd";
-import { useRouter } from "next/navigation";
+} from '@/types/assetManage';
+import axios from 'axios';
+import { useAuth } from '@/context/auth';
+import { useCommon } from '@/context/common';
+import type { MenuProps } from 'antd';
+import { useRouter } from 'next/navigation';
 
 interface ModelTabs {
   key: string;
@@ -73,9 +73,9 @@ const AssetData = () => {
   const { get, del, post, isLoading } = useApiClient();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const assetModelId: string = searchParams.get("modelId") || "";
+  const assetModelId: string = searchParams.get('modelId') || '';
   const assetClassificationId: string =
-    searchParams.get("classificationId") || "";
+    searchParams.get('classificationId') || '';
   const commonContext = useCommon();
   const authContext = useAuth();
   const token = authContext?.token || null;
@@ -93,8 +93,8 @@ const AssetData = () => {
   const [exportLoading, setExportLoading] = useState<boolean>(false);
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
   const [originModels, setOriginModels] = useState<ModelItem[]>([]);
-  const [groupId, setGroupId] = useState<string>("");
-  const [modelId, setModelId] = useState<string>("");
+  const [groupId, setGroupId] = useState<string>('');
+  const [modelId, setModelId] = useState<string>('');
   const [modelList, setModelList] = useState<ModelTabs[]>([]);
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
   const [displayFieldKeys, setDisplayFieldKeys] = useState<string[]>([]);
@@ -115,8 +115,8 @@ const AssetData = () => {
       setExportLoading(true);
       const response = await axios({
         url: `/reqApi/api/instance/${modelId}/inst_export/`, // 替换为你的导出数据的API端点
-        method: "POST",
-        responseType: "blob", // 确保响应类型为blob
+        method: 'POST',
+        responseType: 'blob', // 确保响应类型为blob
         data: keys,
         headers: {
           Authorization: `Bearer ${tokenRef.current}`,
@@ -124,10 +124,10 @@ const AssetData = () => {
       });
       // 创建一个Blob对象
       const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
+        type: response.headers['content-type'],
       });
       // 创建一个下载链接
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
       link.download = `${modelId}资产列表.xlsx`; // 设置下载文件的名称
       document.body.appendChild(link);
@@ -143,20 +143,20 @@ const AssetData = () => {
 
   const showImportModal = () => {
     importRef.current?.showModal({
-      title: t("import"),
-      subTitle: "",
+      title: t('import'),
+      subTitle: '',
       model_id: modelId,
     });
   };
 
-  const addInstItems: MenuProps["items"] = [
+  const addInstItems: MenuProps['items'] = [
     {
-      key: "1",
-      label: <a onClick={() => showAttrModal("add")}>{t("add")}</a>,
+      key: '1',
+      label: <a onClick={() => showAttrModal('add')}>{t('add')}</a>,
     },
     {
-      key: "2",
-      label: <a onClick={showImportModal}>{t("import")}</a>,
+      key: '2',
+      label: <a onClick={showImportModal}>{t('import')}</a>,
     },
   ];
 
@@ -182,11 +182,11 @@ const AssetData = () => {
       const tableColumns = [
         ...attrList,
         {
-          title: t("action"),
-          key: "action",
-          dataIndex: "action",
+          title: t('action'),
+          key: 'action',
+          dataIndex: 'action',
           width: 230,
-          fixed: "right",
+          fixed: 'right',
           render: (_: unknown, record: any) => (
             <>
               <Button
@@ -194,24 +194,24 @@ const AssetData = () => {
                 className="mr-[10px]"
                 onClick={() => checkDetail(record)}
               >
-                {t("detail")}
+                {t('detail')}
               </Button>
               <Button
                 type="link"
                 className="mr-[10px]"
                 onClick={() => showInstanceModal(record)}
               >
-                {t("Model.association")}
+                {t('Model.association')}
               </Button>
               <Button
                 type="link"
                 className="mr-[10px]"
-                onClick={() => showAttrModal("edit", record)}
+                onClick={() => showAttrModal('edit', record)}
               >
-                {t("edit")}
+                {t('edit')}
               </Button>
               <Button type="link" onClick={() => showDeleteConfirm(record)}>
-                {t("delete")}
+                {t('delete')}
               </Button>
             </>
           ),
@@ -220,7 +220,7 @@ const AssetData = () => {
       setColumns(tableColumns);
       setCurrentColumns(
         tableColumns.filter(
-          (item) => displayFieldKeys.includes(item.key) || item.key === "action"
+          (item) => displayFieldKeys.includes(item.key) || item.key === 'action'
         )
       );
     }
@@ -242,9 +242,9 @@ const AssetData = () => {
   };
 
   const getModelGroup = () => {
-    const getCroupList = get("/api/classification/");
-    const getModelList = get("/api/model/");
-    const getAssoType = get("/api/model/model_association_type/");
+    const getCroupList = get('/api/classification/');
+    const getModelList = get('/api/model/');
+    const getAssoType = get('/api/model/model_association_type/');
     setLoading(true);
     try {
       Promise.all([getModelList, getCroupList, getAssoType])
@@ -294,22 +294,22 @@ const AssetData = () => {
 
   const getTableParams = () => {
     const conditions = organization?.length
-      ? [{ field: "organization", type: "list[]", value: organization }]
+      ? [{ field: 'organization', type: 'list[]', value: organization }]
       : [];
     return {
       query_list: queryList ? [queryList, ...conditions] : conditions,
       page: pagination.current,
       page_size: pagination.pageSize,
-      order: "",
+      order: '',
       model_id: modelId,
-      role: "",
+      role: '',
     };
   };
 
   const getInitData = (id: string) => {
     const tableParmas = getTableParams();
     const getAttrList = get(`/api/model/${id}/attr_list/`);
-    const getInstList = post("/api/instance/search/", {
+    const getInstList = post('/api/instance/search/', {
       ...tableParmas,
       model_id: id,
     });
@@ -354,7 +354,7 @@ const AssetData = () => {
     setLoading(true);
     try {
       await post(`/api/instance/${modelId}/show_field/settings/`, fields);
-      message.success(t("successfulSetted"));
+      message.success(t('successfulSetted'));
       getInitData(modelId);
     } finally {
       setLoading(false);
@@ -378,16 +378,16 @@ const AssetData = () => {
     getInitData(currentModelId);
   };
 
-  const showDeleteConfirm = (row = { _id: "" }) => {
+  const showDeleteConfirm = (row = { _id: '' }) => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
           try {
             await del(`/api/instance/${row._id}/`);
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             if (pagination?.current) {
               pagination.current > 1 &&
                 tableData.length === 1 &&
@@ -405,15 +405,15 @@ const AssetData = () => {
 
   const batchDeleteConfirm = () => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve) => {
           try {
             const list = selectedRowKeys;
-            await post("/api/instance/batch_delete/", list);
-            message.success(t("successfullyDeleted"));
+            await post('/api/instance/batch_delete/', list);
+            message.success(t('successfullyDeleted'));
             if (pagination?.current) {
               pagination.current > 1 &&
                 tableData.length === 1 &&
@@ -429,46 +429,46 @@ const AssetData = () => {
     });
   };
 
-  const batchOperateItems: MenuProps["items"] = [
+  const batchOperateItems: MenuProps['items'] = [
     {
-      key: "batchEdit",
+      key: 'batchEdit',
       label: (
         <a
           onClick={() => {
-            showAttrModal("batchEdit");
+            showAttrModal('batchEdit');
           }}
         >
-          {t("batchEdit")}
+          {t('batchEdit')}
         </a>
       ),
       disabled: !selectedRowKeys.length,
     },
     {
-      key: "batchDelete",
-      label: <a onClick={batchDeleteConfirm}>{t("batchDelete")}</a>,
+      key: 'batchDelete',
+      label: <a onClick={batchDeleteConfirm}>{t('batchDelete')}</a>,
       disabled: !selectedRowKeys.length,
     },
   ];
 
-  const exportItems: MenuProps["items"] = [
+  const exportItems: MenuProps['items'] = [
     {
-      key: "batchExport",
+      key: 'batchExport',
       label: (
-        <a onClick={() => handleExport(selectedRowKeys)}>{t("selected")}</a>
+        <a onClick={() => handleExport(selectedRowKeys)}>{t('selected')}</a>
       ),
       disabled: !selectedRowKeys.length,
     },
     {
-      key: "exportCurrentPage",
+      key: 'exportCurrentPage',
       label: (
         <a onClick={() => handleExport(tableData.map((item) => item._id))}>
-          {t("currentPage")}
+          {t('currentPage')}
         </a>
       ),
     },
     {
-      key: "exportAll",
-      label: <a onClick={() => handleExport([])}>{t("all")}</a>,
+      key: 'exportAll',
+      label: <a onClick={() => handleExport([])}>{t('all')}</a>,
     },
   ];
 
@@ -482,13 +482,13 @@ const AssetData = () => {
   };
 
   const showAttrModal = (type: string, row = {}) => {
-    const title = type === "add" ? "Add" : "Edit";
+    const title = type === 'add' ? 'Add' : 'Edit';
     fieldRef.current?.showModal({
       title,
       type,
       attrList: propertyList,
       formInfo: row,
-      subTitle: "",
+      subTitle: '',
       model_id: modelId,
       list: selectedRowKeys,
     });
@@ -502,24 +502,24 @@ const AssetData = () => {
     setQueryList(condition);
   };
 
-  const checkDetail = (row = { _id: "" }) => {
+  const checkDetail = (row = { _id: '' }) => {
     const modelItem = modelList.find((item) => item.key === modelId);
     router.push(
-      `/assetData/detail/baseInfo?icn=${modelItem?.icn || ""}&model_name=${
-        modelItem?.label || ""
+      `/assetData/detail/baseInfo?icn=${modelItem?.icn || ''}&model_name=${
+        modelItem?.label || ''
       }&model_id=${modelId}&classification_id=${groupId}&inst_id=${row._id}`
     );
   };
 
-  const selectOrganization: CascaderProps<Organization>["onChange"] = (
+  const selectOrganization: CascaderProps<Organization>['onChange'] = (
     value
   ) => {
     setOrganization(value);
   };
 
-  const showInstanceModal = (row = { _id: "" }) => {
+  const showInstanceModal = (row = { _id: '' }) => {
     instanceRef.current?.showModal({
-      title: t("Model.AssociationManagement"),
+      title: t('Model.AssociationManagement'),
       model_id: modelId,
       list: [],
       instId: row._id,
@@ -554,7 +554,7 @@ const AssetData = () => {
           <div className="flex justify-between mb-4">
             <Space>
               <Cascader
-                placeholder={t("Model.selectOrganazationPlaceholder")}
+                placeholder={t('Model.selectOrganazationPlaceholder')}
                 options={organizationList}
                 value={organization}
                 onChange={selectOrganization}
@@ -562,7 +562,7 @@ const AssetData = () => {
               <SearchFilter
                 userList={userList}
                 attrList={propertyList.filter(
-                  (item) => item.attr_type !== "organization"
+                  (item) => item.attr_type !== 'organization'
                 )}
                 organizationList={organizationList}
                 onSearch={handleSearch}
@@ -571,7 +571,7 @@ const AssetData = () => {
             <Space>
               <Dropdown menu={{ items: addInstItems }} placement="bottom" arrow>
                 <Button icon={<PlusOutlined />} type="primary">
-                  {t("add")}
+                  {t('add')}
                 </Button>
               </Dropdown>
               <Dropdown
@@ -580,7 +580,7 @@ const AssetData = () => {
                 placement="bottom"
                 arrow
               >
-                <Button>{t("export")}</Button>
+                <Button>{t('export')}</Button>
               </Dropdown>
               <Dropdown
                 menu={{ items: batchOperateItems }}
@@ -588,7 +588,7 @@ const AssetData = () => {
                 placement="bottom"
                 arrow
               >
-                <Button>{t("more")}</Button>
+                <Button>{t('more')}</Button>
               </Dropdown>
             </Space>
           </div>
@@ -598,11 +598,11 @@ const AssetData = () => {
             columns={currentColumns}
             pagination={pagination}
             loading={tableLoading}
-            scroll={{ x: "calc(100vw - 100px)", y: "calc(100vh - 370px)" }}
+            scroll={{ x: 'calc(100vw - 100px)', y: 'calc(100vh - 370px)' }}
             fieldSetting={{
               showSetting: true,
               displayFieldKeys,
-              choosableFields: columns.filter((item) => item.key !== "action"),
+              choosableFields: columns.filter((item) => item.key !== 'action'),
             }}
             onSelectFields={onSelectFields}
             rowKey="_id"

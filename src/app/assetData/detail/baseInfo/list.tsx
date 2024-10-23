@@ -1,19 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { Form, Button, Collapse, Descriptions, message } from "antd";
-import type { DescriptionsProps } from "antd";
-import { AssetDataFieldProps, AttrFieldType } from "@/types/assetManage";
-import { deepClone, getFieldItem } from "@/utils/common";
-import { useSearchParams } from "next/navigation";
+import React, { useState, useEffect } from 'react';
+import { Form, Button, Collapse, Descriptions, message } from 'antd';
+import type { DescriptionsProps } from 'antd';
+import { AssetDataFieldProps, AttrFieldType } from '@/types/assetManage';
+import { deepClone, getFieldItem } from '@/utils/common';
+import { useSearchParams } from 'next/navigation';
 import {
   EditOutlined,
   CopyOutlined,
   CheckOutlined,
   CloseOutlined,
   CaretRightOutlined,
-} from "@ant-design/icons";
-import informationList from "./list.module.less";
-import { useTranslation } from "@/utils/i18n";
-import useApiClient from "@/utils/request";
+} from '@ant-design/icons';
+import informationList from './list.module.less';
+import { useTranslation } from '@/utils/i18n';
+import useApiClient from '@/utils/request';
 
 const { Panel } = Collapse;
 
@@ -25,12 +25,12 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
   onsuccessEdit,
 }) => {
   const [form] = Form.useForm();
-  const [fieldList, setFieldList] = useState<DescriptionsProps["items"]>([]);
+  const [fieldList, setFieldList] = useState<DescriptionsProps['items']>([]);
   const [attrList, setAttrList] = useState<AttrFieldType[]>([]);
   const { t } = useTranslation();
   const { patch } = useApiClient();
   const searchParams = useSearchParams();
-  const instId: string = searchParams.get("inst_id") || "";
+  const instId: string = searchParams.get('inst_id') || '';
 
   useEffect(() => {
     setAttrList(propertyList);
@@ -52,7 +52,7 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
     const params: any = {};
     params[fieldKey] = fieldVaule;
     await patch(`/api/instance/${instId}/`, params);
-    message.success(t("successfullyModified"));
+    message.success(t('successfullyModified'));
     const list = deepClone(attrList);
     const index = list.findIndex(
       (item: AttrFieldType) => item.attr_id === fieldKey
@@ -61,8 +61,8 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
       (item: AttrFieldType) => item.attr_id === fieldKey
     );
     if (
-      config.type === "success" ||
-      (config.type === "fail" && !target?.is_required)
+      config.type === 'success' ||
+      (config.type === 'fail' && !target?.is_required)
     ) {
       list[index].isEdit = false;
       list[index].value = fieldVaule;
@@ -200,7 +200,7 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
     updateInst({
       values,
       id,
-      type: "success",
+      type: 'success',
     });
   };
 
@@ -208,7 +208,7 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
     updateInst({
       values,
       id,
-      type: "fail",
+      type: 'fail',
     });
   };
 
@@ -221,7 +221,7 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
       value,
     });
     navigator.clipboard.writeText(copyVal);
-    message.success(t("successfulCopied"));
+    message.success(t('successfulCopied'));
   };
 
   return (
@@ -235,10 +235,10 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}
       >
-        <Panel header={t("group")} key="group">
+        <Panel header={t('group')} key="group">
           <Descriptions
             bordered
-            items={fieldList?.filter((item) => item.key === "organization")}
+            items={fieldList?.filter((item) => item.key === 'organization')}
             column={2}
           />
         </Panel>
@@ -252,10 +252,10 @@ const InfoList: React.FC<AssetDataFieldProps> = ({
           <CaretRightOutlined rotate={isActive ? 90 : 0} />
         )}
       >
-        <Panel header={t("information")} key="information">
+        <Panel header={t('information')} key="information">
           <Descriptions
             bordered
-            items={fieldList?.filter((item) => item.key !== "organization")}
+            items={fieldList?.filter((item) => item.key !== 'organization')}
             column={2}
           />
         </Panel>

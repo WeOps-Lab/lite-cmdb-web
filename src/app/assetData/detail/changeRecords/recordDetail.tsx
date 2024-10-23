@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
 import React, {
   useState,
   forwardRef,
   useImperativeHandle,
   useEffect,
-} from "react";
-import { Button, Spin } from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
-import useApiClient from "@/utils/request";
+} from 'react';
+import { Button, Spin } from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
+import useApiClient from '@/utils/request';
 import {
   AttrFieldType,
   ModelItem,
   Organization,
   AssoTypeItem,
-} from "@/types/assetManage";
-import { deepClone, getFieldItem } from "@/utils/common";
-import CustomTable from "@/components/custom-table";
-import recordDetailStyle from "./recordDetail.module.less";
+} from '@/types/assetManage';
+import { deepClone, getFieldItem } from '@/utils/common';
+import CustomTable from '@/components/custom-table';
+import recordDetailStyle from './recordDetail.module.less';
 
 interface FieldModalProps {
   userList: Array<any>;
@@ -51,40 +51,40 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
     const { t } = useTranslation();
     const { get } = useApiClient();
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(false);
     const [recordRow, setRecordRow] = useState<any>({});
     const [formData, setFormData] = useState<any>({
       list: [
-        { label: t("Model.action"), id: "type" },
-        { label: t("Model.modelType"), id: "model_id" },
-        { label: t("Model.operationExamples"), id: "inst_id" },
-        { label: t("Model.operationTime"), id: "created_at" },
-        { label: t("Model.operateAccount"), id: "operator" },
+        { label: t('Model.action'), id: 'type' },
+        { label: t('Model.modelType'), id: 'model_id' },
+        { label: t('Model.operationExamples'), id: 'inst_id' },
+        { label: t('Model.operationTime'), id: 'created_at' },
+        { label: t('Model.operateAccount'), id: 'operator' },
       ],
       attrList: [],
       attrColumns: [
         {
-          title: t("Model.attribute"),
-          key: "attr",
-          dataIndex: "attr",
-          align: "left",
-          minWidth: "50",
+          title: t('Model.attribute'),
+          key: 'attr',
+          dataIndex: 'attr',
+          align: 'left',
+          minWidth: '50',
         },
         {
-          title: t("Model.beforeTheChange"),
-          key: "before",
-          dataIndex: "before",
-          align: "left",
-          minWidth: "100px",
+          title: t('Model.beforeTheChange'),
+          key: 'before',
+          dataIndex: 'before',
+          align: 'left',
+          minWidth: '100px',
         },
         {
-          title: t("Model.afterTheChange"),
-          key: "after",
-          dataIndex: "after",
-          align: "left",
-          minWidth: "100px",
+          title: t('Model.afterTheChange'),
+          key: 'after',
+          dataIndex: 'after',
+          align: 'left',
+          minWidth: '100px',
         },
       ],
     });
@@ -106,13 +106,13 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
         setTitle(title);
         setRecordRow(recordRow);
         getChangeRecordDetail(recordRow.id);
-        if (recordRow.label === "instance_association") {
+        if (recordRow.label === 'instance_association') {
           const form = deepClone(formData);
           form.attrColumns[0] = {
-            title: t("Model.objectType"),
-            key: "attr",
-            align: "left",
-            minWidth: "50",
+            title: t('Model.objectType'),
+            key: 'attr',
+            align: 'left',
+            minWidth: '50',
           };
           setFormData(form);
         }
@@ -130,27 +130,27 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
     };
 
     const showModelName = (id: string) => {
-      return modelList.find((item) => item.model_id === id)?.model_name || "--";
+      return modelList.find((item) => item.model_id === id)?.model_name || '--';
     };
 
     const showConnectType = (id: string) => {
       return (
-        connectTypeList.find((item) => item.asst_id === id)?.asst_name || "--"
+        connectTypeList.find((item) => item.asst_id === id)?.asst_name || '--'
       );
     };
 
     const getDisplayName = (id: string) => {
-      let label: any = recordRow[id] || "--";
+      let label: any = recordRow[id] || '--';
       switch (id) {
-        case "type":
-          label = enumList[label] || "--";
+        case 'type':
+          label = enumList[label] || '--';
           break;
-        case "model_id":
+        case 'model_id':
           label =
             modelList.find((item) => item.model_id === label)?.model_name ||
-            "--";
+            '--';
           break;
-        case "inst_id":
+        case 'inst_id':
           label = instInfo.name;
           break;
       }
@@ -167,11 +167,11 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           label,
           type,
         } = data;
-        if (label === "instance") {
+        if (label === 'instance') {
           setInstInfo({
-            name: afterData?.inst_name || beforeData?.inst_name || "--",
+            name: afterData?.inst_name || beforeData?.inst_name || '--',
           });
-          const list = type === "delete_entity" ? [] : afterData;
+          const list = type === 'delete_entity' ? [] : afterData;
           form.attrList = Object.keys(list)
             .map((item, index) => {
               const field = propertyList.find((prop) => prop.attr_id === item);
@@ -193,10 +193,10 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
               };
             })
             .filter((attr) => !!attr.attr);
-        } else if (label.includes("credential")) {
-          let before = "--";
-          let after = "--";
-          if (type === "create_edge") {
+        } else if (label.includes('credential')) {
+          let before = '--';
+          let after = '--';
+          if (type === 'create_edge') {
             after = `${afterData.src.name}关联${showModelName(
               afterData.dst.model_id
             )}(${afterData.dst.inst_name})`;
@@ -207,20 +207,20 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           }
           form.attrList = [
             {
-              attr: t("Model.relatedRelationships"),
+              attr: t('Model.relatedRelationships'),
               id: 1,
               before,
               after,
             },
           ];
           setInstInfo({
-            name: beforeData.dst?.inst_name || afterData.dst?.inst_name || "--",
+            name: beforeData.dst?.inst_name || afterData.dst?.inst_name || '--',
           });
         } else {
-          let before = "--";
-          let after = "--";
+          let before = '--';
+          let after = '--';
           form.attrList = data;
-          if (type === "delete_edge") {
+          if (type === 'delete_edge') {
             before = `${showModelName(beforeData.edge.src_model_id)}(${
               beforeData.src.inst_name
             }) ${showConnectType(beforeData.edge.asst_id)} ${showModelName(
@@ -247,7 +247,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           }
           form.attrList = [
             {
-              attr: t("Model.relatedRelationships"),
+              attr: t('Model.relatedRelationships'),
               id: 1,
               before,
               after,
@@ -274,7 +274,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
           onCancel={handleCancel}
           footer={
             <div>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -297,7 +297,7 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
                 })}
               </ul>
               <CustomTable
-                scroll={{ y: "calc(100vh - 500px)" }}
+                scroll={{ y: 'calc(100vh - 500px)' }}
                 columns={formData.attrColumns}
                 dataSource={formData.attrList}
                 rowKey="id"
@@ -309,5 +309,5 @@ const RecordDetail = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-RecordDetail.displayName = "recordDetail";
+RecordDetail.displayName = 'recordDetail';
 export default RecordDetail;

@@ -1,13 +1,13 @@
-import { useGraphStore, useGraphInstance } from "@antv/xflow";
-import { useEffect, useCallback } from "react";
-import { Graph } from "@antv/x6";
-import { getIconUrl } from "@/utils/common";
+import { useGraphStore, useGraphInstance } from '@antv/xflow';
+import { useEffect, useCallback } from 'react';
+import { Graph } from '@antv/x6';
+import { getIconUrl } from '@/utils/common';
 import {
   ModelItem,
   TopoData,
   NodeData,
   AssoTypeItem,
-} from "@/types/assetManage";
+} from '@/types/assetManage';
 
 interface TopoProps {
   modelId: string;
@@ -45,40 +45,40 @@ export const InitNode: React.FC<TopoProps> = ({
 
   useEffect(() => {
     Graph.registerNode(
-      "custom-rect",
+      'custom-rect',
       {
-        inherit: "rect",
+        inherit: 'rect',
         markup: [
           {
-            tagName: "rect",
-            selector: "body",
+            tagName: 'rect',
+            selector: 'body',
           },
           {
-            tagName: "line",
-            selector: "divider",
+            tagName: 'line',
+            selector: 'divider',
           },
           {
-            tagName: "image",
-            selector: "image",
+            tagName: 'image',
+            selector: 'image',
           },
           {
-            tagName: "text",
-            selector: "label1",
+            tagName: 'text',
+            selector: 'label1',
           },
           {
-            tagName: "text",
-            selector: "label2",
+            tagName: 'text',
+            selector: 'label2',
           },
           {
-            tagName: "path",
-            selector: "expandBtn",
+            tagName: 'path',
+            selector: 'expandBtn',
           },
         ],
         attrs: {
           body: {
-            stroke: "var(--color-border-3)",
+            stroke: 'var(--color-border-3)',
             strokeWidth: 1,
-            fill: "var(--color-bg-1)",
+            fill: 'var(--color-bg-1)',
             rx: 6,
             ry: 6,
             width: 200,
@@ -95,7 +95,7 @@ export const InitNode: React.FC<TopoProps> = ({
             y1: 0,
             x2: 60,
             y2: 80,
-            stroke: "var(--color-border-3)",
+            stroke: 'var(--color-border-3)',
             strokeWidth: 1,
           },
           label1: {
@@ -106,10 +106,10 @@ export const InitNode: React.FC<TopoProps> = ({
               height: 20,
               ellipsis: true,
             },
-            textAnchor: "center",
-            textVerticalAnchor: "middle",
+            textAnchor: 'center',
+            textVerticalAnchor: 'middle',
             fontSize: 14,
-            fill: "var(--color-text-1)",
+            fill: 'var(--color-text-1)',
           },
           label2: {
             refX: 0.4,
@@ -119,21 +119,21 @@ export const InitNode: React.FC<TopoProps> = ({
               height: 20,
               ellipsis: true,
             },
-            textAnchor: "center",
-            textVerticalAnchor: "middle",
+            textAnchor: 'center',
+            textVerticalAnchor: 'middle',
             fontSize: 14,
-            fill: "var(--color-text-4)",
+            fill: 'var(--color-text-4)',
           },
           expandBtn: {
-            d: "M 3 6 L 9 6 M 1 1 L 11 1 L 11 11 L 1 11 Z",
-            fill: "red",
-            cursor: "pointer",
+            d: 'M 3 6 L 9 6 M 1 1 L 11 1 L 11 11 L 1 11 Z',
+            fill: 'red',
+            cursor: 'pointer',
             refX: 1,
             refDx: -7,
             refY: 0.42,
-            stroke: "var(--color-text-4)",
+            stroke: 'var(--color-text-4)',
             strokeWidth: 1,
-            event: "node:collapse",
+            event: 'node:collapse',
             zIndex: 99,
           },
         },
@@ -155,11 +155,11 @@ export const InitNode: React.FC<TopoProps> = ({
         }
       });
     }, 0);
-    graph?.on("node:collapse", handleCollapse);
-    graph?.on("node:click", linkToDetail);
+    graph?.on('node:collapse', handleCollapse);
+    graph?.on('node:click', linkToDetail);
     return () => {
-      graph?.off("node:collapse", handleCollapse);
-      graph?.off("node:click", linkToDetail);
+      graph?.off('node:collapse', handleCollapse);
+      graph?.off('node:click', linkToDetail);
     };
   }, [setInitData]);
 
@@ -169,12 +169,12 @@ export const InitNode: React.FC<TopoProps> = ({
     node.setAttrs({
       expandBtn: {
         d: isExpanded
-          ? "M 3 6 L 9 6 M 6 3 L 6 9 M 1 1 L 11 1 L 11 11 L 1 11 Z"
-          : "M 3 6 L 9 6 M 1 1 L 11 1 L 11 11 L 1 11 Z",
+          ? 'M 3 6 L 9 6 M 6 3 L 6 9 M 1 1 L 11 1 L 11 11 L 1 11 Z'
+          : 'M 3 6 L 9 6 M 1 1 L 11 1 L 11 11 L 1 11 Z',
       },
     });
     const children = node.getData().children || [];
-    const id = node.getData().modelId || "";
+    const id = node.getData().modelId || '';
     if (id === modelId) {
       graph?.getNodes().forEach((item) => {
         if (item.getData().modelId !== modelId) {
@@ -203,27 +203,27 @@ export const InitNode: React.FC<TopoProps> = ({
     const { e, node } = data;
     const target = e.target;
     if (
-      target.tagName === "path" &&
-      target.getAttribute("event") === "node:collapse"
+      target.tagName === 'path' &&
+      target.getAttribute('event') === 'node:collapse'
     ) {
       return;
     }
     const row = node?.getData();
     const params: any = {
-      icn: "",
+      icn: '',
       model_name: showModelName(row.modelId),
       model_id: row.modelId,
-      classification_id: "",
+      classification_id: '',
       inst_id: node.id,
     };
     const queryString = new URLSearchParams(params).toString();
     const url = `/assetData/detail/baseInfo?${queryString}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(url, '_blank', 'noopener,noreferrer');
     console.log(data);
   };
 
   const showModelName = (id: string) => {
-    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+    return modelList.find((item) => item.model_id === id)?.model_name || '--';
   };
 
   const transformData = (
@@ -253,10 +253,10 @@ export const InitNode: React.FC<TopoProps> = ({
         y: nodeY,
         width: 200,
         height: 80,
-        shape: "custom-rect",
+        shape: 'custom-rect',
         attrs: {
           image: {
-            "xlink:href": getIconUrl({ icn: "", model_id: node.model_id })
+            'xlink:href': getIconUrl({ icn: '', model_id: node.model_id })
               ?.default?.src,
           },
           label1: {
@@ -268,8 +268,8 @@ export const InitNode: React.FC<TopoProps> = ({
             title: showModelName(node.model_id),
           },
           expandBtn: {
-            stroke: hasChild ? "var(--color-border-3)" : "",
-            fill: hasChild ? "var(--color-bg-1)" : "transparent",
+            stroke: hasChild ? 'var(--color-border-3)' : '',
+            fill: hasChild ? 'var(--color-bg-1)' : 'transparent',
           },
         },
         data: {
@@ -284,7 +284,7 @@ export const InitNode: React.FC<TopoProps> = ({
           target: id,
           attrs: {
             line: {
-              stroke: "var(--color-border-3)",
+              stroke: 'var(--color-border-3)',
               strokeWidth: 1,
             },
           },
@@ -293,19 +293,19 @@ export const InitNode: React.FC<TopoProps> = ({
               text: {
                 text:
                   assoTypeList.find((tex) => tex.asst_id === node.asst_id)
-                    ?.asst_name || "--",
-                fill: "var(--color-text-4)", // 设置label颜色
+                    ?.asst_name || '--',
+                fill: 'var(--color-text-4)', // 设置label颜色
               },
               rect: {
-                fill: "var(--color-bg-1)", // 设置label背景颜色
-                stroke: "none",
+                fill: 'var(--color-bg-1)', // 设置label背景颜色
+                stroke: 'none',
               },
             },
           },
           router: {
-            name: "er",
+            name: 'er',
             args: {
-              direction: "H",
+              direction: 'H',
               offset: 50,
             },
           },

@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, {
   useState,
@@ -6,17 +6,17 @@ import React, {
   useRef,
   forwardRef,
   useImperativeHandle,
-} from "react";
-import { Input, Button, Form, message, Select, Radio } from "antd";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import OperateModal from "@/components/operate-modal";
-import type { FormInstance } from "antd";
-import { PlusOutlined, DeleteTwoTone, HolderOutlined } from "@ant-design/icons";
-import { deepClone } from "@/utils/common";
-import useApiClient from "@/utils/request";
-import { useSearchParams } from "next/navigation";
-import { AttrFieldType, EnumList } from "@/types/assetManage";
-import { useTranslation } from "@/utils/i18n";
+} from 'react';
+import { Input, Button, Form, message, Select, Radio } from 'antd';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import OperateModal from '@/components/operate-modal';
+import type { FormInstance } from 'antd';
+import { PlusOutlined, DeleteTwoTone, HolderOutlined } from '@ant-design/icons';
+import { deepClone } from '@/utils/common';
+import useApiClient from '@/utils/request';
+import { useSearchParams } from 'next/navigation';
+import { AttrFieldType, EnumList } from '@/types/assetManage';
+import { useTranslation } from '@/utils/i18n';
 const { Option } = Select;
 
 interface AttrModalProps {
@@ -38,14 +38,14 @@ export interface AttrModalRef {
 const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
   ({ onSuccess, attrTypeList }, ref) => {
     const [modelVisible, setModelVisible] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const [attrInfo, setAttrInfo] = useState<any>({});
     const [enumList, setEnumList] = useState<EnumList[]>([
       {
-        id: "",
-        name: "",
+        id: '',
+        name: '',
       },
     ]);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
@@ -53,8 +53,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const { post, put } = useApiClient();
     const searchParams = useSearchParams();
     const classificationId: string =
-      searchParams.get("classification_id") || "";
-    const modelId: string = searchParams.get("model_id") || "";
+      searchParams.get('classification_id') || '';
+    const modelId: string = searchParams.get('model_id') || '';
     const { t } = useTranslation();
 
     useEffect(() => {
@@ -71,7 +71,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
         setSubTitle(subTitle);
         setType(type);
         setTitle(title);
-        if (type === "add") {
+        if (type === 'add') {
           Object.assign(attrInfo, {
             is_required: true,
             editable: true,
@@ -79,8 +79,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
           });
           setEnumList([
             {
-              id: "",
-              name: "",
+              id: '',
+              name: '',
             },
           ]);
         } else {
@@ -105,7 +105,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     // 自定义验证枚举列表
     const validateEnumList = async () => {
       if (enumList.some((item) => !item.id || !item.name)) {
-        return Promise.reject(new Error(t("valueValidate")));
+        return Promise.reject(new Error(t('valueValidate')));
       }
       return Promise.resolve();
     };
@@ -117,8 +117,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     const addEnumItem = () => {
       const enumTypeList = deepClone(enumList);
       enumTypeList.push({
-        id: "",
-        name: "",
+        id: '',
+        name: '',
       });
       setEnumList(enumTypeList);
     };
@@ -158,14 +158,14 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
       try {
         setConfirmLoading(true);
         const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
+          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
         );
         const url: string =
-          type === "add"
+          type === 'add'
             ? `/api/model/${params.model_id}/attr/`
             : `/api/model/${params.model_id}/attr_update/`;
         const requestParams = deepClone(params);
-        const requestType = type === "add" ? post : put;
+        const requestType = type === 'add' ? post : put;
         await requestType(url, requestParams);
         message.success(msg);
         onSuccess();
@@ -193,9 +193,9 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
-              <Button onClick={handleCancel}> {t("cancel")}</Button>
+              <Button onClick={handleCancel}> {t('cancel')}</Button>
             </div>
           }
         >
@@ -206,23 +206,23 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
             wrapperCol={{ span: 20 }}
           >
             <Form.Item<AttrFieldType>
-              label={t("name")}
+              label={t('name')}
               name="attr_name"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label={t("id")}
+              label={t('id')}
               name="attr_id"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Input />
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label={t("type")}
+              label={t('type')}
               name="attr_type"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Select>
                 {attrTypeList.map((item) => {
@@ -241,9 +241,9 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
               }
             >
               {({ getFieldValue }) =>
-                getFieldValue("attr_type") === "enum" ? (
+                getFieldValue('attr_type') === 'enum' ? (
                   <Form.Item<AttrFieldType>
-                    label={t("value")}
+                    label={t('value')}
                     name="option"
                     rules={[{ validator: validateEnumList }]}
                   >
@@ -264,7 +264,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                 {(provided: any) => (
                                   <li
                                     className={`flex ${
-                                      index ? "mt-[10px]" : ""
+                                      index ? 'mt-[10px]' : ''
                                     }`}
                                     ref={provided.innerRef}
                                     {...provided.draggableProps}
@@ -272,8 +272,8 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                   >
                                     <HolderOutlined className="mr-[4px]" />
                                     <Input
-                                      disabled={type === "edit"}
-                                      placeholder={t("fieldKey")}
+                                      disabled={type === 'edit'}
+                                      placeholder={t('fieldKey')}
                                       className="mr-[10px] w-1/5"
                                       value={enumItem.name}
                                       onChange={(e) =>
@@ -281,7 +281,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
                                       }
                                     />
                                     <Input
-                                      placeholder={t("fieldValue")}
+                                      placeholder={t('fieldValue')}
                                       className="mr-[10px] w-3/5"
                                       value={enumItem.id}
                                       onChange={(e) =>
@@ -312,33 +312,33 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
               }
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label={t("editable")}
+              label={t('editable')}
               name="editable"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Radio.Group>
-                <Radio value={true}>{t("yes")}</Radio>
-                <Radio value={false}>{t("no")}</Radio>
+                <Radio value={true}>{t('yes')}</Radio>
+                <Radio value={false}>{t('no')}</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label={t("unique")}
+              label={t('unique')}
               name="is_only"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Radio.Group>
-                <Radio value={true}>{t("yes")}</Radio>
-                <Radio value={false}>{t("no")}</Radio>
+                <Radio value={true}>{t('yes')}</Radio>
+                <Radio value={false}>{t('no')}</Radio>
               </Radio.Group>
             </Form.Item>
             <Form.Item<AttrFieldType>
-              label={t("required")}
+              label={t('required')}
               name="is_required"
-              rules={[{ required: true, message: t("required") }]}
+              rules={[{ required: true, message: t('required') }]}
             >
               <Radio.Group>
-                <Radio value={true}>{t("yes")}</Radio>
-                <Radio value={false}>{t("no")}</Radio>
+                <Radio value={true}>{t('yes')}</Radio>
+                <Radio value={false}>{t('no')}</Radio>
               </Radio.Group>
             </Form.Item>
           </Form>
@@ -347,5 +347,5 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     );
   }
 );
-AttributesModal.displayName = "attributesModal";
+AttributesModal.displayName = 'attributesModal';
 export default AttributesModal;

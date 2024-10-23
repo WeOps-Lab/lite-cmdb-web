@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
 import React, {
   useState,
   forwardRef,
   useImperativeHandle,
   useEffect,
-} from "react";
-import { Select, Button, message, TablePaginationConfig, Spin } from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
+} from 'react';
+import { Select, Button, message, TablePaginationConfig, Spin } from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
 import {
   AttrFieldType,
   UserItem,
   Organization,
   ModelItem,
   ColumnItem,
-} from "@/types/assetManage";
-import { getAssetColumns } from "@/utils/common";
-import useApiClient from "@/utils/request";
-import SearchFilter from "@/app/assetData/list/searchFilter";
-import CustomTable from "@/components/custom-table";
-import selectInstanceStyle from "./selectInstance.module.less";
+} from '@/types/assetManage';
+import { getAssetColumns } from '@/utils/common';
+import useApiClient from '@/utils/request';
+import SearchFilter from '@/app/assetData/list/searchFilter';
+import CustomTable from '@/components/custom-table';
+import selectInstanceStyle from './selectInstance.module.less';
 const { Option } = Select;
-import { CloseOutlined } from "@ant-design/icons";
+import { CloseOutlined } from '@ant-design/icons';
 
 interface FieldModalProps {
   onSuccess: () => void;
@@ -55,11 +55,11 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
       total: 0,
       pageSize: 20,
     });
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
     const [instanceData, setInstanceData] = useState<any>({});
-    const [modelId, setModelId] = useState<string>("");
-    const [credentialModelId, setCredentialModelId] = useState<string>("");
+    const [modelId, setModelId] = useState<string>('');
+    const [credentialModelId, setCredentialModelId] = useState<string>('');
     const [tableLoading, setTableLoading] = useState<boolean>(false);
     const [selectedRowKeys, setSelectedRowKeys] = useState<Array<any>>([]);
     const [columns, setColumns] = useState<ColumnItem[]>([]);
@@ -102,7 +102,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
         const attrList = get(`/api/model/${modelId}/attr_list/`);
         const getInstanseList = post(`/api/instance/search/`, params);
         const getAssoInsts = post(
-          "/api/credential/credential_association_inst_list/",
+          '/api/credential/credential_association_inst_list/',
           credentialParams
         );
         Promise.all([attrList, getInstanseList, getAssoInsts])
@@ -145,10 +145,10 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
         const params = {
           credential_id: instanceData._id,
           instance_ids: selectedRowKeys,
-          model_id: credentialModelId
+          model_id: credentialModelId,
         };
         await post(`/api/credential/credential_association_inst/`, params);
-        message.success(t("successfullyAssociated"));
+        message.success(t('successfullyAssociated'));
         handleCancel();
       } finally {
         setConfirmLoading(false);
@@ -175,9 +175,9 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
         query_list: queryList ? [queryList] : [],
         page: pagination.current,
         page_size: pagination.pageSize,
-        order: "",
+        order: '',
         model_id: credentialModelId,
-        role: "",
+        role: '',
       };
     };
 
@@ -224,9 +224,9 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
                 loading={confirmLoading}
                 onClick={handleSubmit}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
@@ -261,7 +261,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
                   pagination={pagination}
                   loading={tableLoading}
                   rowKey="_id"
-                  scroll={{ x: 620, y: "calc(100vh - 200px)" }}
+                  scroll={{ x: 620, y: 'calc(100vh - 200px)' }}
                   onChange={handleTableChange}
                 />
               </div>
@@ -286,7 +286,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
                     const item = tableData.find((data) => data._id === key);
                     return (
                       <li className={selectInstanceStyle.listItem} key={key}>
-                        <span>{item?.inst_name || "--"}</span>
+                        <span>{item?.inst_name || '--'}</span>
                         <CloseOutlined
                           className={`text-[12px] ${selectInstanceStyle.operate}`}
                           onClick={() => handleRemoveItem(key)}
@@ -303,5 +303,5 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-SelectInstance.displayName = "fieldMoadal";
+SelectInstance.displayName = 'fieldMoadal';
 export default SelectInstance;

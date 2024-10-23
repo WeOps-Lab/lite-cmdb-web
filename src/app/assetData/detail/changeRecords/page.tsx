@@ -1,20 +1,20 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import { DatePicker, Timeline, Spin } from "antd";
-import changeRecordsStyle from "./index.module.less";
-import useApiClient from "@/utils/request";
-import RecordDetail from "./recordDetail";
-import { useTranslation } from "@/utils/i18n";
-import { useSearchParams } from "next/navigation";
-import { useCommon } from "@/context/common";
+import React, { useState, useEffect, useRef } from 'react';
+import { DatePicker, Timeline, Spin } from 'antd';
+import changeRecordsStyle from './index.module.less';
+import useApiClient from '@/utils/request';
+import RecordDetail from './recordDetail';
+import { useTranslation } from '@/utils/i18n';
+import { useSearchParams } from 'next/navigation';
+import { useCommon } from '@/context/common';
 import {
   AttrFieldType,
   ModelItem,
   Organization,
   UserItem,
   AssoTypeItem,
-} from "@/types/assetManage";
+} from '@/types/assetManage';
 
 const { RangePicker } = DatePicker;
 
@@ -59,8 +59,8 @@ const ChangeRecords: React.FC = () => {
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [assoTypes, setAssoTypes] = useState<AssoTypeItem[]>([]);
   const searchParams = useSearchParams();
-  const modelId: string = searchParams.get("model_id") || "";
-  const instId: string = searchParams.get("inst_id") || "";
+  const modelId: string = searchParams.get('model_id') || '';
+  const instId: string = searchParams.get('inst_id') || '';
 
   useEffect(() => {
     if (isLoading) return;
@@ -71,23 +71,23 @@ const ChangeRecords: React.FC = () => {
   const showDetailModal = (log: RecordItemList) => {
     detailRef.current?.showModal({
       title: enumList[log.type] + showModelName(log.model_id),
-      subTitle: "",
+      subTitle: '',
       recordRow: log,
     });
   };
 
   const showModelName = (id: unknown) => {
-    return modelList.find((item) => item.model_id === id)?.model_name || "--";
+    return modelList.find((item) => item.model_id === id)?.model_name || '--';
   };
 
   const initData = async () => {
-    const getChangeRecordLists = get("/api/change_record/", {
+    const getChangeRecordLists = get('/api/change_record/', {
       params: getParams(),
     });
-    const getEnumData = get("/api/change_record/enum_data/");
+    const getEnumData = get('/api/change_record/enum_data/');
     const getAttrList = get(`/api/model/${modelId}/attr_list/`);
-    const getModelList = get("/api/model/");
-    const getAssoType = get("/api/model/model_association_type/");
+    const getModelList = get('/api/model/');
+    const getAssoType = get('/api/model/model_association_type/');
     try {
       setLoading(true);
       Promise.all([
@@ -158,11 +158,11 @@ const ChangeRecords: React.FC = () => {
 
   const handleDateChange = async (dateString: any = []) => {
     const params: any = getParams();
-    params.created_at_after = dateString[0] || "";
-    params.created_at_before = dateString[1] || "";
+    params.created_at_after = dateString[0] || '';
+    params.created_at_before = dateString[1] || '';
     setLoading(true);
     try {
-      const data = await get("/api/change_record/", {
+      const data = await get('/api/change_record/', {
         params,
       });
       dealRecordList(data);
@@ -206,7 +206,7 @@ const ChangeRecords: React.FC = () => {
                         <span
                           className={`${changeRecordsStyle.operator} text-[var(--color-text-3)]`}
                         >
-                          {t("Model.operator")}: {log.operator}
+                          {t('Model.operator')}: {log.operator}
                         </span>
                       </div>
                     </div>

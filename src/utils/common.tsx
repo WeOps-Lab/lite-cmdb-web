@@ -1,7 +1,7 @@
-import { BUILD_IN_MODEL, CREDENTIAL_LIST } from "@/constants/asset";
-import { getSvgIcon } from "./utils";
-import { AttrFieldType } from "@/types/assetManage";
-import { Tag, Select, Input, Cascader, DatePicker } from "antd";
+import { BUILD_IN_MODEL, CREDENTIAL_LIST } from '@/constants/asset';
+import { getSvgIcon } from './utils';
+import { AttrFieldType } from '@/types/assetManage';
+import { Tag, Select, Input, Cascader, DatePicker } from 'antd';
 import {
   ModelIconItem,
   ColumnItem,
@@ -11,13 +11,13 @@ import {
   OriginOrganization,
   OriginSubGroupItem,
   EnumList,
-} from "@/types/assetManage";
+} from '@/types/assetManage';
 const { RangePicker } = DatePicker;
 
 export const iconList = getSvgIcon();
 export function getIconUrl(tex: ModelIconItem) {
   try {
-    const icon = tex.icn?.split("icon-")[1];
+    const icon = tex.icn?.split('icon-')[1];
 
     // 查找显示的图标
     const showIcon = iconList.find((item) => item.key === icon);
@@ -34,14 +34,14 @@ export function getIconUrl(tex: ModelIconItem) {
       : null;
 
     // 使用内置模型图标或者默认图标
-    const iconUrl = builtIcon?.url || "cc-default_默认";
+    const iconUrl = builtIcon?.url || 'cc-default_默认';
 
     // 返回图标路径
     return require(`../../public/assets/assetModelIcon/${iconUrl}.svg`);
   } catch (e) {
     // 记录错误日志并返回默认图标
-    console.error("Error in getIconUrl:", e);
-    return require("../../public/assets/assetModelIcon/cc-default_默认.svg");
+    console.error('Error in getIconUrl:', e);
+    return require('../../public/assets/assetModelIcon/cc-default_默认.svg');
   }
 }
 
@@ -67,7 +67,7 @@ export const deepClone = (obj: any, hash = new WeakMap()) => {
   }
 
   // 复制函数
-  if (typeof obj === "function") {
+  if (typeof obj === 'function') {
     return function (this: unknown, ...args: unknown[]): unknown {
       return obj.apply(this, args);
     };
@@ -89,7 +89,7 @@ export const deepClone = (obj: any, hash = new WeakMap()) => {
 };
 
 export const getRandomColor = () => {
-  const colors = ["#875CFF", "#FF9214", "#00CBA6", "#1272FF"];
+  const colors = ['#875CFF', '#FF9214', '#00CBA6', '#1272FF'];
   const randomIndex = Math.floor(Math.random() * colors.length);
   return colors[randomIndex];
 };
@@ -113,7 +113,7 @@ export const findGroupNameById = (arr: Array<SubGroupItem>, value: unknown) => {
 // 根据数组id找出对应名称（多选）
 export const findNameByIds = (list: Array<any>, ids: Array<string>) => {
   const map = new Map(list.map((i) => [i.id, i.name]));
-  return ids.map((id) => map.get(id)).join("，") || "--";
+  return ids.map((id) => map.get(id)).join('，') || '--';
 };
 
 // 组织改造成联级数据
@@ -156,13 +156,13 @@ export const getAssetColumns = (config: {
       },
     };
     switch (attrType) {
-      case "user":
+      case 'user':
         return {
           ...columnItem,
           render: (_: unknown, record: any) => {
             const userName =
               (config.userList || []).find((item) => item.id === record[attrId])
-                ?.username || "--";
+                ?.username || '--';
             return (
               <div className="column-user" title={userName}>
                 <span
@@ -176,57 +176,57 @@ export const getAssetColumns = (config: {
             );
           },
         };
-      case "pwd":
+      case 'pwd':
         return {
           ...columnItem,
           render: () => <>***</>,
         };
-      case "organization":
+      case 'organization':
         return {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
               {findGroupNameById(config.groupList || [], record[attrId][0]) ||
-                "--"}
+                '--'}
             </>
           ),
         };
-      case "bool":
+      case 'bool':
         return {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
-              <Tag color={record[attrId] ? "green" : "geekblue"}>
-                {config.t(record[attrId] ? "yes" : "no")}
+              <Tag color={record[attrId] ? 'green' : 'geekblue'}>
+                {config.t(record[attrId] ? 'yes' : 'no')}
               </Tag>
             </>
           ),
         };
-      case "enum":
+      case 'enum':
         return {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
               {item.option?.find((item: EnumList) => item.id === record[attrId])
-                ?.name || "--"}
+                ?.name || '--'}
             </>
           ),
         };
-      case "time":
+      case 'time':
         return {
           ...columnItem,
           render: (_: unknown, record: any) => (
             <>
               {Array.isArray(record[attrId])
-                ? record[attrId].join("-")
-                : record[attrId] || "--"}
+                ? record[attrId].join('-')
+                : record[attrId] || '--'}
             </>
           ),
         };
       default:
         return {
           ...columnItem,
-          render: (_: unknown, record: any) => <>{record[attrId] || "--"}</>,
+          render: (_: unknown, record: any) => <>{record[attrId] || '--'}</>,
         };
     }
   });
@@ -242,7 +242,7 @@ export const getFieldItem = (config: {
 }) => {
   if (config.isEdit) {
     switch (config.fieldItem.attr_type) {
-      case "user":
+      case 'user':
         return (
           <Select>
             {config.userList?.map((opt: UserItem) => (
@@ -252,7 +252,7 @@ export const getFieldItem = (config: {
             ))}
           </Select>
         );
-      case "enum":
+      case 'enum':
         return (
           <Select>
             {config.fieldItem.option?.map((opt) => (
@@ -262,12 +262,12 @@ export const getFieldItem = (config: {
             ))}
           </Select>
         );
-      case "bool":
+      case 'bool':
         return (
           <Select>
             {[
-              { id: 1, name: "Yes" },
-              { id: 0, name: "No" },
+              { id: 1, name: 'Yes' },
+              { id: 0, name: 'No' },
             ].map((opt) => (
               <Select.Option key={opt.id} value={opt.id}>
                 {opt.name}
@@ -275,12 +275,12 @@ export const getFieldItem = (config: {
             ))}
           </Select>
         );
-      case "organization":
+      case 'organization':
         return <Cascader options={config.groupList} />;
-      case "time":
+      case 'time':
         return (
           <RangePicker
-            showTime={{ format: "HH:mm" }}
+            showTime={{ format: 'HH:mm' }}
             format="YYYY-MM-DD HH:mm"
           />
         );
@@ -289,10 +289,10 @@ export const getFieldItem = (config: {
     }
   }
   switch (config.fieldItem.attr_type) {
-    case "user":
+    case 'user':
       const userName =
         (config.userList || []).find((item) => item.id === config.value)
-          ?.username || "--";
+          ?.username || '--';
       return config.hideUserAvatar ? (
         userName
       ) : (
@@ -306,23 +306,23 @@ export const getFieldItem = (config: {
           {userName}
         </div>
       );
-    case "organization":
+    case 'organization':
       return (
         findGroupNameById(
           config.groupList || [],
           Array.isArray(config.value) ? config.value?.[0] : config.value
-        ) || "--"
+        ) || '--'
       );
-    case "bool":
-      return config.value ? "Yes" : "No";
-    case "enum":
+    case 'bool':
+      return config.value ? 'Yes' : 'No';
+    case 'enum':
       return (
         config.fieldItem.option?.find(
           (item: EnumList) => item.id === config.value
-        )?.name || "--"
+        )?.name || '--'
       );
     default:
-      return config.value || "--";
+      return config.value || '--';
   }
 };
 

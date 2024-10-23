@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { createContext, useContext, useEffect, useState } from "react";
-import useApiClient from "@/utils/request";
-import { UserItem, Organization } from "@/types/assetManage";
-import { convertArray, filterNodesWithAllParents } from "@/utils/common";
+import { createContext, useContext, useEffect, useState } from 'react';
+import useApiClient from '@/utils/request';
+import { UserItem, Organization } from '@/types/assetManage';
+import { convertArray, filterNodesWithAllParents } from '@/utils/common';
 
 interface CommonContextType {
   permissionGroupsInfo: PermissionGroupsInfo;
@@ -40,9 +40,9 @@ const CommonContextProvider = ({ children }: { children: React.ReactNode }) => {
   const getPermissionGroups = async () => {
     setPageLoading(true);
     try {
-      const getUserList = get("/api/user_group/user_list/");
-      const getOrganizationList = get("/api/user_group/group_list/");
-      const getAuthOrganization = get("/api/user_group/user_groups/");
+      const getUserList = get('/api/user_group/user_list/');
+      const getOrganizationList = get('/api/user_group/group_list/');
+      const getAuthOrganization = get('/api/user_group/user_groups/');
       Promise.all([getUserList, getOrganizationList, getAuthOrganization])
         .then((res) => {
           const userData: UserItem[] = res[0].users;

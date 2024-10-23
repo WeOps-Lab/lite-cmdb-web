@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import React, {
   useState,
   forwardRef,
   useImperativeHandle,
   useEffect,
-} from "react";
+} from 'react';
 import {
   Input,
   Button,
@@ -16,13 +16,13 @@ import {
   DatePicker,
   Col,
   Row,
-} from "antd";
-import OperateModal from "@/components/operate-modal";
-import { useTranslation } from "@/utils/i18n";
-import { AttrFieldType, Organization, UserItem } from "@/types/assetManage";
-import { deepClone } from "@/utils/common";
-import useApiClient from "@/utils/request";
-import dayjs from "dayjs";
+} from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { useTranslation } from '@/utils/i18n';
+import { AttrFieldType, Organization, UserItem } from '@/types/assetManage';
+import { deepClone } from '@/utils/common';
+import useApiClient from '@/utils/request';
+import dayjs from 'dayjs';
 interface FieldModalProps {
   onSuccess: (instId?: string) => void;
   organizationList: Organization[];
@@ -54,13 +54,13 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
   ({ onSuccess, userList, organizationList }, ref) => {
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
-    const [subTitle, setSubTitle] = useState<string>("");
-    const [title, setTitle] = useState<string>("");
-    const [type, setType] = useState<string>("");
+    const [subTitle, setSubTitle] = useState<string>('');
+    const [title, setTitle] = useState<string>('');
+    const [type, setType] = useState<string>('');
     const [formItems, setFormItems] = useState<AttrFieldType[]>([]);
     const [instanceData, setInstanceData] = useState<any>({});
     const [selectedRows, setSelectedRows] = useState<any[]>([]);
-    const [modelId, setModelId] = useState<string>("");
+    const [modelId, setModelId] = useState<string>('');
     const [form] = Form.useForm();
     const { t } = useTranslation();
     const { post } = useApiClient();
@@ -92,21 +92,21 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setFormItems(attrList);
         setSelectedRows(list);
         const forms = deepClone(formInfo);
-        if (type === "add") {
+        if (type === 'add') {
           Object.assign(forms, {
             organization: organizationList[0]?.value
               ? [organizationList[0]?.value]
-              : "",
+              : '',
           });
         } else {
           for (const key in forms) {
             const target = attrList.find((item) => item.attr_id === key);
             if (
-              target?.attr_type === "time" &&
+              target?.attr_type === 'time' &&
               forms[key].every((item: string) => !!item)
             ) {
               forms[key] = forms[key].map((date: string) =>
-                dayjs(date, "YYYY-MM-DD HH:mm:ss")
+                dayjs(date, 'YYYY-MM-DD HH:mm:ss')
               );
             }
           }
@@ -119,9 +119,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       form.validateFields().then((values) => {
         for (const key in values) {
           const target = formItems.find((item) => item.attr_id === key);
-          if (target?.attr_type === "time") {
+          if (target?.attr_type === 'time') {
             values[key] = values[key].map((date: any) =>
-              date.format("YYYY-MM-DD HH:mm:ss")
+              date.format('YYYY-MM-DD HH:mm:ss')
             );
           }
         }
@@ -134,16 +134,16 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
         setConfirmLoading(true);
         const formData = params;
         const msg: string = t(
-          type === "add" ? "successfullyAdded" : "successfullyModified"
+          type === 'add' ? 'successfullyAdded' : 'successfullyModified'
         );
         const url: string =
-          type === "add" ? `/api/instance/` : `/api/instance/batch_update/`;
+          type === 'add' ? `/api/instance/` : `/api/instance/batch_update/`;
         let requestParams: RequestParams = {
           model_id: modelId,
           instance_info: formData,
         };
-        if (type !== "add") {
-          if (type === "batchEdit") {
+        if (type !== 'add') {
+          if (type === 'batchEdit') {
             for (const key in formData) {
               if (
                 !formData[key] &&
@@ -155,13 +155,13 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
             }
           }
           requestParams = {
-            inst_ids: type === "edit" ? [instanceData._id] : selectedRows,
+            inst_ids: type === 'edit' ? [instanceData._id] : selectedRows,
             update_data: formData,
           };
         }
         const { _id: instId } = await post(url, requestParams);
         message.success(msg);
-        onSuccess(confirmType ? instId : "");
+        onSuccess(confirmType ? instId : '');
         handleCancel();
       } catch (error) {
         console.log(error);
@@ -190,26 +190,26 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 loading={confirmLoading}
                 onClick={() => handleSubmit()}
               >
-                {t("confirm")}
+                {t('confirm')}
               </Button>
               <Button
                 className="mr-[10px]"
                 loading={confirmLoading}
-                onClick={() => handleSubmit("associate")}
+                onClick={() => handleSubmit('associate')}
               >
-                {t("Model.confirmAndAssociate")}
+                {t('Model.confirmAndAssociate')}
               </Button>
-              <Button onClick={handleCancel}>{t("cancel")}</Button>
+              <Button onClick={handleCancel}>{t('cancel')}</Button>
             </div>
           }
         >
           <Form form={form}>
             <div className="font-[600] text-[var(--color-text-2)] text-[18px] pl-[12px] pb-[14px]">
-              {t("group")}
+              {t('group')}
             </div>
             <Row gutter={24}>
               {formItems
-                .filter((formItem) => formItem.attr_id === "organization")
+                .filter((formItem) => formItem.attr_id === 'organization')
                 .map((item) => (
                   <Col span={12} key={item.attr_id}>
                     <Form.Item
@@ -218,14 +218,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                       labelCol={{ span: 7 }}
                       rules={[
                         {
-                          required: item.is_required && type !== "batchEdit",
-                          message: t("required"),
+                          required: item.is_required && type !== 'batchEdit',
+                          message: t('required'),
                         },
                       ]}
                     >
                       <Cascader
                         showSearch
-                        disabled={!item.editable && type !== "add"}
+                        disabled={!item.editable && type !== 'add'}
                         options={organizationList}
                       />
                     </Form.Item>
@@ -233,11 +233,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                 ))}
             </Row>
             <div className="font-[600] text-[var(--color-text-2)] text-[18px] pl-[12px] pb-[14px]">
-              {t("information")}
+              {t('information')}
             </div>
             <Row gutter={24}>
               {formItems
-                .filter((formItem) => formItem.attr_id !== "organization")
+                .filter((formItem) => formItem.attr_id !== 'organization')
                 .map((item) => (
                   <Col span={12} key={item.attr_id}>
                     <Form.Item
@@ -246,18 +246,18 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                       labelCol={{ span: 7 }}
                       rules={[
                         {
-                          required: item.is_required && type !== "batchEdit",
-                          message: t("required"),
+                          required: item.is_required && type !== 'batchEdit',
+                          message: t('required'),
                         },
                       ]}
                     >
                       {(() => {
                         switch (item.attr_type) {
-                          case "user":
+                          case 'user':
                             return (
                               <Select
                                 showSearch
-                                disabled={!item.editable && type !== "add"}
+                                disabled={!item.editable && type !== 'add'}
                               >
                                 {userList.map((opt) => (
                                   <Select.Option key={opt.id} value={opt.id}>
@@ -266,10 +266,10 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 ))}
                               </Select>
                             );
-                          case "enum":
+                          case 'enum':
                             return (
                               <Select
-                                disabled={!item.editable && type !== "add"}
+                                disabled={!item.editable && type !== 'add'}
                               >
                                 {item.option?.map((opt) => (
                                   <Select.Option key={opt.id} value={opt.id}>
@@ -278,14 +278,14 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 ))}
                               </Select>
                             );
-                          case "bool":
+                          case 'bool':
                             return (
                               <Select
-                                disabled={!item.editable && type !== "add"}
+                                disabled={!item.editable && type !== 'add'}
                               >
                                 {[
-                                  { id: 1, name: "Yes" },
-                                  { id: 0, name: "No" },
+                                  { id: 1, name: 'Yes' },
+                                  { id: 0, name: 'No' },
                                 ].map((opt) => (
                                   <Select.Option key={opt.id} value={opt.id}>
                                     {opt.name}
@@ -293,11 +293,11 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                                 ))}
                               </Select>
                             );
-                          case "time":
+                          case 'time':
                             return (
                               <RangePicker
                                 showTime
-                                disabled={!item.editable && type !== "add"}
+                                disabled={!item.editable && type !== 'add'}
                                 format="YYYY-MM-DD HH:mm:ss"
                               />
                             );
@@ -305,9 +305,9 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                             return (
                               <Input
                                 disabled={
-                                  (!item.editable && type !== "add") ||
-                                  (type === "batchEdit" &&
-                                    item.attr_id === "inst_name")
+                                  (!item.editable && type !== 'add') ||
+                                  (type === 'batchEdit' &&
+                                    item.attr_id === 'inst_name')
                                 }
                               />
                             );
@@ -323,5 +323,5 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-FieldMoadal.displayName = "fieldMoadal";
+FieldMoadal.displayName = 'fieldMoadal';
 export default FieldMoadal;

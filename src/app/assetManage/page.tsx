@@ -1,31 +1,31 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
-import Introduction from "@/components/introduction";
-import { Input, Button, Modal, message, Spin } from "antd";
-import { deepClone } from "@/utils/common";
-import { GroupItem, ModelItem } from "@/types/assetManage";
+import React, { useState, useEffect, useRef } from 'react';
+import Introduction from '@/components/introduction';
+import { Input, Button, Modal, message, Spin } from 'antd';
+import { deepClone } from '@/utils/common';
+import { GroupItem, ModelItem } from '@/types/assetManage';
 import {
   EditTwoTone,
   DeleteTwoTone,
   SwitcherOutlined,
   HolderOutlined,
-} from "@ant-design/icons";
-import Image from "next/image";
-import assetManageStyle from "./index.module.less";
-import { getIconUrl } from "@/utils/common";
-import GroupModal from "./list/groupModal";
-import ModelModal from "./list/modelModal";
-import { useRouter } from "next/navigation";
-import useApiClient from "@/utils/request";
-import { useTranslation } from "@/utils/i18n";
+} from '@ant-design/icons';
+import Image from 'next/image';
+import assetManageStyle from './index.module.less';
+import { getIconUrl } from '@/utils/common';
+import GroupModal from './list/groupModal';
+import ModelModal from './list/modelModal';
+import { useRouter } from 'next/navigation';
+import useApiClient from '@/utils/request';
+import { useTranslation } from '@/utils/i18n';
 
 const AssetManage = () => {
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
   const [groupList, setGroupList] = useState<GroupItem[]>([]);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
   const [dragItem, setDragItem] = useState<any>({});
   const [dragOverItem, setDragOverItem] = useState<any>({});
   const groupRef = useRef<any>(null);
@@ -42,14 +42,14 @@ const AssetManage = () => {
 
   const showDeleteConfirm = (row: GroupItem) => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
           try {
             await del(`/api/classification/${row.classification_id}/`);
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             getModelGroup();
           } finally {
             resolve(true);
@@ -60,22 +60,22 @@ const AssetManage = () => {
   };
 
   const showGroupModal = (type: string, row = {}) => {
-    const title = t(type === "add" ? "Model.addGroup" : "Model.editGroup");
+    const title = t(type === 'add' ? 'Model.addGroup' : 'Model.editGroup');
     groupRef.current?.showModal({
       title,
       type,
       groupInfo: row,
-      subTitle: "",
+      subTitle: '',
     });
   };
 
   const shoModelModal = (type: string, row = {}) => {
-    const title = t(type === "add" ? "Model.addModel" : "Model.editModel");
+    const title = t(type === 'add' ? 'Model.addModel' : 'Model.editModel');
     modelRef.current?.showModal({
       title,
       type,
       modelForm: row,
-      subTitle: "",
+      subTitle: '',
     });
   };
 
@@ -135,8 +135,8 @@ const AssetManage = () => {
   };
 
   const getModelGroup = () => {
-    const getCroupList = get("/api/classification/");
-    const getModelList = get("/api/model/");
+    const getCroupList = get('/api/classification/');
+    const getModelList = get('/api/model/');
     setLoading(true);
     try {
       Promise.all([getModelList, getCroupList])
@@ -171,13 +171,13 @@ const AssetManage = () => {
   };
 
   return (
-    <div style={{ width: "100%", height: "100%" }}>
-      <Introduction title={t("Model.title")} message={t("Model.message")} />
+    <div style={{ width: '100%', height: '100%' }}>
+      <Introduction title={t('Model.title')} message={t('Model.message')} />
       <div className={assetManageStyle.modelSetting}>
         <div className="nav-box flex justify-between mb-[10px]">
           <div className="left-side w-[240px]">
             <Input
-              placeholder={t("search")}
+              placeholder={t('search')}
               value={searchText}
               allowClear
               onChange={onSearchTxtChange}
@@ -189,12 +189,12 @@ const AssetManage = () => {
             <Button
               type="primary"
               className="mr-[8px]"
-              onClick={() => shoModelModal("add")}
+              onClick={() => shoModelModal('add')}
             >
-              {t("Model.addModel")}
+              {t('Model.addModel')}
             </Button>
-            <Button onClick={() => showGroupModal("add")}>
-              {t("Model.addGroup")}
+            <Button onClick={() => showGroupModal('add')}>
+              {t('Model.addGroup')}
             </Button>
           </div>
         </div>
@@ -211,7 +211,7 @@ const AssetManage = () => {
                   <div className={assetManageStyle.groupOperate}>
                     <EditTwoTone
                       className="edit mr-[6px] cursor-pointer"
-                      onClick={() => showGroupModal("edit", item)}
+                      onClick={() => showGroupModal('edit', item)}
                     />
                     <DeleteTwoTone
                       className="delete cursor-pointer"
@@ -231,7 +231,7 @@ const AssetManage = () => {
                           (group) => group.model_id === dragItem.model_id
                         )
                           ? assetManageStyle.dragActive
-                          : ""
+                          : ''
                       }`}
                       key={index}
                       draggable
@@ -264,7 +264,7 @@ const AssetManage = () => {
                         <Image
                           src={getIconUrl(model)}
                           className="block w-auto h-10"
-                          alt={t("picture")}
+                          alt={t('picture')}
                           width={100}
                           height={40}
                         />

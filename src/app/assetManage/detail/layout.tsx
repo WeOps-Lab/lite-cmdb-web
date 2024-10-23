@@ -1,38 +1,38 @@
-"use client";
+'use client';
 
-import React, { useRef, useState, useEffect } from "react";
-import { Card, Modal, message, Spin } from "antd";
-import WithSideMenuLayout from "@/components/sub-layout";
-import { useRouter } from "next/navigation";
-import { getIconUrl } from "@/utils/common";
-import Image from "next/image";
-import { EditTwoTone, DeleteTwoTone } from "@ant-design/icons";
-import { useSearchParams } from "next/navigation";
-import ModelModal from "../list/modelModal";
-import attrLayoutStyle from "./layout.module.less";
-import useApiClient from "@/utils/request";
-import { ClassificationItem } from "@/types/assetManage";
-import { useTranslation } from "@/utils/i18n";
+import React, { useRef, useState, useEffect } from 'react';
+import { Card, Modal, message, Spin } from 'antd';
+import WithSideMenuLayout from '@/components/sub-layout';
+import { useRouter } from 'next/navigation';
+import { getIconUrl } from '@/utils/common';
+import Image from 'next/image';
+import { EditTwoTone, DeleteTwoTone } from '@ant-design/icons';
+import { useSearchParams } from 'next/navigation';
+import ModelModal from '../list/modelModal';
+import attrLayoutStyle from './layout.module.less';
+import useApiClient from '@/utils/request';
+import { ClassificationItem } from '@/types/assetManage';
+import { useTranslation } from '@/utils/i18n';
 
 const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [groupList, setGroupList] = useState<ClassificationItem[]>([]);
   const [pageLoading, setPageLoading] = useState<boolean>(false);
-  const objIcon: string = searchParams.get("icn") || "";
-  const modelName: string = searchParams.get("model_name") || "";
-  const modelId: string = searchParams.get("model_id") || "";
-  const classificationId: string = searchParams.get("classification_id") || "";
-  const isPre = searchParams.get("is_pre") === "true";
+  const objIcon: string = searchParams.get('icn') || '';
+  const modelName: string = searchParams.get('model_name') || '';
+  const modelId: string = searchParams.get('model_id') || '';
+  const classificationId: string = searchParams.get('classification_id') || '';
+  const isPre = searchParams.get('is_pre') === 'true';
   const { confirm } = Modal;
   const modelRef = useRef<any>(null);
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const menuItems = [
-    { label: t("Model.attributes"), path: "/assetManage/detail/attributes" },
+    { label: t('Model.attributes'), path: '/assetManage/detail/attributes' },
     {
-      label: t("Model.relationships"),
-      path: "/assetManage/detail/associations",
+      label: t('Model.relationships'),
+      path: '/assetManage/detail/associations',
     },
   ];
 
@@ -44,7 +44,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const getGroups = async () => {
     setPageLoading(true);
     try {
-      const data = await get("/api/classification/");
+      const data = await get('/api/classification/');
       setGroupList(data);
     } catch (error) {
       console.log(error);
@@ -64,16 +64,16 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
     router.push(`/assetManage`);
   };
 
-  const showDeleteConfirm = (row = { model_id: "" }) => {
+  const showDeleteConfirm = (row = { model_id: '' }) => {
     confirm({
-      title: t("deleteTitle"),
-      content: t("deleteContent"),
+      title: t('deleteTitle'),
+      content: t('deleteContent'),
       centered: true,
       onOk() {
         return new Promise(async (resolve, reject) => {
           try {
             await del(`/api/model/${row.model_id}/`);
-            message.success(t("successfullyDeleted"));
+            message.success(t('successfullyDeleted'));
             router.push(`/assetManage`);
           } finally {
             resolve(true);
@@ -84,24 +84,24 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   };
 
   const shoModelModal = (type: string, row = {}) => {
-    const title = t(type === "add" ? "Model.addModel" : "Model.editModel");
+    const title = t(type === 'add' ? 'Model.addModel' : 'Model.editModel');
     modelRef.current?.showModal({
       title,
       type,
       modelForm: row,
-      subTitle: "",
+      subTitle: '',
     });
   };
 
   return (
     <div className={`flex flex-col ${attrLayoutStyle.attrLayout}`}>
       <Spin spinning={pageLoading}>
-        <Card style={{ width: "100%" }} className="mb-[20px]">
+        <Card style={{ width: '100%' }} className="mb-[20px]">
           <header className="flex items-center">
             <Image
               src={getIconUrl({ icn: objIcon, model_id: modelId })}
               className="block mr-[20px]"
-              alt={t("picture")}
+              alt={t('picture')}
               width={40}
               height={40}
             />
@@ -116,7 +116,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
                 <EditTwoTone
                   className="edit mr-[6px] cursor-pointer"
                   onClick={() =>
-                    shoModelModal("edit", {
+                    shoModelModal('edit', {
                       model_name: modelName,
                       model_id: modelId,
                       classification_id: classificationId,

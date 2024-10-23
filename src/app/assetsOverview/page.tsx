@@ -1,14 +1,14 @@
-"use client";
-import React, { useEffect, useState } from "react";
-import Masonry from "react-masonry-css";
-import assetsOverviewStyle from "./index.module.less";
-import useApiClient from "@/utils/request";
-import { useTranslation } from "@/utils/i18n";
-import { GroupItem, ModelItem } from "@/types/assetManage";
-import { deepClone, getIconUrl } from "@/utils/common";
-import { useRouter } from "next/navigation";
-import Image from "next/image";
-import { Spin, Input } from "antd";
+'use client';
+import React, { useEffect, useState } from 'react';
+import Masonry from 'react-masonry-css';
+import assetsOverviewStyle from './index.module.less';
+import useApiClient from '@/utils/request';
+import { useTranslation } from '@/utils/i18n';
+import { GroupItem, ModelItem } from '@/types/assetManage';
+import { deepClone, getIconUrl } from '@/utils/common';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Spin, Input } from 'antd';
 
 const AssetsOverview: React.FC = () => {
   const { get, isLoading } = useApiClient();
@@ -17,7 +17,7 @@ const AssetsOverview: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [overViewList, setOverViewList] = useState<GroupItem[]>([]);
   const [allOverViewList, setAllOverViewList] = useState<GroupItem[]>([]);
-  const [searchText, setSearchText] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
 
   useEffect(() => {
     if (isLoading) return;
@@ -55,14 +55,14 @@ const AssetsOverview: React.FC = () => {
   };
 
   const handleClear = () => {
-    setSearchText("");
+    setSearchText('');
     setOverViewList(allOverViewList);
   };
 
   const fetchAssetsOverviewList = () => {
-    const getCroupList = get("/api/classification/");
-    const getModelList = get("/api/model/");
-    const getModelInstCount = get("/api/instance/model_inst_count/");
+    const getCroupList = get('/api/classification/');
+    const getModelList = get('/api/model/');
+    const getModelInstCount = get('/api/instance/model_inst_count/');
     setLoading(true);
     try {
       Promise.all([getModelList, getCroupList, getModelInstCount])
@@ -101,14 +101,14 @@ const AssetsOverview: React.FC = () => {
           className="w-[320px]"
           value={searchText}
           allowClear
-          placeholder={t("search")}
+          placeholder={t('search')}
           onPressEnter={handleSearch}
           onClear={handleClear}
           onChange={handleTextChange}
         />
         <Masonry
           breakpointCols={breakpointColumnsObj}
-          className={assetsOverviewStyle["my-masonry-grid"]}
+          className={assetsOverviewStyle['my-masonry-grid']}
           columnClassName="my-masonry-grid_column"
         >
           {overViewList.map((item) => (
@@ -132,7 +132,7 @@ const AssetsOverview: React.FC = () => {
                       <Image
                         src={getIconUrl(sec)}
                         className="block w-auto h-10"
-                        alt={t("picture")}
+                        alt={t('picture')}
                         width={20}
                         height={20}
                       />

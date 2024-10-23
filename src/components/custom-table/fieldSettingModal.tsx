@@ -1,12 +1,12 @@
-import React, { useState, forwardRef, useImperativeHandle } from "react";
-import { Checkbox, Button } from "antd";
-import OperateModal from "@/components/operate-modal";
-import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useTranslation } from "@/utils/i18n";
-import type { CheckboxProps } from "antd";
-import fieldSettingModalStyle from "./fieldSettingModal.module.less";
-import { HolderOutlined, CloseOutlined } from "@ant-design/icons";
-import { deepClone } from "@/utils/common";
+import React, { useState, forwardRef, useImperativeHandle } from 'react';
+import { Checkbox, Button } from 'antd';
+import OperateModal from '@/components/operate-modal';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+import { useTranslation } from '@/utils/i18n';
+import type { CheckboxProps } from 'antd';
+import fieldSettingModalStyle from './fieldSettingModal.module.less';
+import { HolderOutlined, CloseOutlined } from '@ant-design/icons';
+import { deepClone } from '@/utils/common';
 
 interface ColumnItem {
   title: string;
@@ -27,7 +27,7 @@ export interface FieldModalRef {
 const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
   ({ onConfirm, choosableFields, displayFieldKeys }, ref) => {
     const { t } = useTranslation();
-    const [title, setTitle] = useState<string>("");
+    const [title, setTitle] = useState<string>('');
     const [visible, setVisible] = useState<boolean>(false);
     const [checkedFields, setCheckedFields] = useState<string[]>(
       choosableFields.map((field) => field.key)
@@ -40,14 +40,14 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
     useImperativeHandle(ref, () => ({
       showModal: ({ title }) => {
         // 开启弹窗的交互
-        setTitle(title || t("fieldSetting"));
+        setTitle(title || t('fieldSetting'));
         handleCheckboxChange(displayFieldKeys);
         setVisible(true);
       },
     }));
 
     // 全选或取消全选
-    const onCheckAllChange: CheckboxProps["onChange"] = (e) => {
+    const onCheckAllChange: CheckboxProps['onChange'] = (e) => {
       setCheckedFields(
         e.target.checked ? choosableFields.map((item) => item.key) : []
       );
@@ -112,9 +112,9 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
               type="primary"
               onClick={handleSubmit}
             >
-              {t("confirm")}
+              {t('confirm')}
             </Button>
-            <Button onClick={handleCancel}>{t("cancel")}</Button>
+            <Button onClick={handleCancel}>{t('cancel')}</Button>
           </div>
         }
       >
@@ -128,7 +128,7 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
                 onChange={onCheckAllChange}
                 checked={checkAll}
               >
-                {t("selectAll")}
+                {t('selectAll')}
               </Checkbox>
             </div>
             <Checkbox.Group
@@ -148,10 +148,10 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
           <div className={`${fieldSettingModalStyle.rightSide} w-1/2 p-4`}>
             <div className="flex justify-between items-center">
               <span>
-                {t("selected")} ({`${checkedFields.length} ${t("item")}`} )
+                {t('selected')} ({`${checkedFields.length} ${t('item')}`} )
               </span>
               <Button type="link" onClick={handleClear}>
-                {t("clear")}
+                {t('clear')}
               </Button>
             </div>
             <DragDropContext onDragEnd={handleDragEnd}>
@@ -200,5 +200,5 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
     );
   }
 );
-FieldSettingModal.displayName = "fieldSettingModal";
+FieldSettingModal.displayName = 'fieldSettingModal';
 export default FieldSettingModal;
