@@ -1,19 +1,19 @@
-"use client";
-import React, { useEffect, useState, useRef } from "react";
-import { useTranslation } from "@/utils/i18n";
-import { SearchOutlined } from "@ant-design/icons";
-import assetSearchStyle from "./index.module.less";
-import { ArrowRightOutlined } from "@ant-design/icons";
+'use client';
+import React, { useEffect, useState, useRef } from 'react';
+import { useTranslation } from '@/utils/i18n';
+import { SearchOutlined } from '@ant-design/icons';
+import assetSearchStyle from './index.module.less';
+import { ArrowRightOutlined } from '@ant-design/icons';
 import {
   AttrFieldType,
   UserItem,
   Organization,
   ModelItem,
-} from "@/types/assetManage";
-import { Spin, Input, Tabs, Button } from "antd";
-import useApiClient from "@/utils/request";
-import { useCommon } from "@/context/common";
-import { deepClone, getFieldItem } from "@/utils/common";
+} from '@/types/assetManage';
+import { Spin, Input, Tabs, Button } from 'antd';
+import useApiClient from '@/utils/request';
+import { useCommon } from '@/context/common';
+import { deepClone, getFieldItem } from '@/utils/common';
 const { Search } = Input;
 interface AssetListItem {
   model_id: string;
@@ -41,8 +41,8 @@ const AssetSearch = () => {
   const users = useRef(commonContext?.userList || []);
   const userList: UserItem[] = users.current;
   const [propertyList, setPropertyList] = useState<AttrFieldType[]>([]);
-  const [searchText, setSearchText] = useState<string>("");
-  const [activeTab, setActiveTab] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>('');
+  const [activeTab, setActiveTab] = useState<string>('');
   const [items, setItems] = useState<TabJsxItem[]>([]);
   const [showSearch, setShowSearch] = useState<boolean>(true);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
@@ -70,7 +70,7 @@ const AssetSearch = () => {
   const getInitData = async () => {
     setPageLoading(true);
     try {
-      const data = await get("/api/model/");
+      const data = await get('/api/model/');
       setModelList(data);
     } finally {
       setPageLoading(false);
@@ -83,13 +83,13 @@ const AssetSearch = () => {
     setPageLoading(true);
     try {
       const data: AssetListItem[] = await post(
-        "/api/instance/fulltext_search/",
+        '/api/instance/fulltext_search/',
         {
           search: searchText,
         }
       );
       const tabItems: TabItem[] = getAssetList(data);
-      const defaultTab = tabItems[0]?.key || "";
+      const defaultTab = tabItems[0]?.key || '';
       const attrList = await get(`/api/model/${defaultTab}/attr_list/`);
       setPropertyList(attrList);
       setInstData(tabItems);
@@ -145,15 +145,13 @@ const AssetSearch = () => {
               <div
                 key={index}
                 className={`${assetSearchStyle.listItem} ${
-                  index === activeInstItem ? assetSearchStyle.active : ""
+                  index === activeInstItem ? assetSearchStyle.active : ''
                 }`}
                 onClick={() => checkInstDetail(index, target)}
               >
-                <div className={`${assetSearchStyle.title} mb-[10px]`}>{`${
-                  item.key
-                } - ${
-                  target.find((title: TabJsxItem) => title.key === "inst_name")
-                    ?.children || "--"
+                <div className={assetSearchStyle.title}>{`${item.key} - ${
+                  target.find((title: TabJsxItem) => title.key === 'inst_name')
+                    ?.children || '--'
                 }`}</div>
                 <ul>
                   {target.map((list: TabJsxItem) => {
@@ -169,16 +167,16 @@ const AssetSearch = () => {
                         isEdit: false,
                         value: list.children,
                         hideUserAvatar: true,
-                      }).toString() || "--";
+                      }).toString() || '--';
                     return fieldVal.includes(searchText) ||
-                        ["inst_name", "organization"].includes(list.key) ? (
+                      ['inst_name', 'organization'].includes(list.key) ? (
                         <li key={list.key}>
                           <span>{list.label}</span>:
                           <span
                             className={
                               fieldVal.includes(searchText)
-                                ? "text-[var(--color-primary)]"
-                                : ""
+                                ? 'text-[var(--color-primary)]'
+                                : ''
                             }
                           >
                             {fieldVal}
@@ -194,8 +192,8 @@ const AssetSearch = () => {
             <div className={assetSearchStyle.detailTile}>
               <div className={assetSearchStyle.title}>{`${item.key} - ${
                 instDetail.find(
-                  (title: TabJsxItem) => title.key === "inst_name"
-                )?.children || "--"
+                  (title: TabJsxItem) => title.key === 'inst_name'
+                )?.children || '--'
               }`}</div>
               <Button
                 type="link"
@@ -203,7 +201,7 @@ const AssetSearch = () => {
                 icon={<ArrowRightOutlined />}
                 onClick={linkToDetail}
               >
-                {t("seeMore")}
+                {t('seeMore')}
               </Button>
             </div>
             <ul>
@@ -220,7 +218,7 @@ const AssetSearch = () => {
                     isEdit: false,
                     value: list.children,
                     hideUserAvatar: true,
-                  }).toString() || "--";
+                  }).toString() || '--';
                 return (
                   <li
                     key={list.key}
@@ -239,8 +237,8 @@ const AssetSearch = () => {
                       title={fieldVal}
                       className={`${
                         fieldVal.includes(searchText)
-                          ? "text-[var(--color-primary)]"
-                          : ""
+                          ? 'text-[var(--color-primary)]'
+                          : ''
                       } ${assetSearchStyle.listItemValue}`}
                     >
                       {fieldVal}
@@ -259,24 +257,24 @@ const AssetSearch = () => {
   const getModelName = (item: TabItem) => {
     return (
       (modelList.find((model) => model.model_id === item.key)?.model_name ||
-        "--") + `(${item.children.length})`
+        '--') + `(${item.children.length})`
     );
   };
 
   const linkToDetail = () => {
     const _instDetail = deepClone(instDetail);
     const params: any = {
-      icn: "",
+      icn: '',
       model_name:
         modelList.find((model) => model.model_id === activeTab)?.model_name ||
-        "--",
+        '--',
       model_id: activeTab,
-      classification_id: "",
-      inst_id: _instDetail[0]?.id || "",
+      classification_id: '',
+      inst_id: _instDetail[0]?.id || '',
     };
     const queryString = new URLSearchParams(params).toString();
     const url = `/assetData/detail/baseInfo?${queryString}`;
-    window.open(url, "_blank", "noopener,noreferrer");
+    window.open(url, '_blank', 'noopener,noreferrer');
   };
 
   const onTabChange = async (key: string) => {
@@ -306,14 +304,14 @@ const AssetSearch = () => {
               value={searchText}
               allowClear
               size="large"
-              placeholder={t("Model.assetSearchTxt")}
+              placeholder={t('Model.assetSearchTxt')}
               enterButton={
                 <div
                   className={assetSearchStyle.searchBtn}
                   onClick={handleSearch}
                 >
                   <SearchOutlined className="pr-[8px]" />
-                  {t("searchTxt")}
+                  {t('searchTxt')}
                 </div>
               }
               onChange={handleTextChange}
@@ -323,17 +321,17 @@ const AssetSearch = () => {
         ) : (
           <div className={assetSearchStyle.searchDetail}>
             <Search
-              className="w-[500px]"
+              className={assetSearchStyle.input}
               value={searchText}
               allowClear
-              placeholder={t("Model.assetSearchTxt")}
+              placeholder={t('Model.assetSearchTxt')}
               enterButton={
                 <div
                   className={assetSearchStyle.searchBtn}
                   onClick={handleSearch}
                 >
                   <SearchOutlined className="pr-[8px]" />
-                  {t("searchTxt")}
+                  {t('searchTxt')}
                 </div>
               }
               onChange={handleTextChange}

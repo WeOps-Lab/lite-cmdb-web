@@ -7,6 +7,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
+
     .title {
         font-size: 15px;
         font-weight: 600;
@@ -33,6 +34,11 @@
     }
 
     .searchDetail {
+        .input {
+            min-width: 500px;
+            width: calc(100vw - 450px);
+        }
+
         .searchResult {
             display: flex;
 
@@ -41,6 +47,7 @@
                 padding: 10px;
                 flex: 1;
                 max-height: calc(100vh - 180px);
+                min-width: 500px;
                 overflow-y: auto;
 
                 .active {
@@ -61,7 +68,9 @@
 
                         li {
                             margin-right: 20px;
-                            line-height: 24px;
+                            line-height: 26px;
+                            color: var(--color-text-2);
+                            font-size: 13px;
                         }
                     }
                 }
@@ -79,7 +88,6 @@
                     display: flex;
                     justify-content: space-between;
                     align-items: center;
-                    margin-bottom: 10px;
 
                     .title {
                         max-width: 100%;
@@ -99,7 +107,8 @@
                     .detailListItem {
                         display: flex;
                         align-items: center;
-                        line-height: 28px;
+                        font-size: 13px;
+                        line-height: 26px;
 
                         .listItemLabel {
                             display: flex;
