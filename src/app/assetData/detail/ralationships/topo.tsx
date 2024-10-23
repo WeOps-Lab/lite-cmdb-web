@@ -5,6 +5,7 @@ import { useTranslation } from "@/utils/i18n";
 import useApiClient from "@/utils/request";
 import { InitNode } from "./topoData";
 import { Spin } from "antd";
+import topoStyle from "./index.module.less";
 
 interface AssoTopoProps {
   modelList: ModelItem[];
@@ -41,7 +42,11 @@ const Topo: React.FC<AssoTopoProps> = ({
 
   return (
     <Spin spinning={loading}>
-      <div style={{ height: "calc(100vh - 160px)" }} id="container">
+      <div
+        className={topoStyle.topo}
+        style={{ height: "calc(100vh - 160px)" }}
+        id="container"
+      >
         <XFlow>
           <XFlowGraph zoomable pannable minScale={0.05} maxScale={10} fitView />
           <Grid type="dot" options={{ color: "#ccc", thickness: 1 }} />
@@ -50,7 +55,7 @@ const Topo: React.FC<AssoTopoProps> = ({
             width={200}
             height={120}
             style={{
-              border: "1px solid #ccc",
+              border: "1px solid var(--color-border-3)",
               bottom: "10px",
               right: "10px",
               position: "absolute",
@@ -60,6 +65,7 @@ const Topo: React.FC<AssoTopoProps> = ({
             modelId={modelId}
             instId={instId}
             topoData={topoData}
+            assoTypeList={assoTypeList}
             modelList={modelList}
           />
         </XFlow>

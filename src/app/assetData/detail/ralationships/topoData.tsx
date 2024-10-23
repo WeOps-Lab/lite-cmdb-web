@@ -2,19 +2,26 @@ import { useGraphStore, useGraphInstance } from "@antv/xflow";
 import { useEffect, useCallback } from "react";
 import { Graph } from "@antv/x6";
 import { getIconUrl } from "@/utils/common";
-import { ModelItem, TopoData, NodeData } from "@/types/assetManage";
+import {
+  ModelItem,
+  TopoData,
+  NodeData,
+  AssoTypeItem,
+} from "@/types/assetManage";
 
 interface TopoProps {
   modelId: string;
   instId: string;
   topoData: TopoData;
   modelList: ModelItem[];
+  assoTypeList: AssoTypeItem[];
 }
 
 export const InitNode: React.FC<TopoProps> = ({
   topoData,
   modelList,
   modelId,
+  assoTypeList,
 }) => {
   const initData = useGraphStore((state) => state.initData);
   const graph = useGraphInstance();
@@ -69,9 +76,9 @@ export const InitNode: React.FC<TopoProps> = ({
         ],
         attrs: {
           body: {
-            stroke: "#e5e7eb",
+            stroke: "var(--color-border-3)",
             strokeWidth: 1,
-            fill: "#fff",
+            fill: "var(--color-bg-1)",
             rx: 6,
             ry: 6,
             width: 200,
@@ -88,7 +95,7 @@ export const InitNode: React.FC<TopoProps> = ({
             y1: 0,
             x2: 60,
             y2: 80,
-            stroke: "#e5e7eb",
+            stroke: "var(--color-border-3)",
             strokeWidth: 1,
           },
           label1: {
@@ -102,7 +109,7 @@ export const InitNode: React.FC<TopoProps> = ({
             textAnchor: "center",
             textVerticalAnchor: "middle",
             fontSize: 14,
-            fill: "#333",
+            fill: "var(--color-text-1)",
           },
           label2: {
             refX: 0.4,
@@ -115,7 +122,7 @@ export const InitNode: React.FC<TopoProps> = ({
             textAnchor: "center",
             textVerticalAnchor: "middle",
             fontSize: 14,
-            fill: "#B2BDCC",
+            fill: "var(--color-text-4)",
           },
           expandBtn: {
             d: "M 3 6 L 9 6 M 1 1 L 11 1 L 11 11 L 1 11 Z",
@@ -124,7 +131,7 @@ export const InitNode: React.FC<TopoProps> = ({
             refX: 1,
             refDx: -7,
             refY: 0.42,
-            stroke: "#B2BDCC",
+            stroke: "var(--color-text-4)",
             strokeWidth: 1,
             event: "node:collapse",
             zIndex: 99,
@@ -259,8 +266,8 @@ export const InitNode: React.FC<TopoProps> = ({
             text: showModelName(node.model_id),
           },
           expandBtn: {
-            stroke: hasChild ? "#e5e7eb" : "",
-            fill: hasChild ? "#fff" : "transparent",
+            stroke: hasChild ? "var(--color-border-3)" : "",
+            fill: hasChild ? "var(--color-bg-1)" : "transparent",
           },
         },
         data: {
@@ -275,15 +282,21 @@ export const InitNode: React.FC<TopoProps> = ({
           target: id,
           attrs: {
             line: {
-              stroke: "#e5e7eb",
+              stroke: "var(--color-border-3)",
               strokeWidth: 1,
             },
           },
           label: {
             attrs: {
               text: {
-                text: node.asst_id,
-                fill: "#B2BDCC", // 设置label颜色
+                text:
+                  assoTypeList.find((tex) => tex.asst_id === node.asst_id)
+                    ?.asst_name || "--",
+                fill: "var(--color-text-4)", // 设置label颜色
+              },
+              rect: {
+                fill: "var(--color-bg-1)", // 设置label背景颜色
+                stroke: "none",
               },
             },
           },
