@@ -299,8 +299,11 @@ const AssetSearch = () => {
       <Spin spinning={pageLoading}>
         {showSearch ? (
           <div className={assetSearchStyle.searchInput}>
+            <h1 className={assetSearchStyle.searchTitle}>{`${t(
+              'menu.asset'
+            )}.${t('searchTxt')}`}</h1>
             <Search
-              className="mt-[15%] w-[70%]"
+              className={assetSearchStyle.inputBtn}
               value={searchText}
               allowClear
               size="large"
