@@ -116,6 +116,7 @@
     "AssociationManagement": "Association Management",
     "assetSearchTxt": "Please enter keywords and click or enter to search",
     "selectOrganazationPlaceholder": "Select an organization",
-    "confirmAndAssociate": "Confirm & Associate"
+    "confirmAndAssociate": "Confirm & Associate",
+    "searchHistory": "Search History"
   }
 }

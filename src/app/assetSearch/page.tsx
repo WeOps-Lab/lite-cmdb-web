@@ -354,7 +354,9 @@ const AssetSearch = () => {
             {!!historyList.length && (
               <div className={assetSearchStyle.history}>
                 <div className={assetSearchStyle.description}>
-                  <span className={assetSearchStyle.historyName}>搜索历史</span>
+                  <span className={assetSearchStyle.historyName}>
+                    {t('Model.searchHistory')}
+                  </span>
                   <Button type="link" onClick={clearHistories}>
                     {`${t('clear')} ${t('all')}`}
                   </Button>
