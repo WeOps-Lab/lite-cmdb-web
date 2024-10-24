@@ -44,9 +44,54 @@
             margin-bottom: 15px;
         }
 
-        .inputBtn {
+        .inputBtn,
+        .history {
             width: 60%;
             min-width: 500px;
+        }
+
+        .history {
+            margin-top: 20px;
+
+            .description {
+                display: flex;
+                justify-content: space-between;
+
+                .historyName {
+                    font-size: 16px;
+                    font-weight: 800;
+                }
+
+            }
+
+            ul {
+                display: flex;
+                flex-wrap: wrap;
+
+                li {
+                    margin-right: 6px;
+                    cursor: pointer;
+
+                    :global {
+                        .ant-tag {
+                            color: var(--color-text-1);
+
+                            .anticon {
+                                display: none;
+                                position: absolute;
+                                top: -3px;
+                                right: -3px;
+                            }
+
+                            &:hover {
+                                .anticon {
+                                    display: block;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -63,7 +108,7 @@
                 background: var(--color-bg-1);
                 padding: 10px;
                 flex: 1;
-                max-height: calc(100vh - 180px);
+                max-height: calc(100vh - 50%);
                 min-width: 500px;
                 overflow-y: auto;
 

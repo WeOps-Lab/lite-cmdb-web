@@ -3,14 +3,14 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from '@/utils/i18n';
 import { SearchOutlined } from '@ant-design/icons';
 import assetSearchStyle from './index.module.less';
-import { ArrowRightOutlined } from '@ant-design/icons';
+import { ArrowRightOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import {
   AttrFieldType,
   UserItem,
   Organization,
   ModelItem,
 } from '@/types/assetManage';
-import { Spin, Input, Tabs, Button } from 'antd';
+import { Spin, Input, Tabs, Button, Tag } from 'antd';
 import useApiClient from '@/utils/request';
 import { useCommon } from '@/context/common';
 import { deepClone, getFieldItem } from '@/utils/common';
@@ -50,11 +50,17 @@ const AssetSearch = () => {
   const [pageLoading, setPageLoading] = useState<boolean>(false);
   const [activeInstItem, setActiveInstItem] = useState<number>(-1);
   const [instData, setInstData] = useState<TabItem[]>([]);
+  const [historyList, setHistoryList] = useState<string[]>([]);
 
   useEffect(() => {
     if (isLoading) return;
     getInitData();
   }, [isLoading]);
+
+  useEffect(() => {
+    const histories = localStorage.getItem('assetSearchHistory');
+    if (histories) setHistoryList(JSON.parse(histories));
+  }, []);
 
   useEffect(() => {
     if (propertyList.length) {
@@ -80,6 +86,15 @@ const AssetSearch = () => {
   const handleSearch = async () => {
     setShowSearch(!searchText);
     if (!searchText) return;
+    const histories = deepClone(historyList);
+    if (
+      !histories.length ||
+      (histories.length && !histories.includes(searchText))
+    ) {
+      histories.push(searchText);
+    }
+    localStorage.setItem('assetSearchHistory', JSON.stringify(histories));
+    setHistoryList(histories);
     setPageLoading(true);
     try {
       const data: AssetListItem[] = await post(
@@ -294,6 +309,22 @@ const AssetSearch = () => {
     setInstDetail(row);
   };
 
+  const clearHistoryItem = (
+    e: React.MouseEvent<HTMLElement>,
+    index: number
+  ) => {
+    e.preventDefault();
+    const histories = deepClone(historyList);
+    histories.splice(index, 1);
+    setHistoryList(histories);
+    localStorage.setItem('assetSearchHistory', JSON.stringify(histories));
+  };
+
+  const clearHistories = () => {
+    localStorage.removeItem('assetSearchHistory');
+    setHistoryList([]);
+  };
+
   return (
     <div className={assetSearchStyle.assetSearch}>
       <Spin spinning={pageLoading}>
@@ -320,6 +351,29 @@ const AssetSearch = () => {
               onChange={handleTextChange}
               onPressEnter={handleSearch}
             />
+            {!!historyList.length && (
+              <div className={assetSearchStyle.history}>
+                <div className={assetSearchStyle.description}>
+                  <span className={assetSearchStyle.historyName}>搜索历史</span>
+                  <Button type="link" onClick={clearHistories}>
+                    {`${t('clear')} ${t('all')}`}
+                  </Button>
+                </div>
+                <ul>
+                  {historyList.map((item, index) => (
+                    <li key={index} onClick={() => setSearchText(item)}>
+                      <Tag
+                        color="var(--color-bg-1)"
+                        closeIcon={<CloseCircleOutlined />}
+                        onClose={(e) => clearHistoryItem(e, index)}
+                      >
+                        {item}
+                      </Tag>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         ) : (
           <div className={assetSearchStyle.searchDetail}>
