@@ -10,7 +10,7 @@ import {
 } from '@/types/assetManage';
 import { getAssetColumns, findAndFlattenAttrs } from '@/utils/common';
 import CustomTable from '@/components/custom-table';
-import { Spin, Collapse } from 'antd';
+import { Spin, Collapse, Empty } from 'antd';
 import useApiClient from '@/utils/request';
 import { useCommon } from '@/context/common';
 import { CaretRightOutlined } from '@ant-design/icons';
@@ -171,15 +171,19 @@ const Credentials = () => {
   return (
     <Spin spinning={pageLoading}>
       <div className={credentialsStyle.credentials}>
-        <Collapse
-          bordered={false}
-          activeKey={activeKey}
-          expandIcon={({ isActive }) => (
-            <CaretRightOutlined rotate={isActive ? 90 : 0} />
-          )}
-          items={assoCredentials}
-          onChange={handleCollapseChange}
-        />
+        {assoCredentials.length ? (
+          <Collapse
+            bordered={false}
+            activeKey={activeKey}
+            expandIcon={({ isActive }) => (
+              <CaretRightOutlined rotate={isActive ? 90 : 0} />
+            )}
+            items={assoCredentials}
+            onChange={handleCollapseChange}
+          />
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </div>
       <FieldModal ref={fieldRef} userList={userList} />
     </Spin>

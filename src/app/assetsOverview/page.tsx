@@ -8,7 +8,7 @@ import { GroupItem, ModelItem } from '@/types/assetManage';
 import { deepClone, getIconUrl } from '@/utils/common';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Spin, Input } from 'antd';
+import { Spin, Input, Empty } from 'antd';
 
 const AssetsOverview: React.FC = () => {
   const { get, isLoading } = useApiClient();
@@ -106,47 +106,51 @@ const AssetsOverview: React.FC = () => {
           onClear={handleClear}
           onChange={handleTextChange}
         />
-        <Masonry
-          breakpointCols={breakpointColumnsObj}
-          className={assetsOverviewStyle['my-masonry-grid']}
-          columnClassName="my-masonry-grid_column"
-        >
-          {overViewList.map((item) => (
-            <div
-              key={item.classification_id}
-              className={`bg-[var(--color-bg-1)] p-[10px] mb-[20px] rounded`}
-            >
-              <h2
-                className={`${assetsOverviewStyle.title} text-[16px] font-[600]`}
+        {overViewList.length ? (
+          <Masonry
+            breakpointCols={breakpointColumnsObj}
+            className={assetsOverviewStyle['my-masonry-grid']}
+            columnClassName="my-masonry-grid_column"
+          >
+            {overViewList.map((item) => (
+              <div
+                key={item.classification_id}
+                className={`bg-[var(--color-bg-1)] p-[10px] mb-[20px] rounded`}
               >
-                {item.classification_name}
-              </h2>
-              <ul className={assetsOverviewStyle.list}>
-                {item.list.map((sec) => (
-                  <li
-                    className={assetsOverviewStyle.listItem}
-                    key={sec.model_id}
-                    onClick={() => linkToDetial(sec)}
-                  >
-                    <span className={assetsOverviewStyle.leftSide}>
-                      <Image
-                        src={getIconUrl(sec)}
-                        className="block w-auto h-10"
-                        alt={t('picture')}
-                        width={20}
-                        height={20}
-                      />
-                      <span title={sec.model_name}>{sec.model_name}</span>
-                    </span>
-                    <span className={assetsOverviewStyle.rightSide}>
-                      {sec.count}
-                    </span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </Masonry>
+                <h2
+                  className={`${assetsOverviewStyle.title} text-[16px] font-[600]`}
+                >
+                  {item.classification_name}
+                </h2>
+                <ul className={assetsOverviewStyle.list}>
+                  {item.list.map((sec) => (
+                    <li
+                      className={assetsOverviewStyle.listItem}
+                      key={sec.model_id}
+                      onClick={() => linkToDetial(sec)}
+                    >
+                      <span className={assetsOverviewStyle.leftSide}>
+                        <Image
+                          src={getIconUrl(sec)}
+                          className="block w-auto h-10"
+                          alt={t('picture')}
+                          width={20}
+                          height={20}
+                        />
+                        <span title={sec.model_name}>{sec.model_name}</span>
+                      </span>
+                      <span className={assetsOverviewStyle.rightSide}>
+                        {sec.count}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </Masonry>
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </Spin>
     </div>
   );

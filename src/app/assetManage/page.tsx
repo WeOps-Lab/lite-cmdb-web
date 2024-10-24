@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Introduction from '@/components/introduction';
-import { Input, Button, Modal, message, Spin } from 'antd';
+import { Input, Button, Modal, message, Spin, Empty } from 'antd';
 import { deepClone } from '@/utils/common';
 import { GroupItem, ModelItem } from '@/types/assetManage';
 import {
@@ -199,94 +199,98 @@ const AssetManage = () => {
           </div>
         </div>
         <Spin spinning={loading}>
-          {modelGroup.map((item, groupIndex) => {
-            return (
-              <div className="model-group" key={item.classification_id}>
-                <div
-                  className={`${assetManageStyle.groupTitle} flex items-center mt-[20px] text-[14px]`}
-                >
-                  <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
-                    {item.classification_name}（{item.count}）
-                  </span>
-                  <div className={assetManageStyle.groupOperate}>
-                    <EditTwoTone
-                      className="edit mr-[6px] cursor-pointer"
-                      onClick={() => showGroupModal('edit', item)}
-                    />
-                    <DeleteTwoTone
-                      className="delete cursor-pointer"
-                      onClick={() => showDeleteConfirm(item)}
-                    />
+          {modelGroup.length ? (
+            modelGroup.map((item, groupIndex) => {
+              return (
+                <div className="model-group" key={item.classification_id}>
+                  <div
+                    className={`${assetManageStyle.groupTitle} flex items-center mt-[20px] text-[14px]`}
+                  >
+                    <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
+                      {item.classification_name}（{item.count}）
+                    </span>
+                    <div className={assetManageStyle.groupOperate}>
+                      <EditTwoTone
+                        className="edit mr-[6px] cursor-pointer"
+                        onClick={() => showGroupModal('edit', item)}
+                      />
+                      <DeleteTwoTone
+                        className="delete cursor-pointer"
+                        onClick={() => showDeleteConfirm(item)}
+                      />
+                    </div>
                   </div>
-                </div>
-                <ul className={assetManageStyle.modelList}>
-                  {item.list.map((model, index) => (
-                    <li
-                      className={`bg-[var(--color-bg)] flex justify-between items-center ${
-                        assetManageStyle.modelListItem
-                      } ${
-                        dragOverItem?.model_id === model.model_id &&
-                        dragOverItem?.model_id !== dragItem?.model_id &&
-                        modelGroup[groupIndex].list.find(
-                          (group) => group.model_id === dragItem.model_id
-                        )
-                          ? assetManageStyle.dragActive
-                          : ''
-                      }`}
-                      key={index}
-                      draggable
-                      onDragStart={() =>
-                        handleDragStart({
-                          ...model,
-                          index,
-                        })
-                      }
-                      onDragEnter={() =>
-                        handleDragEnter({
-                          ...model,
-                          index,
-                        })
-                      }
-                      onDragEnd={() => handleDragEnd(groupIndex)}
-                    >
-                      <div
-                        className={assetManageStyle.leftSide}
-                        onClick={() =>
-                          linkToDetial({
+                  <ul className={assetManageStyle.modelList}>
+                    {item.list.map((model, index) => (
+                      <li
+                        className={`bg-[var(--color-bg)] flex justify-between items-center ${
+                          assetManageStyle.modelListItem
+                        } ${
+                          dragOverItem?.model_id === model.model_id &&
+                          dragOverItem?.model_id !== dragItem?.model_id &&
+                          modelGroup[groupIndex].list.find(
+                            (group) => group.model_id === dragItem.model_id
+                          )
+                            ? assetManageStyle.dragActive
+                            : ''
+                        }`}
+                        key={index}
+                        draggable
+                        onDragStart={() =>
+                          handleDragStart({
                             ...model,
-                            classification_id: item.classification_id,
+                            index,
                           })
                         }
+                        onDragEnter={() =>
+                          handleDragEnter({
+                            ...model,
+                            index,
+                          })
+                        }
+                        onDragEnd={() => handleDragEnd(groupIndex)}
                       >
-                        <HolderOutlined
-                          className={`${assetManageStyle.dragHander} cursor-move`}
-                        />
-                        <Image
-                          src={getIconUrl(model)}
-                          className="block w-auto h-10"
-                          alt={t('picture')}
-                          width={100}
-                          height={40}
-                        />
-                        <div className="flex flex-col pl-[10px]">
-                          <span className="text-[14px] pb-[4px] font-[600]">
-                            {model.model_name}
-                          </span>
-                          <span className="text-[12px] text-[var(--color-text-3)]">
-                            {model.model_id}
-                          </span>
+                        <div
+                          className={assetManageStyle.leftSide}
+                          onClick={() =>
+                            linkToDetial({
+                              ...model,
+                              classification_id: item.classification_id,
+                            })
+                          }
+                        >
+                          <HolderOutlined
+                            className={`${assetManageStyle.dragHander} cursor-move`}
+                          />
+                          <Image
+                            src={getIconUrl(model)}
+                            className="block w-auto h-10"
+                            alt={t('picture')}
+                            width={100}
+                            height={40}
+                          />
+                          <div className="flex flex-col pl-[10px]">
+                            <span className="text-[14px] pb-[4px] font-[600]">
+                              {model.model_name}
+                            </span>
+                            <span className="text-[12px] text-[var(--color-text-3)]">
+                              {model.model_id}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                      <div className={assetManageStyle.rightSide}>
-                        <SwitcherOutlined />
-                        <span className="text-[12px] pt-[4px]">0</span>
-                      </div>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            );
-          })}
+                        <div className={assetManageStyle.rightSide}>
+                          <SwitcherOutlined />
+                          <span className="text-[12px] pt-[4px]">0</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
         </Spin>
       </div>
       <GroupModal ref={groupRef} onSuccess={updateGroupList} />

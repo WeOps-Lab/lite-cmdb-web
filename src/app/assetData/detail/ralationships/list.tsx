@@ -20,7 +20,7 @@ import {
 } from '@/types/assetManage';
 import { getAssetColumns } from '@/utils/common';
 import CustomTable from '@/components/custom-table';
-import { Spin, Collapse, Button, Modal, message } from 'antd';
+import { Spin, Collapse, Button, Modal, message, Empty } from 'antd';
 import useApiClient from '@/utils/request';
 import { CaretRightOutlined } from '@ant-design/icons';
 import assoListStyle from './index.module.less';
@@ -248,15 +248,19 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
     return (
       <Spin spinning={pageLoading}>
         <div className={assoListStyle.ralationships}>
-          <Collapse
-            bordered={false}
-            activeKey={activeKey}
-            expandIcon={({ isActive }) => (
-              <CaretRightOutlined rotate={isActive ? 90 : 0} />
-            )}
-            items={assoCredentials}
-            onChange={handleCollapseChange}
-          />
+          {assoCredentials.length ? (
+            <Collapse
+              bordered={false}
+              activeKey={activeKey}
+              expandIcon={({ isActive }) => (
+                <CaretRightOutlined rotate={isActive ? 90 : 0} />
+              )}
+              items={assoCredentials}
+              onChange={handleCollapseChange}
+            />
+          ) : (
+            <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+          )}
         </div>
         <SelectInstance
           ref={instanceRef}

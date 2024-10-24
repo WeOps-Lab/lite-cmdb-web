@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { DatePicker, Timeline, Spin } from 'antd';
+import { DatePicker, Timeline, Spin, Empty } from 'antd';
 import changeRecordsStyle from './index.module.less';
 import useApiClient from '@/utils/request';
 import RecordDetail from './recordDetail';
@@ -181,41 +181,45 @@ const ChangeRecords: React.FC = () => {
             onChange={(value, dateString) => handleDateChange(dateString)}
           />
         </div>
-        <div
-          className={`bg-[var(--color-fill-2)] rounded-lg px-[20px] py-[10px] ${changeRecordsStyle.list}`}
-        >
-          {recordList.map((event, index) => (
-            <div key={index}>
-              <h4 className="text-[15px] font-semibold mb-[10px]">
-                {event.date}
-              </h4>
-              <Timeline>
-                {event.list.map((log, logIndex) => (
-                  <Timeline.Item key={logIndex}>
-                    <div
-                      onClick={() => showDetailModal(log)}
-                      className="cursor-pointer"
-                    >
-                      <div className="mb-[4px]">
-                        {enumList[log.type] + showModelName(log.model_id)}
+        {recordList.length ? (
+          <div
+            className={`bg-[var(--color-fill-2)] rounded-lg px-[20px] py-[10px] ${changeRecordsStyle.list}`}
+          >
+            {recordList.map((event, index) => (
+              <div key={index}>
+                <h4 className="text-[15px] font-semibold mb-[10px]">
+                  {event.date}
+                </h4>
+                <Timeline>
+                  {event.list.map((log, logIndex) => (
+                    <Timeline.Item key={logIndex}>
+                      <div
+                        onClick={() => showDetailModal(log)}
+                        className="cursor-pointer"
+                      >
+                        <div className="mb-[4px]">
+                          {enumList[log.type] + showModelName(log.model_id)}
+                        </div>
+                        <div className="flex items-center text-[12px]">
+                          <span className="text-[var(--color-text-3)]">
+                            {log.created_at}
+                          </span>
+                          <span
+                            className={`${changeRecordsStyle.operator} text-[var(--color-text-3)]`}
+                          >
+                            {t('Model.operator')}: {log.operator}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center text-[12px]">
-                        <span className="text-[var(--color-text-3)]">
-                          {log.created_at}
-                        </span>
-                        <span
-                          className={`${changeRecordsStyle.operator} text-[var(--color-text-3)]`}
-                        >
-                          {t('Model.operator')}: {log.operator}
-                        </span>
-                      </div>
-                    </div>
-                  </Timeline.Item>
-                ))}
-              </Timeline>
-            </div>
-          ))}
-        </div>
+                    </Timeline.Item>
+                  ))}
+                </Timeline>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+        )}
       </div>
       <RecordDetail
         ref={detailRef}

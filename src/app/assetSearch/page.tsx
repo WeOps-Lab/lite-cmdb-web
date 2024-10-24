@@ -10,7 +10,7 @@ import {
   Organization,
   ModelItem,
 } from '@/types/assetManage';
-import { Spin, Input, Tabs, Button, Tag } from 'antd';
+import { Spin, Input, Tabs, Button, Tag, Empty } from 'antd';
 import useApiClient from '@/utils/request';
 import { useCommon } from '@/context/common';
 import { deepClone, getFieldItem } from '@/utils/common';
@@ -105,6 +105,10 @@ const AssetSearch = () => {
       );
       const tabItems: TabItem[] = getAssetList(data);
       const defaultTab = tabItems[0]?.key || '';
+      if (!defaultTab) {
+        setPageLoading(false);
+        return;
+      }
       const attrList = await get(`/api/model/${defaultTab}/attr_list/`);
       setPropertyList(attrList);
       setInstData(tabItems);
@@ -332,7 +336,7 @@ const AssetSearch = () => {
           <div className={assetSearchStyle.searchInput}>
             <h1 className={assetSearchStyle.searchTitle}>{`${t(
               'menu.asset'
-            )}.${t('searchTxt')}`}</h1>
+            )} ${t('searchTxt')}`}</h1>
             <Search
               className={assetSearchStyle.inputBtn}
               value={searchText}
@@ -397,11 +401,15 @@ const AssetSearch = () => {
               onPressEnter={handleSearch}
             />
             <div>
-              <Tabs
-                activeKey={activeTab}
-                items={items}
-                onChange={onTabChange}
-              />
+              {items.length ? (
+                <Tabs
+                  activeKey={activeTab}
+                  items={items}
+                  onChange={onTabChange}
+                />
+              ) : (
+                <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />
+              )}
             </div>
           </div>
         )}
