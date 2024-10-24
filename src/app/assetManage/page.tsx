@@ -21,6 +21,12 @@ import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
 
 const AssetManage = () => {
+  const { get, del, isLoading } = useApiClient();
+  const { confirm } = Modal;
+  const { t } = useTranslation();
+  const groupRef = useRef<any>(null);
+  const modelRef = useRef<any>(null);
+  const router = useRouter();
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
   const [groupList, setGroupList] = useState<GroupItem[]>([]);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
@@ -28,12 +34,6 @@ const AssetManage = () => {
   const [searchText, setSearchText] = useState<string>('');
   const [dragItem, setDragItem] = useState<any>({});
   const [dragOverItem, setDragOverItem] = useState<any>({});
-  const groupRef = useRef<any>(null);
-  const modelRef = useRef<any>(null);
-  const router = useRouter();
-  const { get, del, isLoading } = useApiClient();
-  const { confirm } = Modal;
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (isLoading) return;
@@ -46,7 +46,7 @@ const AssetManage = () => {
       content: t('deleteContent'),
       centered: true,
       onOk() {
-        return new Promise(async (resolve, reject) => {
+        return new Promise(async (resolve) => {
           try {
             await del(`/api/classification/${row.classification_id}/`);
             message.success(t('successfullyDeleted'));

@@ -23,10 +23,10 @@ export interface SelectIconRef {
 
 const SelectIcon = forwardRef<SelectIconRef, SelectIconProps>(
   ({ onSelect }, ref) => {
+    const { t } = useTranslation();
     const [visible, setVisible] = useState<boolean>(false);
     const [title, setTitle] = useState<string>('');
     const [activeIcon, setActiveIcon] = useState<string>('');
-    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       showModal: ({ defaultIcon, title }) => {

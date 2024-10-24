@@ -30,6 +30,10 @@ export interface ModelModalRef {
 
 const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
   ({ onSuccess, groupList }, ref) => {
+    const { post, put } = useApiClient();
+    const { t } = useTranslation();
+    const formRef = useRef<FormInstance>(null);
+    const selectIconRef = useRef<any>(null);
     const [modelVisible, setModelVisible] = useState<boolean>(false);
     const [subTitle, setSubTitle] = useState<string>('');
     const [title, setTitle] = useState<string>('');
@@ -38,10 +42,6 @@ const ModelModal = forwardRef<ModelModalRef, ModelModalProps>(
     const [modelInfo, setModelInfo] = useState<any>({});
     const [modelIcon, setModelIcon] = useState<any>('');
     const [iconId, setIconId] = useState<any>('');
-    const formRef = useRef<FormInstance>(null);
-    const selectIconRef = useRef<any>(null);
-    const { post, put } = useApiClient();
-    const { t } = useTranslation();
 
     useEffect(() => {
       if (modelVisible) {

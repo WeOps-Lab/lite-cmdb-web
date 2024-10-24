@@ -24,15 +24,15 @@ export interface GroupModalRef {
 
 const GroupMoadal = forwardRef<GroupModalRef, GroupModalProps>(
   ({ onSuccess }, ref) => {
+    const { post, put } = useApiClient();
+    const { t } = useTranslation();
+    const formRef = useRef<FormInstance>(null);
     const [groupVisible, setGroupVisible] = useState<boolean>(false);
     const [confirmLoading, setConfirmLoading] = useState<boolean>(false);
     const [groupForm, setGroupForm] = useState<GroupFieldType>({});
     const [subTitle, setSubTitle] = useState<string>('');
     const [title, setTitle] = useState<string>('');
     const [type, setType] = useState<string>('');
-    const formRef = useRef<FormInstance>(null);
-    const { post, put } = useApiClient();
-    const { t } = useTranslation();
 
     useImperativeHandle(ref, () => ({
       showModal: ({ type, groupInfo, subTitle, title }) => {
