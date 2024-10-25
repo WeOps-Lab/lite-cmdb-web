@@ -502,12 +502,14 @@ const AssetData = () => {
     setQueryList(condition);
   };
 
-  const checkDetail = (row = { _id: '' }) => {
+  const checkDetail = (row = { _id: '', inst_name: '' }) => {
     const modelItem = modelList.find((item) => item.key === modelId);
     router.push(
       `/assetData/detail/baseInfo?icn=${modelItem?.icn || ''}&model_name=${
         modelItem?.label || ''
-      }&model_id=${modelId}&classification_id=${groupId}&inst_id=${row._id}`
+      }&model_id=${modelId}&classification_id=${groupId}&inst_id=${
+        row._id
+      }&inst_name=${row.inst_name}`
     );
   };
 

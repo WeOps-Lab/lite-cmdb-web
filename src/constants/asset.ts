@@ -468,7 +468,13 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
       {
         model_id: 'host',
         model_name: 'Host',
-        assoModelIds: ['host'],
+        assoModelIds: [
+          'host',
+          'vmware_vm',
+          'alibabacloud_ecs',
+          'tencentcloud_cvm',
+          'huaweicloud_ecs',
+        ],
         attrs: [
           {
             attr_id: 'name',
@@ -820,16 +826,16 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
             is_required: true,
           },
           {
-            attr_id: 'username',
-            attr_name: 'Username',
+            attr_id: 'access_key',
+            attr_name: 'Access key',
             attr_type: 'str',
             option: [],
             editable: true,
             is_required: true,
           },
           {
-            attr_id: 'password',
-            attr_name: 'Password',
+            attr_id: 'access_secret',
+            attr_name: 'Access secret',
             attr_type: 'pwd',
             option: [],
             editable: true,
@@ -859,16 +865,16 @@ export const CREDENTIAL_LIST: CredentialListItem[] = [
             is_required: true,
           },
           {
-            attr_id: 'username',
-            attr_name: 'Username',
+            attr_id: 'access_key',
+            attr_name: 'Access key',
             attr_type: 'str',
             option: [],
             editable: true,
             is_required: true,
           },
           {
-            attr_id: 'password',
-            attr_name: 'Password',
+            attr_id: 'access_secret',
+            attr_name: 'Access secret',
             attr_type: 'pwd',
             option: [],
             editable: true,

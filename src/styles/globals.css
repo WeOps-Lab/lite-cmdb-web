@@ -274,6 +274,21 @@ html:not(.dark) body {
   text-overflow: ellipsis;
 }
 
+.hide-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ant-modal-confirm-btns {
+    display: flex;
+    flex-direction: row-reverse;
+}
+
+.ant-modal-confirm-btns button:nth-child(1) {
+    margin-left: 8px;
+}
+
 @keyframes rt {
   100% {
       transform: rotate(360deg);

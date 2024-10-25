@@ -20,6 +20,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
   const objIcon: string = searchParams.get('icn') || '';
   const modelName: string = searchParams.get('model_name') || '';
   const modelId: string = searchParams.get('model_id') || '';
+  const instName: string = searchParams.get('inst_name') || '--';
   const { get, del, isLoading } = useApiClient();
   const { t } = useTranslation();
   const menuItems = [
@@ -69,8 +70,11 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
         width={30}
         height={30}
       />
-      <div className="flex flex-col mr-[10px]">
+      <div className="flex items-center mr-[10px]">
         <span className="text-[14px] font-[800] mb-[2px] ">{modelName}</span>
+        <span className="w-[100px] text-[var(--color-text-2)] font-[400] text-[12px] hide-text">
+          -{instName}
+        </span>
       </div>
     </header>
   );

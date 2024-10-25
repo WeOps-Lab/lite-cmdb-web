@@ -104,6 +104,7 @@ const Associations = () => {
         <>
           <Button
             type="link"
+            disabled={record.is_pre}
             onClick={() => showDeleteConfirm(record.model_asst_id)}
           >
             {t('delete')}

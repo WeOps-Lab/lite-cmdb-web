@@ -73,7 +73,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
         setTitle(title);
         if (type === 'add') {
           Object.assign(attrInfo, {
-            is_required: true,
+            is_required: false,
             editable: true,
             is_only: false,
           });
@@ -180,7 +180,7 @@ const AttributesModal = forwardRef<AttrModalRef, AttrModalProps>(
     return (
       <div>
         <OperateModal
-          width={600}
+          width={650}
           title={title}
           subTitle={subTitle}
           visible={modelVisible}

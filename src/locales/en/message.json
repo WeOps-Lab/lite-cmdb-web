@@ -117,7 +117,7 @@
     "selectInstance": "Select instance",
     "credentialManagement": "Credential Manage",
     "AssociationManagement": "Association Management",
-    "assetSearchTxt": "Please enter keywords and click or enter to search",
+    "assetSearchTxt": "Please enter the keywords...",
     "selectOrganazationPlaceholder": "Select an organization",
     "confirmAndAssociate": "Confirm & Associate",
     "searchHistory": "Search History"

@@ -160,10 +160,10 @@ export const getAssetColumns = (config: {
         return {
           ...columnItem,
           render: (_: unknown, record: any) => {
-            const userName =
-              (config.userList || []).find((item) => item.id === record[attrId])
-                ?.username || '--';
-            return (
+            const userName = (config.userList || []).find(
+              (item) => item.id === record[attrId]
+            )?.username;
+            return userName ? (
               <div className="column-user" title={userName}>
                 <span
                   className="user-avatar"
@@ -173,6 +173,8 @@ export const getAssetColumns = (config: {
                 </span>
                 <span className="user-name">{userName}</span>
               </div>
+            ) : (
+              <>--</>
             );
           },
         };
@@ -290,9 +292,10 @@ export const getFieldItem = (config: {
   }
   switch (config.fieldItem.attr_type) {
     case 'user':
-      const userName =
-        (config.userList || []).find((item) => item.id === config.value)
-          ?.username || '--';
+      const userName = (config.userList || []).find(
+        (item) => item.id === config.value
+      )?.username;
+      if (!userName) return '--';
       return config.hideUserAvatar ? (
         userName
       ) : (

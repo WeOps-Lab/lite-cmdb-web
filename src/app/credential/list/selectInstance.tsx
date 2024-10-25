@@ -96,7 +96,7 @@ const SelectInstance = forwardRef<FieldModalRef, FieldModalProps>(
       try {
         const params = getTableParams();
         const credentialParams = {
-          credential_id: formInfo._id || instanceData._id,
+          credential_id: formInfo?._id || instanceData._id,
         };
         params.model_id = modelId;
         const attrList = get(`/api/model/${modelId}/attr_list/`);

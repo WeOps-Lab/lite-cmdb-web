@@ -209,16 +209,18 @@ const AssetManage = () => {
                     <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
                       {item.classification_name}（{item.count}）
                     </span>
-                    <div className={assetManageStyle.groupOperate}>
-                      <EditTwoTone
-                        className="edit mr-[6px] cursor-pointer"
-                        onClick={() => showGroupModal('edit', item)}
-                      />
-                      <DeleteTwoTone
-                        className="delete cursor-pointer"
-                        onClick={() => showDeleteConfirm(item)}
-                      />
-                    </div>
+                    {!item.is_pre && !item.list.length && (
+                      <div className={assetManageStyle.groupOperate}>
+                        <EditTwoTone
+                          className="edit mr-[6px] cursor-pointer"
+                          onClick={() => showGroupModal('edit', item)}
+                        />
+                        <DeleteTwoTone
+                          className="delete cursor-pointer"
+                          onClick={() => showDeleteConfirm(item)}
+                        />
+                      </div>
+                    )}
                   </div>
                   <ul className={assetManageStyle.modelList}>
                     {item.list.map((model, index) => (

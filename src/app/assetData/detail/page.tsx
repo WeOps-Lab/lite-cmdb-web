@@ -9,8 +9,9 @@ export default function AssetDetail() {
   const modelId = searchParams.get('model_id');
   const classificationId = searchParams.get('classification_id');
   const instId = searchParams.get('inst_id');
+  const instName = searchParams.get('inst_name');
   redirect(
-    `/assetData/detail/baseInfo?icn=${objIcon}&model_name=${modelName}&model_id=${modelId}&classification_id=${classificationId}&inst_id=${instId}`
+    `/assetData/detail/baseInfo?icn=${objIcon}&model_name=${modelName}&model_id=${modelId}&classification_id=${classificationId}&inst_id=${instId}&inst_name=${instName}`
   );
   return null;
 }
