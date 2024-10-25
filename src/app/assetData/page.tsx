@@ -185,7 +185,7 @@ const AssetData = () => {
           title: t('action'),
           key: 'action',
           dataIndex: 'action',
-          width: 230,
+          width: 240,
           fixed: 'right',
           render: (_: unknown, record: any) => (
             <>
@@ -519,7 +519,7 @@ const AssetData = () => {
 
   const showInstanceModal = (row = { _id: '' }) => {
     instanceRef.current?.showModal({
-      title: t('Model.AssociationManagement'),
+      title: t('Model.association'),
       model_id: modelId,
       list: [],
       instId: row._id,

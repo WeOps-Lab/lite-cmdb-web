@@ -98,7 +98,7 @@ const Ralationships = () => {
               icon={<GatewayOutlined />}
               onClick={handleRelate}
             >
-              {t('Model.AssociationManagement')}
+              {t('Model.association')}
             </Button>
             <div className={ralationshipsStyle.expand} onClick={handleExpand}>
               <Icon

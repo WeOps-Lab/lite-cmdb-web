@@ -68,7 +68,7 @@ const AssoList = forwardRef<AssoListRef, AssoListProps>(
       },
       showRelateModal: () => {
         instanceRef.current?.showModal({
-          title: t('Model.AssociationManagement'),
+          title: t('Model.association'),
           model_id: modelId,
           list: instIds,
           instId,

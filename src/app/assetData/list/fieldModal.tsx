@@ -180,7 +180,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
           title={title}
           subTitle={subTitle}
           visible={groupVisible}
-          width={800}
+          width={900}
           onCancel={handleCancel}
           footer={
             <div>
@@ -215,7 +215,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
                     <Form.Item
                       name={item.attr_id}
                       label={item.attr_name}
-                      labelCol={{ span: 7 }}
+                      labelCol={{ span: 8 }}
                       rules={[
                         {
                           required: item.is_required && type !== 'batchEdit',

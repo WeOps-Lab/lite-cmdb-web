@@ -65,7 +65,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
       pageSize: 20,
     });
     const [title, setTitle] = useState<string>('');
-    const [assoModelId, setAssoModelId] = useState<string>('');
+    const [assoModelId, setAssoModelId] = useState<number>(0);
     const [instId, setInstId] = useState<string>('');
     const [modelId, setModelId] = useState<string>('');
     const [tableLoading, setTableLoading] = useState<boolean>(false);
@@ -153,10 +153,11 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                       : item.src_model_id,
                 };
               });
-              const currentAssoModelId = relationData[0]?.id || '';
+              const currentAssoModelId = relationData[0]?._id || 0;
+              const _modelId = relationData[0]?.id || '';
               setRelationList(relationData);
               setAssoModelId(currentAssoModelId);
-              initPage(currentAssoModelId);
+              initPage(_modelId);
               if (needFetchAssoInstIds) {
                 const assoIds = res[1].reduce(
                   (pre: RelationListInstItem[], cur: CrentialsAssoInstItem) => {
@@ -204,6 +205,11 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
       }
     };
 
+    const getModelId = (id: number) => {
+      const target = relationList.find((item) => item._id === id);
+      return target?.id || '';
+    };
+
     const showModelName = (id: string) => {
       return models.find((item) => item.model_id === id)?.model_name || '--';
     };
@@ -218,7 +224,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
       }
       setTableLoading(true);
       try {
-        const target = relationList.find((item) => item.id === assoModelId);
+        const target = relationList.find((item) => item._id === assoModelId);
         const params = {
           model_asst_id: target?.model_asst_id,
           src_model_id: target?.src_model_id,
@@ -280,7 +286,7 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
         page: pagination.current,
         page_size: pagination.pageSize,
         order: '',
-        model_id: assoModelId,
+        model_id: getModelId(assoModelId),
         role: '',
       };
     };
@@ -297,9 +303,10 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
       setPagination(pagination);
     };
 
-    const handleModelChange = (model: string) => {
+    const handleModelChange = (model: number) => {
       setAssoModelId(model);
-      initPage(model);
+      const id: any = getModelId(model);
+      initPage(id);
     };
 
     return (
@@ -324,9 +331,9 @@ const SelectInstance = forwardRef<RelationInstanceRef, FieldModalProps>(
                     value={assoModelId}
                     onChange={handleModelChange}
                   >
-                    {relationList.map((item) => {
+                    {relationList.map((item, index) => {
                       return (
-                        <Option value={item.id} key={item.id}>
+                        <Option value={item._id} key={index}>
                           {item.name}
                         </Option>
                       );
