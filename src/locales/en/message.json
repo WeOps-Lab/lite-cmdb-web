@@ -74,6 +74,9 @@
     "assetSearch": "Search",
     "assetsOverview": "Overview"
   },
+  "common": {
+    "serverError": "ServerError"
+  },
   "Model": {
     "addModel": "Add Model",
     "editModel": "Edit Model",
