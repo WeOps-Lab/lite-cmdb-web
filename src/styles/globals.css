@@ -268,23 +268,16 @@ html:not(.dark) body {
   color: var(--color-bg-1);
   font-size: 12px;
 }
-.column-user .user-name {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
+.column-user .user-name,
 .hide-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
-
 .ant-modal-confirm-btns {
     display: flex;
     flex-direction: row-reverse;
 }
-
 .ant-modal-confirm-btns button:nth-child(1) {
     margin-left: 8px;
 }
