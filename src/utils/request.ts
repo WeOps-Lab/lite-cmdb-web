@@ -67,11 +67,11 @@ const useApiClient = () => {
             signIn('keycloak');
           } else if (status === 403) {
             // 处理 403 错误，显示无权限消息
-            message.error(messageText);
+            message.error(messageText || t('common.noPermission'));
             return Promise.reject(new Error(messageText));
           } else if (status === 500) {
             // 处理 500 错误，例如显示错误消息
-            message.error(messageText);
+            message.error(messageText || t('common.serverError'));
             return Promise.reject(new Error(t('common.serverError')));
           }
         }

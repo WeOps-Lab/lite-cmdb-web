@@ -4,6 +4,7 @@ import { createContext, useContext, useState, ReactNode, useEffect } from 'react
 import { ConfigProvider } from 'antd';
 import { ThemeConfig } from 'antd/es/config-provider/context';
 import { lightTheme, darkTheme } from '@/constants/theme'
+import { useTranslation } from '@/utils/i18n';
 
 const ThemeContext = createContext<{
   theme: ThemeConfig;
@@ -41,9 +42,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useTheme = () => {
+  const { t } = useTranslation();
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    throw new Error(t('common.useThemeError'));
   }
   return context;
 };

@@ -10,7 +10,14 @@ export default withAntdLess({
       },
     ];
   },
-  webpack(config) {
+  webpack(config, { isServer }) {
+    config.module.rules.push({
+      test: /\.m?js/,
+      resolve: {
+        fullySpecified: false,
+      },
+    });
+
     return config;
   },
 });

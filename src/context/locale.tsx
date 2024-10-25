@@ -5,6 +5,7 @@ import { IntlProvider } from 'react-intl';
 import enMessages from '@/locales/en/message.json';
 import zhMessages from '@/locales/zh/message.json';
 import flattenMessages from '@/utils/flattenMessage'
+import { useTranslation } from '@/utils/i18n';
 
 interface MessageContent {
   [key: string]: string | MessageContent;
@@ -51,9 +52,10 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
 };
 
 export const useLocale = () => {
+  const { t } = useTranslation();
   const context = useContext(LocaleContext);
   if (context === undefined) {
-    throw new Error('useLocale must be used within a LocaleProvider');
+    throw new Error(t('common.useLocaleError'));
   }
   return context;
 };
