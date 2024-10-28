@@ -13,21 +13,25 @@ import attrLayoutStyle from './layout.module.less';
 import useApiClient from '@/utils/request';
 import { ClassificationItem } from '@/types/assetManage';
 import { useTranslation } from '@/utils/i18n';
+import { useCommon } from '@/context/common';
 
 const AboutLayout = ({ children }: { children: React.ReactNode }) => {
+  const { get, del, isLoading } = useApiClient();
+  const { t } = useTranslation();
+  const { confirm } = Modal;
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [groupList, setGroupList] = useState<ClassificationItem[]>([]);
-  const [pageLoading, setPageLoading] = useState<boolean>(false);
+  const commonContext = useCommon();
   const objIcon: string = searchParams.get('icn') || '';
   const modelName: string = searchParams.get('model_name') || '';
   const modelId: string = searchParams.get('model_id') || '';
   const classificationId: string = searchParams.get('classification_id') || '';
   const isPre = searchParams.get('is_pre') === 'true';
-  const { confirm } = Modal;
   const modelRef = useRef<any>(null);
-  const { get, del, isLoading } = useApiClient();
-  const { t } = useTranslation();
+  const permissionGroupsInfo = useRef(
+    commonContext?.permissionGroupsInfo || null
+  );
+  const isAdmin = permissionGroupsInfo.current?.is_all;
   const menuItems = [
     { label: t('Model.attributes'), path: '/assetManage/detail/attributes' },
     {
@@ -35,6 +39,8 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
       path: '/assetManage/detail/associations',
     },
   ];
+  const [groupList, setGroupList] = useState<ClassificationItem[]>([]);
+  const [pageLoading, setPageLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (isLoading) return;
@@ -111,7 +117,7 @@ const AboutLayout = ({ children }: { children: React.ReactNode }) => {
               </span>
               <span className="text-[var(--color-text-3)]">{modelId}</span>
             </div>
-            {!isPre && (
+            {(isAdmin || !isPre) && (
               <div className="self-start">
                 <EditTwoTone
                   className="edit mr-[6px] cursor-pointer"

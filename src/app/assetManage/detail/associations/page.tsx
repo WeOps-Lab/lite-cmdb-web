@@ -13,9 +13,20 @@ import { ModelItem, AssoTypeItem, GroupItem } from '@/types/assetManage';
 import { useSearchParams } from 'next/navigation';
 import { useTranslation } from '@/utils/i18n';
 import { deepClone } from '@/utils/common';
+import { useCommon } from '@/context/common';
 const { confirm } = Modal;
 
 const Associations = () => {
+  const { get, del } = useApiClient();
+  const searchParams = useSearchParams();
+  const modelId = searchParams.get('model_id');
+  const { t } = useTranslation();
+  const commonContext = useCommon();
+  const permissionGroupsInfo = useRef(
+    commonContext?.permissionGroupsInfo || null
+  );
+  const isAdmin = permissionGroupsInfo.current?.is_all;
+  const assoRef = useRef<any>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [pagination, setPagination] = useState<any>({
     current: 1,
@@ -27,11 +38,6 @@ const Associations = () => {
   const [modelList, setModelList] = useState<ModelItem[]>([]);
   const [assoTypeList, setAssoTypeList] = useState<AssoTypeItem[]>([]);
   const [groups, setGroups] = useState<GroupItem[]>([]);
-  const assoRef = useRef<any>(null);
-  const { get, del } = useApiClient();
-  const searchParams = useSearchParams();
-  const modelId = searchParams.get('model_id');
-  const { t } = useTranslation();
   const columns: TableColumnsType<any> = [
     {
       title: t('name'),
@@ -104,7 +110,7 @@ const Associations = () => {
         <>
           <Button
             type="link"
-            disabled={record.is_pre}
+            disabled={!isAdmin && record.is_pre}
             onClick={() => showDeleteConfirm(record.model_asst_id)}
           >
             {t('delete')}

@@ -19,14 +19,20 @@ import ModelModal from './list/modelModal';
 import { useRouter } from 'next/navigation';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
+import { useCommon } from '@/context/common';
 
 const AssetManage = () => {
   const { get, del, isLoading } = useApiClient();
   const { confirm } = Modal;
   const { t } = useTranslation();
+  const commonContext = useCommon();
+  const router = useRouter();
   const groupRef = useRef<any>(null);
   const modelRef = useRef<any>(null);
-  const router = useRouter();
+  const permissionGroupsInfo = useRef(
+    commonContext?.permissionGroupsInfo || null
+  );
+  const isAdmin = permissionGroupsInfo.current?.is_all;
   const [modelGroup, setModelGroup] = useState<GroupItem[]>([]);
   const [groupList, setGroupList] = useState<GroupItem[]>([]);
   const [modelList, setModelList] = useState<ModelItem[]>([]);
@@ -219,18 +225,21 @@ const AssetManage = () => {
                     <span className="border-l-[4px] border-[var(--color-primary)] px-[4px] py-[1px] font-[600]">
                       {item.classification_name}（{item.count}）
                     </span>
-                    {!item.is_pre && !item.list.length && (
-                      <div className={assetManageStyle.groupOperate}>
-                        <EditTwoTone
-                          className="edit mr-[6px] cursor-pointer"
-                          onClick={() => showGroupModal('edit', item)}
-                        />
-                        <DeleteTwoTone
-                          className="delete cursor-pointer"
-                          onClick={() => showDeleteConfirm(item)}
-                        />
-                      </div>
-                    )}
+                    {isAdmin ||
+                      (!item.is_pre && (
+                        <div className={assetManageStyle.groupOperate}>
+                          <EditTwoTone
+                            className="edit mr-[6px] cursor-pointer"
+                            onClick={() => showGroupModal('edit', item)}
+                          />
+                          {!item.list.length && (
+                            <DeleteTwoTone
+                              className="delete cursor-pointer"
+                              onClick={() => showDeleteConfirm(item)}
+                            />
+                          )}
+                        </div>
+                      ))}
                   </div>
                   <ul className={assetManageStyle.modelList}>
                     {item.list.map((model, index) => (

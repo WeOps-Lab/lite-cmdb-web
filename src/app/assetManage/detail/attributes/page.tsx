@@ -11,8 +11,20 @@ import type { TableColumnsType } from 'antd';
 import { ATTR_TYPE_LIST } from '@/constants/asset';
 import useApiClient from '@/utils/request';
 import { useTranslation } from '@/utils/i18n';
+import { useCommon } from '@/context/common';
 
 const Attributes = () => {
+  const { get, del } = useApiClient();
+  const { confirm } = Modal;
+  const { t } = useTranslation();
+  const commonContext = useCommon();
+  const searchParams = useSearchParams();
+  const modelId = searchParams.get('model_id');
+  const permissionGroupsInfo = useRef(
+    commonContext?.permissionGroupsInfo || null
+  );
+  const isAdmin = permissionGroupsInfo.current?.is_all;
+  const attrRef = useRef<any>(null);
   const [searchText, setSearchText] = useState<string>('');
   const [pagination, setPagination] = useState<any>({
     current: 1,
@@ -21,12 +33,6 @@ const Attributes = () => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [tableData, setTableData] = useState<any[]>([]);
-  const attrRef = useRef<any>(null);
-  const { get, del } = useApiClient();
-  const { confirm } = Modal;
-  const searchParams = useSearchParams();
-  const modelId = searchParams.get('model_id');
-  const { t } = useTranslation();
   const columns: TableColumnsType = [
     {
       title: t('name'),
@@ -93,14 +99,14 @@ const Attributes = () => {
           <Button
             type="link"
             className="mr-[10px]"
-            disabled={record.is_pre}
+            disabled={!isAdmin && record.is_pre}
             onClick={() => showAttrModal('edit', record)}
           >
             {t('edit')}
           </Button>
           <Button
             type="link"
-            disabled={record.is_pre}
+            disabled={!isAdmin && record.is_pre}
             onClick={() =>
               showDeleteConfirm({
                 model_id: record.model_id,
