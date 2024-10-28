@@ -103,7 +103,7 @@ const FieldMoadal = forwardRef<FieldModalRef, FieldModalProps>(
       form.validateFields().then((values) => {
         for (const key in values) {
           const target = formItems.find((item) => item.attr_id === key);
-          if (target?.attr_type === 'time') {
+          if (target?.attr_type === 'time' && values[key]) {
             values[key] = values[key].map((date: any) =>
               date.format('YYYY-MM-DD HH:mm:ss')
             );
