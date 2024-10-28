@@ -137,9 +137,10 @@ const AssetManage = () => {
   const getModelGroup = () => {
     const getCroupList = get('/api/classification/');
     const getModelList = get('/api/model/');
+    const getModelInstCount = get('/api/instance/model_inst_count/');
     setLoading(true);
     try {
-      Promise.all([getModelList, getCroupList])
+      Promise.all([getModelList, getCroupList, getModelInstCount])
         .then((res) => {
           const modeldata: ModelItem[] = res[0];
           const groupData: GroupItem[] = res[1];
@@ -154,6 +155,7 @@ const AssetManage = () => {
                 item.classification_id === modelItem.classification_id
             );
             if (target) {
+              modelItem.count = res[2][modelItem.model_id] || 0;
               target.list.push(modelItem);
               target.count++;
             }
@@ -168,6 +170,14 @@ const AssetManage = () => {
     } catch (error) {
       setLoading(false);
     }
+  };
+
+  const linkToInstList = (item: ModelItem) => {
+    const params = new URLSearchParams({
+      modelId: item.model_id,
+      classificationId: item.classification_id,
+    }).toString();
+    router.push(`/assetData?${params}`);
   };
 
   return (
@@ -280,9 +290,14 @@ const AssetManage = () => {
                             </span>
                           </div>
                         </div>
-                        <div className={assetManageStyle.rightSide}>
+                        <div
+                          className={assetManageStyle.rightSide}
+                          onClick={() => linkToInstList(model)}
+                        >
                           <SwitcherOutlined />
-                          <span className="text-[12px] pt-[4px]">0</span>
+                          <span className="text-[12px] pt-[4px]">
+                            {model.count}
+                          </span>
                         </div>
                       </li>
                     ))}
