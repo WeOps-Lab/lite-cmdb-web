@@ -1,7 +1,6 @@
 import React, { useState, forwardRef, useImperativeHandle } from 'react';
 import { Checkbox, Button } from 'antd';
 import OperateModal from '@/components/operate-modal';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useTranslation } from '@/utils/i18n';
 import type { CheckboxProps } from 'antd';
 import fieldSettingModalStyle from './fieldSettingModal.module.less';
@@ -11,6 +10,11 @@ import { deepClone } from '@/utils/common';
 interface ColumnItem {
   title: string;
   key: string;
+  [key: string]: unknown;
+}
+
+interface DragItem {
+  index: number;
   [key: string]: unknown;
 }
 
@@ -36,6 +40,8 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
     const checkAll = choosableFields.length === checkedFields.length;
     const indeterminate =
       checkedFields.length > 0 && checkedFields.length < choosableFields.length;
+    const [dragItem, setDragItem] = useState<DragItem | null>(null);
+    const [dragOverItem, setDragOverItem] = useState<DragItem | null>(null);
 
     useImperativeHandle(ref, () => ({
       showModal: ({ title }) => {
@@ -82,14 +88,6 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
       setCheckedFields([]);
     };
 
-    const handleDragEnd = (result: any) => {
-      if (!result.destination) return;
-      const items = Array.from(dragFields);
-      const [reorderedItem] = items.splice(result.source.index, 1);
-      items.splice(result.destination.index, 0, reorderedItem);
-      setDragFields(items);
-    };
-
     const handleSubmit = () => {
       onConfirm(dragFields.map((item) => item.key));
       handleCancel();
@@ -97,6 +95,28 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
 
     const handleCancel = () => {
       setVisible(false);
+    };
+
+    const handleDragStart = (item: DragItem) => {
+      if (!item) return;
+      setDragItem(item);
+    };
+
+    const handleDragEnter = (item: DragItem) => {
+      if (!item) return;
+      setDragOverItem(item);
+    };
+
+    const handleDragEnd = () => {
+      if (dragItem === null || dragOverItem === null) {
+        return;
+      }
+      const newItems = Array.from(dragFields);
+      const [draggedItem] = newItems.splice(dragItem.index, 1);
+      newItems.splice(dragOverItem.index, 0, draggedItem);
+      setDragItem(null);
+      setDragOverItem(null);
+      setDragFields(newItems);
     };
 
     return (
@@ -154,46 +174,39 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
                 {t('clear')}
               </Button>
             </div>
-            <DragDropContext onDragEnd={handleDragEnd}>
-              <Droppable droppableId="droppable">
-                {(provided: any) => (
+            <div className="mt-4">
+              {dragFields
+                .filter((field) => checkedFields.includes(field.key))
+                .map((field, index) => (
                   <div
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                    className="mt-4"
+                    className={`p-2 bg-white shadow-sm ${fieldSettingModalStyle.fieldItem}`}
+                    key={index}
+                    draggable
+                    onDragStart={() =>
+                      handleDragStart({
+                        ...field,
+                        index,
+                      })
+                    }
+                    onDragEnter={() =>
+                      handleDragEnter({
+                        ...field,
+                        index,
+                      })
+                    }
+                    onDragEnd={handleDragEnd}
                   >
-                    {dragFields
-                      .filter((field) => checkedFields.includes(field.key))
-                      .map((field, index) => (
-                        <Draggable
-                          key={field.key}
-                          draggableId={field.key}
-                          index={index}
-                        >
-                          {(provided: any) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              className={`p-2 bg-white shadow-sm ${fieldSettingModalStyle.fieldItem}`}
-                            >
-                              <HolderOutlined
-                                className={`mr-[4px] ${fieldSettingModalStyle.dragTrigger}`}
-                              />
-                              {field.title}
-                              <CloseOutlined
-                                className={fieldSettingModalStyle.clearItem}
-                                onClick={() => clearCheckedItem(field.key)}
-                              ></CloseOutlined>
-                            </div>
-                          )}
-                        </Draggable>
-                      ))}
-                    {provided.placeholder}
+                    <HolderOutlined
+                      className={`mr-[4px] ${fieldSettingModalStyle.dragTrigger}`}
+                    />
+                    {field.title}
+                    <CloseOutlined
+                      className={fieldSettingModalStyle.clearItem}
+                      onClick={() => clearCheckedItem(field.key)}
+                    ></CloseOutlined>
                   </div>
-                )}
-              </Droppable>
-            </DragDropContext>
+                ))}
+            </div>
           </div>
         </div>
       </OperateModal>
