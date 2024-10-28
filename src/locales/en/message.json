@@ -129,7 +129,14 @@
     "noAccessToken": "No accessToken found in session",
     "usePermissionsContextError": "usePermissionsContext must be used within a PermissionsProvider",
     "useLocaleError": "useLocale must be used within a LocaleProvider",
-    "useThemeError": "useTheme must be used within a ThemeProvider"
+    "useThemeError": "useTheme must be used within a ThemeProvider",
+    "selectAll": "Select All",
+    "clear": "clear",
+    "selected": "selected",
+    "items": "item(s)"
+  },
+  "cutomTable": {
+    "fieldSetting": "List field settings"
   },
   "Model": {
     "addModel": "Add Model",

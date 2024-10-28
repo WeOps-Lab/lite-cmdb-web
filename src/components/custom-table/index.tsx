@@ -22,7 +22,7 @@ interface CustomTableProps
 }
 
 interface FieldRef {
-  showModal: (config: { title?: string }) => void;
+  showModal: () => void;
 }
 
 const CustomTable: React.FC<CustomTableProps> = ({
@@ -39,7 +39,7 @@ const CustomTable: React.FC<CustomTableProps> = ({
 }) => {
   const fieldRef = useRef<FieldRef>(null);
   const showFeildSetting = () => {
-    fieldRef.current?.showModal({});
+    fieldRef.current?.showModal();
   };
 
   return (

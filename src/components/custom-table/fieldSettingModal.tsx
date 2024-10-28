@@ -25,7 +25,7 @@ interface FieldModalProps {
 }
 
 export interface FieldModalRef {
-  showModal: (info: { title?: string }) => void;
+  showModal: () => void;
 }
 
 const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
@@ -44,9 +44,9 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
     const [dragOverItem, setDragOverItem] = useState<DragItem | null>(null);
 
     useImperativeHandle(ref, () => ({
-      showModal: ({ title }) => {
+      showModal: () => {
         // 开启弹窗的交互
-        setTitle(title || t('fieldSetting'));
+        setTitle(t('cutomTable.fieldSetting'));
         handleCheckboxChange(displayFieldKeys);
         setVisible(true);
       },
@@ -132,9 +132,9 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
               type="primary"
               onClick={handleSubmit}
             >
-              {t('confirm')}
+              {t('common.confirm')}
             </Button>
-            <Button onClick={handleCancel}>{t('cancel')}</Button>
+            <Button onClick={handleCancel}>{t('common.cancel')}</Button>
           </div>
         }
       >
@@ -148,7 +148,7 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
                 onChange={onCheckAllChange}
                 checked={checkAll}
               >
-                {t('selectAll')}
+                {t('common.selectAll')}
               </Checkbox>
             </div>
             <Checkbox.Group
@@ -168,10 +168,14 @@ const FieldSettingModal = forwardRef<FieldModalRef, FieldModalProps>(
           <div className={`${fieldSettingModalStyle.rightSide} w-1/2 p-4`}>
             <div className="flex justify-between items-center">
               <span>
-                {t('selected')} ({`${checkedFields.length} ${t('item')}`} )
+                {t('common.selected')}(
+                <span className="text-[var(--color-text-3)]">
+                  {`${checkedFields.length} ${t('common.items')}`}
+                </span>
+                )
               </span>
               <Button type="link" onClick={handleClear}>
-                {t('clear')}
+                {t('common.clear')}
               </Button>
             </div>
             <div className="mt-4">
